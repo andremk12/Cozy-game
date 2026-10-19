@@ -1,0 +1,57 @@
+{
+  "name": "little-haven",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Little Haven — A Cozy Place to Breathe. Um pequeno refúgio local em pixel art.",
+  "author": "Little Haven",
+  "license": "UNLICENSED",
+  "type": "module",
+  "main": "electron/main/index.js",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "dev:web": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1 --port 4173 --strictPort",
+    "start": "electron .",
+    "test": "node --test tests/*.test.js",
+    "test:e2e": "npm run build && playwright test",
+    "test:desktop": "node scripts/desktop-smoke.mjs",
+    "package:win": "npm run build && electron-builder --win portable --x64"
+  },
+  "dependencies": {
+    "@fontsource/dm-sans": "5.3.0",
+    "@fontsource/fraunces": "5.3.0",
+    "@fontsource/pixelify-sans": "5.3.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1",
+    "@vitejs/plugin-react": "6.1.2",
+    "electron": "44.9.0",
+    "electron-builder": "26.15.3",
+    "vite": "8.3.4"
+  },
+  "build": {
+    "appId": "studio.littlehaven.desktop",
+    "productName": "Little Haven",
+    "asar": true,
+    "directories": {
+      "output": "outputs/desktop"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "public/assets/icons/haven.png",
+      "package.json"
+    ],
+    "win": {
+      "icon": "public/assets/icons/haven.ico",
+      "target": "portable"
+    },
+    "artifactName": "Little-Haven-${version}-${arch}.${ext}"
+  }
+}

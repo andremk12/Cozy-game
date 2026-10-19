@@ -1,0 +1,354 @@
+.float-experience {
+  display: flex;
+  min-height: 500px;
+  background: #293f49;
+  overflow: hidden;
+  isolation: isolate;
+}
+.writing-paper {
+  position: relative;
+  z-index: 2;
+  width: 43%;
+  padding: 34px 36px 25px;
+  background: #eee5d2;
+  color: #3b4d43;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 12px 0 30px #152b3822;
+}
+.paper-eyebrow {
+  color: #858269;
+}
+.writing-paper h2 {
+  font:
+    400 clamp(28px, 2.8vw, 40px)/1.13 'Fraunces',
+    Georgia,
+    serif;
+  margin: 17px 0 15px;
+  letter-spacing: -1px;
+}
+.writing-paper > p {
+  font-size: 13px;
+  line-height: 1.7;
+  max-width: 290px;
+  color: #687264;
+  margin: 0 0 18px;
+}
+.writing-paper textarea {
+  width: 100%;
+  min-height: 132px;
+  flex: 1;
+  resize: vertical;
+  border: 0;
+  border-top: 1px solid #b6b09b65;
+  border-bottom: 1px solid #b6b09b65;
+  border-radius: 0;
+  background: repeating-linear-gradient(
+    transparent,
+    transparent 29px,
+    #b6b09b42 29px,
+    #b6b09b42 30px
+  );
+  line-height: 30px;
+  padding: 10px 3px 3px;
+  font:
+    400 15px/30px 'DM Sans',
+    sans-serif;
+  color: #374a40;
+  outline-offset: 5px;
+}
+.writing-paper textarea::placeholder {
+  color: #8e9383;
+  font-size: 13px;
+}
+.paper-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 21px;
+}
+.text-button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  padding: 9px 0;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.release-button {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border: 1px solid #43594c;
+  border-radius: 5px;
+  background: #43594c;
+  color: #f4eddf;
+  padding: 12px 18px;
+  font:
+    500 13px 'DM Sans',
+    sans-serif;
+  cursor: pointer;
+  box-shadow: 0 2px 0 #2e4134;
+}
+.release-button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.release-button:not(:disabled):hover {
+  background: #344b3e;
+}
+.privacy-note {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 10px;
+  color: #7e8475;
+  margin-top: 19px;
+}
+.river-scene {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  min-height: 500px;
+}
+.river-art {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+  object-fit: cover;
+  image-rendering: pixelated;
+}
+.phase-writing .river-art {
+  width: 177%;
+  max-width: none;
+  left: -32%;
+}
+.river-whisper {
+  position: absolute;
+  inset: 25% 0 auto;
+  text-align: center;
+  color: #e4ddc6;
+}
+.river-whisper > span {
+  font:
+    400 48px 'Pixelify Sans',
+    monospace;
+  letter-spacing: -2px;
+  text-shadow: 0 3px #203539;
+}
+.river-whisper p {
+  font:
+    italic 15px Georgia,
+    serif;
+  color: #b3c1b7;
+  margin: 12px 0;
+}
+.preview-boat {
+  position: absolute;
+  width: 52px;
+  left: 53%;
+  top: 68%;
+  opacity: 0.85;
+  animation: boat-bob 5s ease-in-out infinite;
+}
+.ritual-status {
+  position: absolute;
+  z-index: 2;
+  text-align: center;
+  inset: 34px 20px auto;
+  color: #e9e4d3;
+}
+.ritual-status > .eyebrow {
+  color: #acbcb3;
+  font-size: 10px;
+}
+.ritual-status h2 {
+  font:
+    400 32px 'Fraunces',
+    Georgia,
+    serif;
+  margin: 14px 0 10px;
+}
+.ritual-status p {
+  font-size: 12px;
+  color: #b8c7be;
+  margin: 0;
+}
+.river-actions {
+  position: absolute;
+  z-index: 2;
+  bottom: 28px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+}
+.sailing-boat,
+.resting-boat {
+  width: 57px;
+  position: absolute;
+  top: 64%;
+  left: 23%;
+  filter: drop-shadow(0 7px 3px #173a3e55);
+}
+.sailing-boat {
+  animation: sail-away 14.5s linear forwards;
+}
+.resting-boat {
+  left: 68%;
+  top: 59%;
+  width: 38px;
+  opacity: 0.8;
+}
+.folding-paper {
+  position: absolute;
+  width: 65px;
+  height: 65px;
+  top: 58%;
+  left: calc(50% - 32px);
+}
+.folding-paper > span {
+  position: absolute;
+  inset: 0;
+  background: #eee2c5;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  animation: fold-sheet 2.2s ease-in-out forwards;
+}
+.folding-paper > svg {
+  position: absolute;
+  inset: 18px 0 0;
+  width: 65px;
+  opacity: 0;
+  animation: appear-boat 2.2s ease-in-out forwards;
+}
+.firefly {
+  animation: firefly-glow 5s ease-in-out infinite;
+}
+.firefly-1 {
+  animation-delay: -1.7s;
+}
+.firefly-2 {
+  animation-delay: -3s;
+}
+@keyframes firefly-glow {
+  50% {
+    opacity: 0.2;
+  }
+}
+@keyframes sail-away {
+  0% {
+    left: 23%;
+    top: 67%;
+    transform: rotate(-3deg);
+    opacity: 1;
+    width: 57px;
+  }
+  30% {
+    top: 64%;
+    transform: rotate(2deg);
+  }
+  65% {
+    top: 58%;
+    transform: rotate(-2deg);
+    opacity: 0.85;
+  }
+  90% {
+    opacity: 0.65;
+  }
+  100% {
+    left: 84%;
+    top: 54%;
+    width: 23px;
+    transform: rotate(1deg);
+    opacity: 0;
+  }
+}
+@keyframes fold-sheet {
+  0%,
+  15% {
+    transform: rotate(-5deg);
+    opacity: 1;
+  }
+  50% {
+    transform: rotate(4deg) scaleY(0.6);
+    clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  }
+  80%,
+  100% {
+    transform: scale(0.2);
+    opacity: 0;
+  }
+}
+@keyframes appear-boat {
+  0%,
+  50% {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  90%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes boat-bob {
+  50% {
+    transform: translateY(3px) rotate(3deg);
+  }
+}
+@media (max-width: 760px) {
+  .float-experience {
+    flex-direction: column;
+  }
+  .writing-paper {
+    width: 100%;
+    padding: 24px;
+  }
+  .writing-paper h2 br {
+    display: none;
+  }
+  .writing-paper textarea {
+    min-height: 145px;
+  }
+  .phase-writing .river-scene {
+    min-height: 200px;
+  }
+  .phase-writing .river-art {
+    width: 100%;
+    left: 0;
+  }
+  .river-whisper {
+    inset: 16% 0 auto;
+  }
+  .river-whisper > span {
+    font-size: 35px;
+  }
+  .river-whisper p {
+    font-size: 12px;
+    margin: 6px;
+  }
+  .ritual-status h2 {
+    font-size: 25px;
+  }
+  .ritual-status p {
+    line-height: 1.6;
+    max-width: 280px;
+    margin: auto;
+  }
+  .river-scene {
+    min-height: 460px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .preview-boat,
+  .firefly,
+  .sailing-boat,
+  .folding-paper > span,
+  .folding-paper > svg {
+    animation: none;
+  }
+}

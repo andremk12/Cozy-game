@@ -1,0 +1,89 @@
+* {
+  box-sizing: border-box;
+}
+html {
+  min-width: 360px;
+  background: #172724;
+  color: #e8e4d5;
+  color-scheme: dark;
+}
+body {
+  margin: 0;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+}
+button,
+input,
+textarea {
+  font: inherit;
+}
+button {
+  touch-action: manipulation;
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #e1be80;
+  outline-offset: 5px;
+}
+button:disabled {
+  cursor: default;
+}
+button:not(:disabled) {
+  -webkit-tap-highlight-color: transparent;
+}
+::selection {
+  background: #c2ab7b;
+  color: #203a32;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.soft-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 11px 17px;
+  border: 1px solid #99ad995c;
+  background: #304b42dd;
+  color: #e6e7d2;
+  border-radius: 5px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.soft-button:hover {
+  background: #435d4d;
+}
+.soft-button.subtle {
+  background: #233f3b9c;
+  font-size: 11px;
+  color: #c0cbbd;
+}
+.eyebrow {
+  font-size: 9px;
+  letter-spacing: 2.4px;
+  font-weight: 500;
+  color: #9dad9c;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,51 @@
+.planned-world {
+  min-height: 500px;
+  position: relative;
+  overflow: hidden;
+  background: #2e4544;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.planned-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.42;
+  image-rendering: pixelated;
+  object-fit: cover;
+}
+.planned-copy {
+  z-index: 1;
+  max-width: 520px;
+  padding: 40px 25px;
+  text-align: center;
+  background: radial-gradient(ellipse, #233d3bef 15%, #233d3ba8 60%, transparent 75%);
+}
+.planned-label {
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: #c9cfb9;
+}
+.planned-copy h2 {
+  font:
+    400 37px/1.2 'Fraunces',
+    Georgia,
+    serif;
+  color: #f0e6cc;
+  letter-spacing: -1px;
+}
+.planned-copy p {
+  font-size: 13px;
+  line-height: 1.9;
+  color: #c0cbbb;
+  max-width: 340px;
+  margin: 0 auto 25px;
+}
+.planned-copy button {
+  margin: auto;
+}
+.planned-journey {
+  background: #354651;
+}
