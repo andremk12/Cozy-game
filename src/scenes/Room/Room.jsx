@@ -1,4 +1,4 @@
-import { useId } from 'react';
+import { useEffect, useId, useState } from 'react';
 import './Room.css';
 
 // Original artwork, drawn on a 480 × 270 grid. All scene details are local SVG.
@@ -22,6 +22,13 @@ const FLOOR_GRAINS = [
   [324, 260, 21],
   [142, 194, 18],
   [308, 191, 28],
+];
+
+const WINDOW_DROPS = [
+  [76, 48],
+  [116, 96],
+  [158, 57],
+  [195, 101],
 ];
 
 function Plant({ x, y, large = false }) {
@@ -53,7 +60,7 @@ function Plant({ x, y, large = false }) {
   );
 }
 
-function Window({ rainOn, windowId, rainId }) {
+function Window({ rainOn, windowId, rainId, nearRainId }) {
   return (
     <g>
       <path d="M38 27h192v120H38z" fill="#1b3032" />
@@ -76,7 +83,12 @@ function Window({ rainOn, windowId, rainId }) {
         />
         <path d="M179 43h5v13h-3v3h-6v-3h4z" fill="#365669" />
         <g className={`room-stars ${rainOn ? '' : 'is-visible'}`} fill="#d8d8bb">
-          <path d="M73 42h2v2h-2zM106 58h2v2h-2zM147 44h1v4h-1zM145 45h5v1h-5zM197 79h2v2h-2zM112 77h1v3h-1zM111 78h3v1h-3z" />
+          <path className="room-star" d="M73 42h2v2h-2zM197 79h2v2h-2z" />
+          <path
+            className="room-star room-star--late"
+            d="M106 58h2v2h-2zM147 44h1v4h-1zM145 45h5v1h-5z"
+          />
+          <path className="room-star room-star--soft" d="M112 77h1v3h-1zM111 78h3v1h-3z" />
         </g>
         <path
           d="M51 112h7v-3h10v-5h9v-5h13v4h9v5h14v-7h7v-7h12v4h7v6h12v6h16v-5h10v-8h8v-5h8v5h8v9h16v31H51z"
@@ -102,10 +114,22 @@ function Window({ rainOn, windowId, rainId }) {
           <g className="room-rainfall">
             <rect x="51" y="-59" width="166" height="242" fill={`url(#${rainId})`} />
           </g>
+          <g className="room-rainfall-near">
+            <rect x="51" y="-59" width="166" height="242" fill={`url(#${nearRainId})`} />
+          </g>
+          {WINDOW_DROPS.map(([x, y], index) => (
+            <g key={x} transform={`translate(${x} ${y})`}>
+              <path
+                className={`room-window-drop room-window-drop--${index}`}
+                d="M0 0h1v5H0zM-1 5h2v2h-2z"
+                fill="#c1d8d6"
+              />
+            </g>
+          ))}
           <path
-            d="M91 64h1v5h-1zM90 69h1v2h-1zM155 105h1v5h-1zM154 110h1v3h-1zM184 77h1v7h-1zM80 119h1v5h-1z"
+            className="room-sill-splash"
+            d="M73 134h4v1h-4zM72 132h1v1h-1zM78 132h1v1h-1zM163 134h4v1h-4zM162 132h1v1h-1z"
             fill="#b0c9cf"
-            opacity=".5"
           />
         </g>
       </g>
@@ -183,17 +207,19 @@ function Desk({ lampOn }) {
   return (
     <g>
       <g className="room-lamplight" opacity={lampOn ? 1 : 0}>
-        <path
-          d="M207 64h45v8h17v11h14v20h10v46h-9v20h-16v15h-74v-9h-18v-17h-11v-42h9V94h12V77h21z"
-          fill="#efc779"
-          opacity=".055"
-        />
-        <path
-          d="M217 86h26v7h13v11h10v19h7v29h-9v18h-58v-7h-13v-18h-6v-24h8v-18h12V93h10z"
-          fill="#f2c982"
-          opacity=".07"
-        />
-        <path d="M219 129h24l22 34h-68z" fill="#f4cc84" opacity=".08" />
+        <g className="room-lamp-breathe">
+          <path
+            d="M207 64h45v8h17v11h14v20h10v46h-9v20h-16v15h-74v-9h-18v-17h-11v-42h9V94h12V77h21z"
+            fill="#efc779"
+            opacity=".075"
+          />
+          <path
+            d="M217 86h26v7h13v11h10v19h7v29h-9v18h-58v-7h-13v-18h-6v-24h8v-18h12V93h10z"
+            fill="#f2c982"
+            opacity=".09"
+          />
+          <path d="M219 129h24l22 34h-68z" fill="#f4cc84" opacity=".12" />
+        </g>
       </g>
       <path d="M40 173h10v51H40zM45 174h4v50h-4zM218 173h36v50h-36z" fill="#584d3f" />
       <path d="M221 175h30v43h-30z" fill="#816d51" />
@@ -213,8 +239,9 @@ function Desk({ lampOn }) {
       <path d="M105 151h13v7h-13zM119 154h3v3h-3z" fill="#d4cfad" />
       <path d="M107 151h9v2h-9z" fill="#7d6955" />
       <path d="M106 159h14v2h-14z" fill="#d2b789" />
-      <g className="room-tea-steam" stroke="#d7d6b2" strokeWidth="1" fill="none" opacity=".4">
-        <path d="M109 146v-4h2v-5M115 147v-3h-1v-4" />
+      <g stroke="#d7d6b2" strokeWidth="1" fill="none">
+        <path className="room-tea-steam" d="M109 146v-4h2v-5" />
+        <path className="room-tea-steam room-tea-steam--late" d="M115 147v-3h-1v-4" />
       </g>
       <path d="M143 152h19v-2h20v2h5v10h-44z" fill="#5a614b" />
       <path d="M145 151h17v2h2v-2h19v9h-19v1h-2v-1h-17z" fill="#ded4b1" />
@@ -239,21 +266,27 @@ function Desk({ lampOn }) {
       />
       <path
         d="M221 115h4v3h-4zM218 118h5v5h-5zM215 124h6v4h-6z"
+        className="room-lampshade"
         fill={lampOn ? '#f7dfa6' : '#beb187'}
       />
       <path
         d="M238 115h2v3h-2zM240 118h3v6h-3zM242 124h4v4h-4z"
+        className="room-lampshade"
         fill={lampOn ? '#cda66b' : '#827c5a'}
       />
-      <path d="M216 129h29v2h-29z" fill={lampOn ? '#f2d69a' : '#776f51'} />
+      <path
+        className="room-lampshade"
+        d="M216 129h29v2h-29z"
+        fill={lampOn ? '#f2d69a' : '#776f51'}
+      />
       <g className="room-lamplight" opacity={lampOn ? 1 : 0} fill="#f0d18d">
-        <path d="M208 132h2v2h-2zM251 119h2v2h-2zM230 103h2v2h-2z" opacity=".45" />
-        <path
-          d="M199 149h2v2h-2zM253 143h1v1h-1zM245 95h1v1h-1z"
-          className="room-dust"
-          opacity=".5"
-        />
-        <path d="M179 162h75v1h-75z" opacity=".35" />
+        <path className="room-dust" d="M208 132h1v1h-1zM245 95h1v1h-1z" />
+        <path className="room-dust room-dust--late" d="M230 103h1v1h-1zM253 143h1v1h-1z" />
+        <path className="room-dust room-dust--slow" d="M199 149h1v1h-1zM251 119h1v1h-1z" />
+        <g className="room-lamp-breathe">
+          <path d="M192 157h62v2h-62zM202 155h43v2h-43z" opacity=".16" />
+          <path d="M179 162h75v1h-75z" opacity=".35" />
+        </g>
       </g>
       <path d="M121 177h35v4h4v25h-42v-25h3z" fill="#293e36" />
       <path d="M124 179h29v3h4v20h-36v-20h3z" fill="#71846a" />
@@ -383,11 +416,25 @@ export default function Room({
   const uniqueId = useId().replaceAll(':', '');
   const windowId = `room-window-${uniqueId}`;
   const rainId = `room-rain-${uniqueId}`;
+  const nearRainId = `room-rain-near-${uniqueId}`;
+  const [paused, setPaused] = useState(() => document.hidden);
+  const sceneClassName = [
+    'room-scene',
+    reducedMotion && 'is-reduced-motion',
+    lampOn && 'is-lamp-on',
+    rainOn && 'is-rain-on',
+    paused && 'is-paused',
+  ].filter(Boolean).join(' ');
+
+  useEffect(() => {
+    const updateVisibility = () => setPaused(document.hidden);
+    updateVisibility();
+    document.addEventListener('visibilitychange', updateVisibility);
+    return () => document.removeEventListener('visibilitychange', updateVisibility);
+  }, []);
 
   return (
-    <div
-      className={`room-scene${reducedMotion ? ' is-reduced-motion' : ''}${lampOn ? ' is-lamp-on' : ''}`}
-    >
+    <div className={sceneClassName}>
       <svg
         className="room-art"
         viewBox="0 0 480 270"
@@ -409,7 +456,14 @@ export default function Room({
             <path
               d="M7 2h1v4H7zM6 6h1v4H6zM23 18h1v4h-1zM22 22h1v3h-1zM13 33h1v4h-1zM12 37h1v4h-1z"
               fill="#b7d0d5"
-              opacity=".44"
+              opacity=".27"
+            />
+          </pattern>
+          <pattern id={nearRainId} width="53" height="48" patternUnits="userSpaceOnUse">
+            <path
+              d="M17 4h1v5h-1zM16 9h1v5h-1zM39 29h1v4h-1zM38 33h1v4h-1z"
+              fill="#c4dbdc"
+              opacity=".42"
             />
           </pattern>
           <pattern
@@ -449,9 +503,21 @@ export default function Room({
           />
         ))}
         <path d="M13 185h455v3H13z" fill="#263d35" opacity=".35" />
-        <Window rainOn={rainOn} windowId={windowId} rainId={rainId} />
+        <Window rainOn={rainOn} windowId={windowId} rainId={rainId} nearRainId={nearRainId} />
         <WallDetails />
         <FloorDetails />
+        <g className={`room-rain-reflection${rainOn ? ' is-visible' : ''}`} fill="#a5c6c7">
+          <g className="room-rain-shimmer">
+            <path d="M58 186h90v5h10v7h-86v-5H58zM80 202h81v3h9v5H90v-4H80z" opacity=".045" />
+            <path d="M64 187h31v2H64zM108 192h36v2h-36zM96 204h49v1H96z" opacity=".13" />
+          </g>
+        </g>
+        <g className="room-lamplight" opacity={lampOn ? 1 : 0} fill="#edc783">
+          <g className="room-lamp-breathe">
+            <path d="M192 205h61v5h16v8h14v7H171v-7h10v-8h11z" opacity=".075" />
+            <path d="M202 210h45v4h13v5h-70v-5h12z" opacity=".065" />
+          </g>
+        </g>
         <Bed />
         <Desk lampOn={lampOn} />
         <Plant x={31} y={109} large />

@@ -173,6 +173,7 @@
 
 .room-object--notebook:hover .room-notebook-spark,
 .room-object--notebook:focus-visible .room-notebook-spark {
+  animation: none;
   opacity: 0;
 }
 
@@ -185,23 +186,90 @@
 }
 
 .room-stars,
-.room-rain {
+.room-rain,
+.room-rain-reflection {
   opacity: 0;
   transition: opacity 900ms ease;
 }
 
 .room-stars.is-visible,
-.room-rain.is-visible {
+.room-rain.is-visible,
+.room-rain-reflection.is-visible {
   opacity: 1;
 }
 
 .room-rainfall {
-  animation: room-rain-fall 2.3s linear infinite;
-  will-change: transform;
+  animation: room-rain-fall 3.2s linear infinite;
+}
+
+.room-rainfall-near {
+  animation: room-rain-fall 1.9s linear infinite;
+  animation-delay: -1.1s;
+}
+
+.room-window-drop {
+  opacity: 0.3;
+  animation: room-glass-drop 9s ease-in-out infinite;
+}
+
+.room-window-drop--1 {
+  animation-delay: -5.5s;
+  animation-duration: 12s;
+}
+
+.room-window-drop--2 {
+  animation-delay: -3s;
+  animation-duration: 10s;
+}
+
+.room-window-drop--3 {
+  animation-delay: -7s;
+  animation-duration: 14s;
+}
+
+.room-sill-splash {
+  opacity: 0.25;
+  animation: room-sill-ripple 4.7s ease-in-out infinite;
+}
+
+.room-rain-shimmer {
+  opacity: 0.8;
+  animation: room-rain-shimmer 7s ease-in-out infinite;
+}
+
+.room-lamp-breathe {
+  animation: room-lamp-warmth 9s ease-in-out infinite;
 }
 
 .room-tea-steam {
-  animation: room-steam 5s ease-in-out infinite;
+  opacity: 0.4;
+  animation: room-steam 6s ease-in-out infinite;
+}
+
+.room-tea-steam--late {
+  animation-delay: -3s;
+  animation-duration: 7s;
+}
+
+.room-plant-leaves {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: room-leaf-rest 12s ease-in-out infinite;
+}
+
+.room-star {
+  opacity: 0.8;
+  animation: room-starlight 8s ease-in-out infinite;
+}
+
+.room-star--late {
+  animation-delay: -3s;
+  animation-duration: 11s;
+}
+
+.room-star--soft {
+  animation-delay: -6s;
+  animation-duration: 13s;
 }
 
 .room-sleeping-cat {
@@ -209,24 +277,129 @@
 }
 
 .room-dust {
-  animation: room-dust-drift 8s ease-in-out infinite;
+  opacity: 0.35;
+  animation: room-dust-drift 10s ease-in-out infinite;
+}
+
+.room-dust--late {
+  animation-duration: 13s;
+  animation-delay: -4s;
+}
+
+.room-dust--slow {
+  animation-duration: 16s;
+  animation-delay: -9s;
+}
+
+/* Keep toggles on the outer groups; animated opacity belongs to their children. */
+.room-scene:not(.is-rain-on) .room-rainfall,
+.room-scene:not(.is-rain-on) .room-rainfall-near,
+.room-scene:not(.is-rain-on) .room-window-drop,
+.room-scene:not(.is-rain-on) .room-sill-splash,
+.room-scene:not(.is-rain-on) .room-rain-shimmer,
+.room-scene.is-rain-on .room-star,
+.room-scene:not(.is-lamp-on) .room-lamp-breathe,
+.room-scene:not(.is-lamp-on) .room-dust {
+  animation-play-state: paused;
+}
+
+.room-scene.is-paused *,
+.room-scene.is-paused *::before,
+.room-scene.is-paused *::after {
+  animation-play-state: paused !important;
 }
 
 @keyframes room-rain-fall {
   to {
-    transform: translate(-0px, 48px);
+    /* Both rain patterns repeat every 48 pixels, so the loop has no jump. */
+    transform: translateY(48px);
+  }
+}
+
+@keyframes room-glass-drop {
+  0%,
+  12% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.32;
+  }
+  75% {
+    opacity: 0.25;
+  }
+  90%,
+  100% {
+    transform: translateY(19px);
+    opacity: 0;
+  }
+}
+
+@keyframes room-sill-ripple {
+  0%,
+  45%,
+  100% {
+    opacity: 0.1;
+  }
+  65% {
+    opacity: 0.4;
+  }
+}
+
+@keyframes room-rain-shimmer {
+  0%,
+  100% {
+    opacity: 0.65;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes room-lamp-warmth {
+  0%,
+  100% {
+    opacity: 0.88;
+  }
+  50% {
+    opacity: 1;
   }
 }
 
 @keyframes room-steam {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.65;
+  }
+  70% {
+    opacity: 0.4;
+  }
+  100% {
+    transform: translate(1px, -5px);
+    opacity: 0;
+  }
+}
+
+@keyframes room-leaf-rest {
   0%,
   100% {
-    transform: translateY(0);
-    opacity: 0.2;
+    transform: rotate(-0.4deg);
   }
   50% {
-    transform: translateY(-3px);
-    opacity: 0.5;
+    transform: rotate(0.6deg);
+  }
+}
+
+@keyframes room-starlight {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.95;
   }
 }
 
@@ -244,11 +417,11 @@
   0%,
   100% {
     transform: translate(0, 0);
-    opacity: 0.15;
+    opacity: 0.12;
   }
   50% {
-    transform: translate(2px, -3px);
-    opacity: 0.55;
+    transform: translate(3px, -5px);
+    opacity: 0.5;
   }
 }
 
