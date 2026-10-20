@@ -1,0 +1,237 @@
+.journey-scene {
+  width: 100%;
+  isolation: isolate;
+  background: #253d38;
+}
+
+.journey-art {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  image-rendering: pixelated;
+  user-select: none;
+}
+
+.journey-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  padding: 15px 23px;
+  border-top: 1px solid #9da18030;
+  background: #273e35;
+  color: #d7d8bf;
+  font-size: 11px;
+}
+
+.journey-scenery-control,
+.journey-motion-controls {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.journey-scenery-control label {
+  color: #aebba4;
+}
+
+.journey-scenery-control select {
+  min-width: 136px;
+  min-height: 34px;
+  padding: 7px 26px 7px 10px;
+  border: 1px solid #aeb69954;
+  border-radius: 4px;
+  background: #324c3e;
+  color: #e4e4cd;
+  font: inherit;
+  cursor: pointer;
+}
+
+.journey-scenery-control select:hover {
+  border-color: #bcc6a982;
+}
+
+.journey-control {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 34px;
+  padding: 7px 8px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  color: #d7d8bf;
+  font-size: inherit;
+  cursor: pointer;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.journey-control:not(:disabled):hover {
+  background: #92a17c16;
+  color: #eee6ca;
+}
+
+.journey-control[aria-pressed='true'] {
+  color: #e4cd9e;
+}
+
+.journey-control:disabled {
+  color: #b7bda7;
+}
+
+.journey-scenery-control select:focus-visible,
+.journey-control:focus-visible {
+  outline: 2px solid #e1be80;
+  outline-offset: 3px;
+}
+
+.journey-back {
+  margin-left: auto;
+  color: #b8c6ad;
+}
+
+.journey-parallax {
+  animation: journey-pass-landscape 110s linear infinite;
+}
+
+.journey-parallax--middle {
+  animation-duration: 57s;
+}
+
+.journey-parallax--near {
+  animation-duration: 25s;
+}
+
+.journey-rain {
+  opacity: 0;
+  transition: opacity 600ms ease;
+}
+
+.journey-rain.is-visible {
+  opacity: 1;
+}
+
+.journey-rainfall {
+  animation: journey-falling-rain 3.2s linear infinite;
+}
+
+.journey-rainfall--near {
+  animation-duration: 2.1s;
+  animation-delay: -1s;
+}
+
+.journey-lamp-glow {
+  animation: journey-warm-light 10s ease-in-out infinite;
+}
+
+.journey-steam {
+  opacity: .4;
+  animation: journey-warm-tea 7s ease-in-out infinite;
+}
+
+.journey-steam--late {
+  animation-delay: -3s;
+  animation-duration: 8s;
+}
+
+.journey-plant-leaves {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: journey-leaf-rest 14s ease-in-out infinite;
+}
+
+.journey-scene:not(.is-rain-on) .journey-rainfall {
+  animation-play-state: paused;
+}
+
+.journey-scene.is-paused *,
+.journey-scene.is-paused *::before,
+.journey-scene.is-paused *::after {
+  animation-play-state: paused !important;
+}
+
+@keyframes journey-pass-landscape {
+  to {
+    /* Each pair is made of identical 320px tiles: the reset is visually seamless. */
+    transform: translateX(-320px);
+  }
+}
+
+@keyframes journey-falling-rain {
+  to {
+    /* Rain patterns repeat every 48 logical pixels. */
+    transform: translateY(48px);
+  }
+}
+
+@keyframes journey-warm-light {
+  0%, 100% { opacity: .87; }
+  50% { opacity: 1; }
+}
+
+@keyframes journey-warm-tea {
+  0% { transform: translateY(0); opacity: .15; }
+  35% { opacity: .55; }
+  75% { opacity: .3; }
+  100% { transform: translate(1px, -5px); opacity: .15; }
+}
+
+@keyframes journey-leaf-rest {
+  0%, 100% { transform: rotate(-.35deg); }
+  50% { transform: rotate(.35deg); }
+}
+
+.journey-scene.is-reduced-motion *,
+.journey-scene.is-reduced-motion *::before,
+.journey-scene.is-reduced-motion *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .journey-scene *,
+  .journey-scene *::before,
+  .journey-scene *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .journey-controls {
+    gap: 10px 15px;
+    padding: 12px 16px;
+  }
+
+  .journey-motion-controls {
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 520px) {
+  .journey-controls {
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .journey-scenery-control {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .journey-scenery-control select {
+    min-width: 160px;
+  }
+
+  .journey-motion-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .journey-control {
+    padding: 7px 3px;
+  }
+}

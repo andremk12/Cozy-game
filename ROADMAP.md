@@ -1,8 +1,8 @@
 # Roadmap — Little Haven
 
-O desenvolvimento avança por pequenas experiências completas, preservando o funcionamento local, a privacidade, a estética cozy e a ausência de cobranças. Esta entrega implementa apenas a Fase 1; as fases seguintes são planejamento.
+O desenvolvimento avança por pequenas experiências completas, preservando o funcionamento local, a privacidade, a estética cozy e a ausência de cobranças. A Fase 1 está implementada e The Journey recebeu sua primeira versão interativa. O jardim e as expansões abaixo continuam planejados; a numeração registra a organização original do roadmap, sem exigir uma ordem de entrega.
 
-## Fase 1 — Fundação, quarto interativo e ritual dos pensamentos
+## Fase 1 — Fundação, quarto interativo e ritual dos pensamentos — implementada
 
 - Base React, Vite e Electron com comunicação isolada e validada.
 - Quarto original em pixel art, luminária e chuva interativas.
@@ -10,28 +10,39 @@ O desenvolvimento avança por pequenas experiências completas, preservando o fu
 - Preferências locais, áudio procedural suave e alternativa com movimento reduzido.
 - Testes, documentação e configuração inicial de distribuição Windows.
 
-## Fase 2 — Jardim interativo e cuidados com plantas
+## Fase 2 — Jardim interativo e cuidados com plantas — planejada
 
 - Plantar, regar e observar crescimento suave.
 - Reorganizar vasos e criar um pequeno terrário.
 - Introduzir borboletas, vagalumes e ambientação própria.
 - Cuidar sem plantas morrendo, prazos ou punições pela ausência.
 
-## Fase 3 — Viagem de trem e cenários contemplativos
+## Fase 3 — Viagem de trem e cenários contemplativos — versão inicial implementada
 
-- Criar um vagão acolhedor com paisagens pela janela.
-- Variar cenários, noite e chuva.
-- Adicionar sons locais e pequenas interações no vagão.
-- Manter a viagem sem destino obrigatório, missões ou contagem de tempo.
+Entregue nesta versão:
 
-## Fase 4 — Personalização, ambientação expandida e melhorias visuais
+- Vagão acolhedor em SVG original de 480 × 270 e paisagens com parallax horizontal em loop.
+- Seleção entre noite chuvosa, floresta e pôr do sol; chuva opcional na paisagem noturna.
+- Pausa e retomada das animações, retorno ao quarto e cena estática com movimento reduzido.
+- Paisagem, pausa e chuva mantidas apenas durante a sessão, inclusive ao trocar de ambiente; sem novas preferências persistentes.
+- Reuso da chuva procedural na noite com chuva; floresta e pôr do sol silenciosos.
+- Viagem sem destino obrigatório, progressão, missões ou contagem de tempo.
+
+Limites e evoluções planejadas:
+
+- As três paisagens se repetem em loop; ampliar a variedade e refinar transições e detalhes da ambientação.
+- Adicionar sons locais próprios ou licenciados do trem e pequenas interações no vagão, com controle explícito do usuário.
+- Revisar a experiência em diferentes resoluções, escalas e computadores, preservando teclado e movimento reduzido.
+- Manter o ritmo livre, sem obrigações ou punições pela ausência.
+
+## Fase 4 — Personalização, ambientação expandida e melhorias visuais — planejada
 
 - Permitir escolhas de decoração, iluminação e detalhes dos ambientes.
 - Expandir sons próprios ou licenciados, sempre com controle explícito.
 - Refinar arte, transições e pequenos sinais de vida.
 - Evoluir as preferências sem introduzir armazenamento de pensamentos.
 
-## Fase 5 — Polimento, otimização, acessibilidade e distribuição desktop
+## Fase 5 — Polimento, otimização, acessibilidade e distribuição desktop — evolução contínua
 
 - Revisar teclado, leitores de tela, contraste, foco e movimento reduzido.
 - Medir desempenho e consumo de memória em diferentes computadores.

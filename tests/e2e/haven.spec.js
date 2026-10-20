@@ -83,8 +83,10 @@ test('reduced motion offers an immediate, static completion and planned worlds a
   await expect(page.locator('.sailing-boat')).toHaveCount(0);
   await page.getByRole('button', { name: 'The Garden — em planejamento', exact: true }).click();
   await expect(page.getByText('UM FUTURO CANTINHO · EM PLANEJAMENTO')).toBeVisible();
-  await page.getByRole('button', { name: 'The Journey — em planejamento', exact: true }).click();
-  await expect(page.getByText('Uma viagem sem pressa de chegar.')).toBeVisible();
+  await page.getByRole('button', { name: 'The Journey', exact: true }).click();
+  await expect(page.locator('.journey-scene')).toBeVisible();
+  await expect(page.locator('.journey-scene')).toHaveClass(/is-reduced-motion/);
+  await expect(page.getByRole('combobox', { name: 'Paisagem da viagem' })).toBeVisible();
 });
 
 test('audio starts only on interaction and requires a fresh gesture after reload', async ({

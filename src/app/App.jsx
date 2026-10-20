@@ -1,6 +1,7 @@
 import { useEffect, useReducer, useRef, useState } from 'react';
 import Room from '../scenes/Room/Room.jsx';
 import LetItFloat from '../scenes/LetItFloat/LetItFloat.jsx';
+import Journey from '../scenes/Journey/Journey.jsx';
 import Planned from '../scenes/Planned/Planned.jsx';
 import { initialRitual, ritualReducer } from '../scenes/LetItFloat/ritual.js';
 import { usePreferences } from '../hooks/usePreferences.js';
@@ -24,7 +25,6 @@ const worlds = [
     name: 'The Journey',
     sub: 'O caminho também é casa',
     icon: 'journey',
-    planned: true,
   },
   { id: 'float', name: 'Let It Float', sub: 'Um respiro, um recomeço', icon: 'boat' },
 ];
@@ -37,11 +37,33 @@ export default function App() {
   const [ritual, dispatch] = useReducer(ritualReducer, initialRitual);
   const [audioActive, setAudioActive] = useState(false);
   const [audioNotice, setAudioNotice] = useState('');
+  // These choices belong to this visit, outside the persisted preference allowlist.
+  const [journeyScenery, setJourneyScenery] = useState('rainy-night');
+  const [journeyRainOn, setJourneyRainOn] = useState(true);
+  const [journeyPaused, setJourneyPaused] = useState(false);
   const audio = useRef(null);
   const audioStarting = useRef(false);
   const heading = useRef(null);
   const previousWorld = useRef(world);
   const selected = worlds.find((item) => item.id === world);
+  const ambientRainOn =
+    world === 'journey'
+      ? journeyScenery === 'rainy-night' && journeyRainOn
+      : world !== 'garden' && preferences.rainOn;
+  const weather =
+    world === 'journey'
+      ? journeyScenery === 'forest'
+        ? { icon: 'garden', label: 'Floresta' }
+        : journeyScenery === 'sunset'
+          ? { icon: 'sunset', label: 'Pôr do sol' }
+          : {
+              icon: journeyRainOn ? 'rain' : 'moon',
+              label: journeyRainOn ? 'Noite chuvosa' : 'Noite tranquila',
+            }
+      : {
+          icon: preferences.rainOn ? 'rain' : 'moon',
+          label: preferences.rainOn ? 'Uma noite de chuva' : 'Uma noite tranquila',
+        };
 
   useEffect(() => {
     const engine = new AmbientAudio();
@@ -53,8 +75,8 @@ export default function App() {
   }, []);
   useEffect(() => {
     audio.current?.setVolume(preferences.volume);
-    audio.current?.setRain(preferences.rainOn);
-  }, [preferences.volume, preferences.rainOn]);
+    audio.current?.setRain(ambientRainOn);
+  }, [preferences.volume, ambientRainOn]);
   useEffect(() => {
     if (previousWorld.current !== world) {
       // The writing view places focus in its paper; other worlds announce their title.
@@ -91,7 +113,7 @@ export default function App() {
     }
     audioStarting.current = true;
     audio.current?.setVolume(preferences.volume);
-    audio.current?.setRain(preferences.rainOn);
+    audio.current?.setRain(ambientRainOn);
     const started = await audio.current?.start();
     audioStarting.current = false;
     setAudioActive(Boolean(started));
@@ -173,8 +195,8 @@ export default function App() {
             </p>
           </div>
           <div className="scene-weather">
-            <Icon name={preferences.rainOn ? 'rain' : 'moon'} size={18} />
-            <span>{preferences.rainOn ? 'Uma noite de chuva' : 'Uma noite tranquila'}</span>
+            <Icon name={weather.icon} size={18} />
+            <span>{weather.label}</span>
           </div>
         </div>
         <div className="scene-frame">
@@ -197,6 +219,17 @@ export default function App() {
                 onOpenNotebook={() => moveTo('float')}
                 reducedMotion={reducedMotion}
               />
+            ) : world === 'journey' ? (
+              <Journey
+                scenery={journeyScenery}
+                onSceneryChange={setJourneyScenery}
+                rainOn={journeyRainOn}
+                onToggleRain={() => setJourneyRainOn((value) => !value)}
+                paused={journeyPaused}
+                onTogglePaused={() => setJourneyPaused((value) => !value)}
+                reducedMotion={reducedMotion}
+                onBack={() => moveTo('room')}
+              />
             ) : world === 'float' ? (
               <LetItFloat
                 ritual={ritual}
@@ -214,6 +247,10 @@ export default function App() {
                 <>
                   <span className="tiny-diamond" /> Pequenas coisas guardam bons momentos. Explore o
                   quarto.
+                </>
+              ) : world === 'journey' ? (
+                <>
+                  <Icon name="journey" size={13} /> Sem destino, sem pressa. A paisagem faz companhia.
                 </>
               ) : world === 'float' ? (
                 <>

@@ -35,6 +35,7 @@ export default function Icon({ name, size = 20, ...props }) {
       </>
     ),
     moon: <path d="M20 15A9 9 0 0 1 9 4a9 9 0 1 0 11 11Z" />,
+    sunset: <path d="M3 16h18M6 16a6 6 0 0 1 12 0M12 2v3M3 7l2 2m16-2-2 2M7 20h10" />,
     rain: (
       <>
         <path d="M6 13a4 4 0 1 1 1-8 6 6 0 0 1 11 2 3 3 0 0 1 1 6H6Z" />

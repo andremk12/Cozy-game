@@ -1,4 +1,45 @@
-# Little Haven 0.1.0 — validação da Fase 1
+# Validação atual — primeira versão de The Journey
+
+Verificações desta implementação, executadas em Windows x64, Node.js 22.18.0 e npm 10.9.3. O histórico da Fase 1 abaixo permanece separado e não serve como prova de validação desta mudança.
+
+| Verificação executada | Resultado |
+| --- | --- |
+| `npm test` após a implementação | 22 passaram; nenhum falhou |
+| `npm run build` | Build de produção concluído |
+| `npm run test:e2e` no Microsoft Edge | 19 passaram; nenhum falhou; encerramento com código 0 |
+| `git diff --check` | Sem erros de whitespace |
+| Inspeção visual das quatro capturas de Journey | Três paisagens desktop e uma captura de 360 × 780 abertas e revisadas |
+
+A primeira execução de interface no sandbox apresentou os 19 casos aprovados, mas ficou presa ao encerrar o servidor de teste e foi interrompida. A execução final fora do sandbox validou a arte corrigida, gerou novamente as capturas e encerrou normalmente com `19 passed (37.2s)`.
+
+## Comportamentos verificados nesta mudança
+
+- **Navegação:** Room → Journey → Let It Float e retorno ao quarto; Journey abre a experiência real e recebe foco no título. Garden continua planejado. Um rascunho sintético exige confirmação antes de sair para Journey; continuar preserva o texto e descartar o remove.
+- **Paisagens e chuva:** noite chuvosa, floresta e pôr do sol alteram a cena e o indicador de ambiente. A chuva da viagem é independente da chuva do quarto, só aparece na noite e pode ser desligada. As escolhas da viagem sobrevivem à troca de ambiente e reiniciam ao recarregar, sem novas preferências persistentes.
+- **Movimento:** as transformações das camadas mudam ao longo do tempo, permanecem iguais durante a pausa e voltam a mudar após retomar. A pausa permanece ativa ao trocar a paisagem; os estilos das animações ambientais também são verificados.
+- **Movimento reduzido:** as três paisagens ficam sem animações e sem transições; chuva e seleção continuam utilizáveis. A mudança da preferência do sistema durante a sessão preserva cenário, chuva e a escolha explícita de pausa.
+- **Áudio:** nenhum AudioContext é criado antes do gesto de ativação. O ganho da chuva acompanha o ambiente e o toggle da viagem, silencia em floresta, pôr do sol e Garden, e volta a seguir a preferência do quarto em Room/Let It Float. Recarregar exige novo gesto.
+- **Teclado e layout:** navegação com Tab/Enter/Espaço, seleção com teclado e foco visível. Controles e cena verificados em 1440 × 960, 800 × 650, 390 × 844 e 360 × 780, sem transbordamento horizontal. As capturas mostram pixels nítidos e cores distintas nos três cenários.
+- **Regressões:** suíte anterior de Room e Let It Float passou, incluindo ritual completo, proteção e privacidade do rascunho, preferências e áudio. Os testes novos não observaram erros de renderer/console nem requisições externas.
+
+Capturas locais, não versionadas: `outputs/Little-Haven-Journey-rainy-night.png`, `outputs/Little-Haven-Journey-forest.png`, `outputs/Little-Haven-Journey-sunset.png` e `outputs/Little-Haven-Journey-mobile.png`.
+
+## Limites desta validação e da versão inicial
+
+Não foram executados nesta tarefa o smoke test nativo do Electron, empacotamento, testes do executável portátil, leitores de tela ou avaliação subjetiva do áudio em equipamentos reais. Os módulos Electron, a CSP, a ponte e a lista de preferências persistentes não foram alterados. O executável anterior não foi atualizado; para experimentar o código atual, use `npm run dev` ou `npm start` após o build.
+
+The Journey oferece três paisagens em loop e a camada sonora existente de chuva, sem sons próprios de trilhos ou do vagão. O pause automático quando o documento fica oculto foi revisado no código; não foi acrescentado um teste específico desse comportamento de Journey. Não há progressão ou destino obrigatório. As escolhas de cenário, chuva e pausa duram apenas a sessão. Próximas evoluções: áudio local próprio com controle explícito, pequenas interações no vagão e maior variedade de paisagens.
+
+## Verificação manual sugerida
+
+1. Execute `npm run dev` na raiz do projeto e escolha **The Journey**.
+2. Troque as três paisagens, pause e retome; na noite, desligue e ligue a chuva. Ative o som por clique para ouvir a chuva e confira o silêncio nos outros cenários.
+3. Volte ao quarto, entre em Let It Float e escreva somente um texto de teste. Tente abrir Journey, escolha continuar e depois confirme o descarte.
+4. Percorra os controles com Tab, use as setas no seletor e ative movimento reduzido no sistema; a cena deve ficar estática.
+
+---
+
+# Little Haven 0.1.0 — validação da Fase 1 (histórico anterior)
 
 Data da entrega: 19 de outubro de 2026. Ambiente: Windows x64, Node.js 22.18.0, npm 10.9.3. React 19.3.1, Vite 8.3.4 e Electron 44.9.0, com versões fixadas no lockfile.
 

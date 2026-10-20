@@ -2,7 +2,7 @@
 
 Um pequeno refúgio desktop em pixel art: uma noite de chuva, uma luz quente e um lugar onde você pode apenas existir. Sem contas, metas, pontuações ou serviços em nuvem.
 
-Esta primeira fase entrega **The Room** e o ritual **Let It Float**. **The Garden** e **The Journey** têm apresentações identificadas como planejadas; suas experiências interativas ficam para as próximas fases.
+A fundação da Fase 1 entrega **The Room** e o ritual **Let It Float**. O aplicativo também oferece uma primeira versão interativa de **The Journey**, uma viagem contemplativa de trem. **The Garden** permanece identificado como planejado.
 
 O comando `npm run package:win` gera o executável em `outputs/desktop/Little-Haven-0.1.0-x64.exe`. Depois de gerado, abra esse arquivo para usar o aplicativo sem instalar Node.js. A distribuição é portátil e ainda não possui assinatura digital. O código-fonte editável fica na raiz deste projeto; dependências, builds, executáveis e perfis de teste são locais e não são versionados no Git.
 
@@ -47,10 +47,12 @@ A instalação de dependências, o primeiro download do runtime Electron e as fe
 - Escolha **Let it float** para dobrar o papel e acompanhar o barquinho pelo rio. O texto não é exibido no barco.
 - **Cancelar** e a navegação para outro ambiente pedem confirmação quando existe um rascunho. Fechar ou recarregar a janela desktop também permite continuar escrevendo antes de descartar.
 - Ao final, volte ao quarto. Durante a animação, **Concluir sem animação** permite chegar diretamente ao momento final.
+- Escolha **The Journey** para entrar em um vagão acolhedor. Em **Paisagem da viagem**, alterne entre noite chuvosa, floresta e pôr do sol, com paisagens em movimento contínuo pela janela.
+- Pause ou retome a viagem pelos controles abaixo do cenário; a pausa congela as animações. Na paisagem noturna, ligue ou desligue a chuva. O botão de retorno leva ao quarto.
 
-O botão de som inicia uma chuva suave sintetizada no dispositivo. O volume começa em 25% e tem ganho de saída limitado. Desligar a chuva também silencia essa camada sonora. Mesmo com a preferência de áudio salva, cada abertura exige um novo clique em **Retomar som**; o aplicativo não inicia áudio sozinho.
+O botão de som inicia uma chuva suave sintetizada no dispositivo. O volume começa em 25% e tem ganho de saída limitado. No quarto e em Let It Float, essa camada acompanha a chuva do quarto; em The Journey, só toca na paisagem noturna com a chuva da viagem ligada. Floresta e pôr do sol são silenciosos. Mesmo com a preferência de áudio salva, cada abertura exige um novo clique em **Retomar som**; o aplicativo não inicia áudio sozinho.
 
-Os objetos, a navegação e os botões funcionam com **Tab**, **Enter** ou **Espaço**, com foco visível. O volume aceita as setas do teclado. Os diálogos mantêm o foco e **Esc** preserva o rascunho. A preferência de movimento reduzido do sistema interrompe as animações ambientais e conclui o ritual com uma alternativa estática.
+Os objetos, a navegação e os botões funcionam com **Tab**, **Enter** ou **Espaço**, com foco visível. O volume e a seleção de paisagem aceitam as setas do teclado. Os diálogos mantêm o foco e **Esc** preserva o rascunho. A preferência de movimento reduzido do sistema interrompe as animações ambientais e conclui o ritual com uma alternativa estática. Na viagem, mantém a cena estática e desabilita o controle de pausa; a troca de paisagem e o retorno ao quarto continuam disponíveis.
 
 ## Privacidade e preferências
 
@@ -69,9 +71,11 @@ Somente estas preferências são persistidas:
 
 No Electron, o arquivo é `preferences.json` dentro de `app.getPath('userData')`, normalmente `%APPDATA%\Little Haven` no Windows. O processo principal valida os campos e grava o JSON de forma atômica. Campos desconhecidos são rejeitados. No modo de navegador, essas quatro preferências usam a chave `haven.preferences.v1` do `localStorage`; esse armazenamento é independente do desktop.
 
+Paisagem, pausa e chuva de The Journey ficam apenas no estado React da sessão. Essas escolhas permanecem ao trocar de ambiente e reiniciam ao reabrir ou recarregar o aplicativo. A viagem não adiciona preferências persistentes e sua chuva é independente da preferência `rainOn` do quarto.
+
 ## Arquitetura
 
-JavaScript com ES Modules, React, Vite, Electron e CSS organizado por experiência. A arte usa SVG original desenhado em uma grade de pixels; o quarto tem resolução lógica de 480 × 270. Formas com bordas nítidas e escalas proporcionais preservam o desenho. Esta fase não precisa de Phaser ou de uma biblioteca de animação.
+JavaScript com ES Modules, React, Vite, Electron e CSS organizado por experiência. A arte usa SVG original desenhado em uma grade de pixels; o quarto e o vagão têm resolução lógica de 480 × 270. Formas com bordas nítidas e escalas proporcionais preservam o desenho. As paisagens da viagem usam camadas de parallax horizontal em loop. Não há engine gráfica ou biblioteca de animação adicional.
 
 ```text
 electron/
@@ -85,7 +89,8 @@ src/
   hooks/                        Preferências e movimento reduzido
   scenes/Room/                  Arte e objetos interativos do quarto
   scenes/LetItFloat/            Escrita, estados do ritual e rio
-  scenes/Planned/               Apresentações de Garden e Journey
+  scenes/Journey/               Vagão, paisagens e controles da viagem
+  scenes/Planned/               Apresentação de Garden
   services/                     Preferências do renderer e motor de áudio
   styles/                       Estilos e fontes locais
 public/
@@ -142,12 +147,12 @@ Os resultados e limites das verificações desta entrega estão em [`VALIDATION.
 
 ## Arte, áudio e licenças
 
-O quarto, o rio, o barquinho e os ícones são desenhos originais produzidos no código do projeto, sem sprites de jogos existentes. A chuva sonora é procedural, gerada por Web Audio, sem gravações de terceiros, captura de microfone ou downloads durante o uso. Para adicionar gravações próprias ou licenciadas, siga `public/assets/audio/README.md` e mantenha a origem e a licença junto de cada arquivo.
+O quarto, o rio, o barquinho, o vagão, as paisagens e os ícones são desenhos originais produzidos no código do projeto, sem sprites de jogos existentes. A chuva sonora é procedural, gerada por Web Audio, sem gravações de terceiros, captura de microfone ou downloads durante o uso. The Journey reutiliza essa camada de chuva, sem novas faixas sonoras. Para adicionar gravações próprias ou licenciadas, siga `public/assets/audio/README.md` e mantenha a origem e a licença junto de cada arquivo.
 
 **DM Sans**, **Fraunces** e **Pixelify Sans** são distribuídas localmente por Fontsource sob **SIL Open Font License 1.1**. Os avisos e textos completos estão em [`public/licenses/`](public/licenses/). Preserve esses arquivos ao redistribuir as fontes. Os direitos pertencem, respectivamente, aos autores dos projetos DM Sans (2014), Fraunces (2020) e Pixelify Sans (2021). As demais dependências mantêm suas próprias licenças.
 
 ## Limitações e continuidade
 
-A primeira versão oferece um quarto, um ritual e uma camada sonora de chuva. Garden e Journey apresentam suas propostas, sem simular recursos ainda ausentes. Não há personalização, histórico de textos, sincronização, cultivo ou viagem de trem nesta fase.
+A versão atual oferece um quarto, um ritual, uma viagem de trem e uma camada sonora de chuva. The Journey tem três paisagens em loop, sem destino, progressão, missões ou contagem de tempo. Não há sons próprios do trem ou dos trilhos, novas trilhas de áudio ou interações adicionais dentro do vagão. Garden segue como proposta planejada. Não há personalização, histórico de textos, sincronização ou cultivo.
 
-A próxima etapa recomendada é refinar a experiência em janelas e dispositivos reais, revisar acessibilidade e desempenho, e então iniciar o jardim sem punições por ausência. O plano completo está em [`ROADMAP.md`](ROADMAP.md).
+As próximas etapas incluem refinar a experiência em janelas e dispositivos reais, revisar acessibilidade e desempenho, evoluir a ambientação da viagem e implementar o jardim sem punições por ausência. O plano completo está em [`ROADMAP.md`](ROADMAP.md).
