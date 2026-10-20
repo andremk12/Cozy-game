@@ -1,5 +1,7 @@
 import { useEffect, useId, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
+import ImmersiveViewport from '../../components/ImmersiveViewport/ImmersiveViewport.jsx';
+import { useImmersiveMode } from '../../hooks/useImmersiveMode.js';
 import JourneyLandscape from './JourneyLandscape.jsx';
 import { CarriageShell, TrainWindowFrame, CarriageInterior } from './JourneyCarriage.jsx';
 import './Journey.css';
@@ -36,6 +38,7 @@ export default function Journey({
   const selectedScenery = SCENERIES.find((item) => item.id === scenery) || SCENERIES[0];
   const effectiveRain = selectedScenery.id === 'rainy-night' && rainOn;
   const [hidden, setHidden] = useState(() => document.hidden);
+  const immersive = useImmersiveMode();
 
   useEffect(() => {
     const updateVisibility = () => setHidden(document.hidden);
@@ -52,6 +55,7 @@ export default function Journey({
 
   return (
     <section className={sceneClassName} data-scenery={selectedScenery.id} aria-label="The Journey: uma viagem sem pressa">
+      <ImmersiveViewport targetRef={immersive.targetRef} active={immersive.active} onExit={immersive.exit}>
       <svg
         className="journey-art"
         viewBox="0 0 480 270"
@@ -80,6 +84,7 @@ export default function Journey({
         <TrainWindowFrame />
         <CarriageInterior />
       </svg>
+      </ImmersiveViewport>
       <div className="journey-controls" role="group" aria-label="Controles da viagem">
         <div className="journey-scenery-control">
           <label htmlFor={sceneryId}>Paisagem</label>
@@ -98,10 +103,22 @@ export default function Journey({
             <MovementIcon paused={paused || reducedMotion} />
             <span>{reducedMotion ? 'Movimento reduzido' : paused ? 'Retomar movimento' : 'Pausar movimento'}</span>
           </button>
+          <button
+            ref={immersive.triggerRef}
+            type="button"
+            className="journey-control"
+            aria-label="Modo Imersivo"
+            title="Modo Imersivo"
+            disabled={immersive.pending}
+            onClick={immersive.enter}
+          >
+            <Icon name="expand" size={17} />
+          </button>
         </div>
         <button type="button" className="journey-control journey-back" onClick={onBack}>
           <Icon name="back" size={15} /><span>Voltar ao quarto</span>
         </button>
+        {immersive.error && <p className="journey-immersive-error" role="status">{immersive.error}</p>}
       </div>
     </section>
   );

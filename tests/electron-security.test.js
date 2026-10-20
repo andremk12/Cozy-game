@@ -5,6 +5,7 @@ import { pathToFileURL } from 'node:url';
 import {
   contentSecurityPolicy,
   getDevelopmentUrl,
+  isAllowedFullscreenPermission,
   isAllowedResource,
 } from '../electron/services/security.js';
 
@@ -61,4 +62,43 @@ test('production CSP blocks connections, frames and script evaluation', () => {
   assert.match(csp, /frame-src 'none'/);
   assert.match(csp, /script-src 'self'/);
   assert.doesNotMatch(csp, /unsafe-eval/);
+});
+
+test('fullscreen is limited to the exact local page in the trusted main frame', () => {
+  for (const expectedPage of [
+    pathToFileURL(path.join(directory, 'index.html')).href,
+    'http://127.0.0.1:5173/',
+  ]) {
+    const contents = { mainFrame: { url: expectedPage } };
+    const request = {
+      permission: 'fullscreen',
+      contents,
+      trustedContents: contents,
+      expectedPage,
+      details: { isMainFrame: true, requestingUrl: expectedPage },
+    };
+    assert.equal(isAllowedFullscreenPermission(request), true);
+    for (const permission of ['automatic-fullscreen', 'media', 'notifications', 'keyboardLock', 'unknown']) {
+      assert.equal(isAllowedFullscreenPermission({ ...request, permission }), false);
+    }
+    assert.equal(isAllowedFullscreenPermission({ ...request, contents: null }), false);
+    assert.equal(isAllowedFullscreenPermission({ ...request, trustedContents: undefined }), false);
+    assert.equal(isAllowedFullscreenPermission({
+      ...request, contents: { mainFrame: { url: expectedPage } },
+    }), false);
+    assert.equal(isAllowedFullscreenPermission({ ...request, details: undefined }), false);
+    assert.equal(isAllowedFullscreenPermission({
+      ...request, details: { ...request.details, isMainFrame: false },
+    }), false);
+    for (const requestingUrl of [
+      undefined, 'https://example.com/', 'http://127.0.0.1:5174/', `${expectedPage}?other`,
+      pathToFileURL(path.join(directory, 'other.html')).href,
+    ]) {
+      assert.equal(isAllowedFullscreenPermission({
+        ...request, details: { ...request.details, requestingUrl },
+      }), false);
+    }
+    contents.mainFrame.url = 'https://example.com/';
+    assert.equal(isAllowedFullscreenPermission(request), false);
+  }
 });

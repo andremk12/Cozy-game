@@ -1,0 +1,86 @@
+.immersive-viewport {
+  position: relative;
+  width: 100%;
+}
+
+.immersive-art {
+  width: 100%;
+}
+
+.has-immersive-scene {
+  overflow: hidden;
+}
+
+.immersive-viewport:fullscreen {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  overflow: hidden;
+  outline: none;
+  background: #1e3531;
+  cursor: none;
+}
+
+.immersive-viewport::backdrop {
+  background: #1e3531;
+}
+
+.immersive-viewport:fullscreen > .immersive-art {
+  position: absolute;
+  max-width: 100%;
+  max-height: 100%;
+  image-rendering: pixelated;
+}
+
+.immersive-viewport:fullscreen > .immersive-art > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
+.immersive-exit {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border: 1px solid #acb69966;
+  border-radius: 5px;
+  background: #273e35ed;
+  color: #e4dfbf;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  cursor: pointer;
+  transition: opacity 180ms ease;
+}
+
+.immersive-exit[hidden] {
+  display: none;
+}
+
+.immersive-viewport.is-exit-visible {
+  cursor: default;
+}
+
+.immersive-viewport.is-exit-visible > .immersive-exit {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.immersive-exit:focus-visible {
+  outline: 2px solid #e1be80;
+  outline-offset: 4px;
+}

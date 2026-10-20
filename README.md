@@ -49,10 +49,19 @@ A instalação de dependências, o primeiro download do runtime Electron e as fe
 - Ao final, volte ao quarto. Durante a animação, **Concluir sem animação** permite chegar diretamente ao momento final.
 - Escolha **The Journey** para entrar em um vagão acolhedor. Em **Paisagem da viagem**, alterne entre noite chuvosa, floresta e pôr do sol, com paisagens em movimento contínuo pela janela.
 - Pause ou retome a viagem pelos controles abaixo do cenário; a pausa congela as animações. Na paisagem noturna, ligue ou desligue a chuva. O botão de retorno leva ao quarto.
+- Em The Journey, o botão com ícone de expandir e tooltip **Modo Imersivo** abre o cenário em tela cheia.
 
 O botão de som inicia uma chuva suave sintetizada no dispositivo. O volume começa em 25% e tem ganho de saída limitado. No quarto e em Let It Float, essa camada acompanha a chuva do quarto; em The Journey, só toca na paisagem noturna com a chuva da viagem ligada. Floresta e pôr do sol são silenciosos. Mesmo com a preferência de áudio salva, cada abertura exige um novo clique em **Retomar som**; o aplicativo não inicia áudio sozinho.
 
 Os objetos, a navegação e os botões funcionam com **Tab**, **Enter** ou **Espaço**, com foco visível. O volume e a seleção de paisagem aceitam as setas do teclado. Os diálogos mantêm o foco e **Esc** preserva o rascunho. A preferência de movimento reduzido do sistema interrompe as animações ambientais e conclui o ritual com uma alternativa estática. Na viagem, mantém a cena estática e desabilita o controle de pausa; a troca de paisagem e o retorno ao quarto continuam disponíveis.
+
+### Modo Imersivo de The Journey
+
+Em tela cheia, a arte do vagão e da paisagem fica centralizada, sem o cabeçalho, títulos, navegação ou controles de paisagem da interface normal. Pressione **Esc** para voltar. Um botão temporário de saída aparece ao mover o cursor para o canto superior direito ou ao usar **Tab**, com foco visível; ele desaparece quando deixa de ser usado.
+
+A composição preserva a proporção de 480 × 270, sem recorte ou distorção, com margens na cor do cenário (`#1e3531`). O ajuste usa escala inteira em pixels físicos, considerando o `devicePixelRatio` do monitor, sempre que uma grade inteira cabe na área disponível. Quando nem a grade original cabe, usa uma redução fracionária para manter toda a arte visível.
+
+O cenário permanece no mesmo DOM ao entrar e sair: paisagem selecionada, chuva, pausa, animações e áudio já ativado continuam no estado anterior. Movimento reduzido também continua respeitado. Apenas The Journey oferece o botão nesta versão. No navegador, a entrada exige suporte e permissão para a Fullscreen API e uma ação do usuário; uma recusa exibe uma mensagem de erro e mantém a interface normal.
 
 ## Privacidade e preferências
 
@@ -85,8 +94,8 @@ electron/
   services/security.js          Políticas de recursos e CSP
 src/
   app/App.jsx                   Navegação e coordenação das experiências
-  components/                   Ícones e confirmação de descarte
-  hooks/                        Preferências e movimento reduzido
+  components/                   Ícones, confirmação e viewport imersivo
+  hooks/                        Preferências, movimento reduzido e modo imersivo
   scenes/Room/                  Arte e objetos interativos do quarto
   scenes/LetItFloat/            Escrita, estados do ritual e rio
   scenes/Journey/               Vagão, paisagens e controles da viagem
@@ -103,13 +112,15 @@ tests/                          Testes unitários e de interface
 
 O ritual tem estados explícitos de escrita, dobra, navegação do barco e conclusão, em `src/scenes/LetItFloat/ritual.js`. O conteúdo escrito não faz parte do serviço de preferências. O motor de áudio libera fontes, conexões e contexto ao ser descartado.
 
+O hook `useImmersiveMode` coordena a DOM Fullscreen API e o componente `ImmersiveViewport` envolve a arte SVG, sem remontar a cena. A lógica de entrada, saída e ajuste de escala pode ser reutilizada por outros ambientes, que ainda não expõem esse modo.
+
 ### Limites de segurança do desktop
 
 O renderer usa `contextIsolation: true`, `nodeIntegration: false` e `sandbox: true`. A ponte expõe somente `window.haven.getPreferences()` e `window.haven.savePreferences(prefs)`. Há validação na ponte e no processo principal, incluindo a origem do pedido IPC.
 
 O processo principal usa ESM. O preload tem extensão **`.cjs`** porque o sandbox fornece um ambiente CommonJS limitado, sem um carregador ESM completo. Isso permite manter o sandbox e oferecer apenas a interface necessária. Consulte a [segurança do Electron](https://www.electronjs.org/docs/latest/tutorial/security), o [sandbox de processos](https://www.electronjs.org/docs/latest/tutorial/sandbox) e as [regras de ESM](https://www.electronjs.org/docs/latest/tutorial/esm).
 
-Em produção, o Electron carrega `dist/index.html`, bloqueia requisições de rede e arquivos fora do bundle, nega permissões, novas janelas, downloads e navegações externas. A CSP restringe scripts a arquivos locais e impede conexões. O desenvolvimento habilita apenas o servidor local explícito `127.0.0.1:5173` e seu WebSocket; esse modo é ignorado no aplicativo empacotado. Não há backend, autenticação, telemetria ou atualização automática.
+Em produção, o Electron carrega `dist/index.html`, bloqueia requisições de rede e arquivos fora do bundle, nega novas janelas, downloads e navegações externas. A única exceção à negação de permissões é `fullscreen`, limitada ao frame principal da janela e à página local confiável esperada; `automatic-fullscreen` e as demais permissões continuam negadas. O modo imersivo usa a DOM Fullscreen API, sem adicionar funções ao preload ou novos canais IPC. A CSP permanece a mesma, restringindo scripts a arquivos locais e impedindo conexões. O desenvolvimento habilita apenas o servidor local explícito `127.0.0.1:5173` e seu WebSocket; esse modo é ignorado no aplicativo empacotado. Não há backend, autenticação, telemetria ou atualização automática.
 
 ## Testes
 
@@ -120,7 +131,7 @@ npm run build
 npm run test:desktop
 ```
 
-Os testes unitários cobrem o ritual, a lista permitida de preferências, restauração, concorrência de gravações, áudio e políticas de segurança. Os testes de interface cobrem luz, chuva, escrita, confirmação de descarte, barco, privacidade do texto, áudio, teclado, telas menores e movimento reduzido.
+Os testes unitários cobrem o ritual, a lista permitida de preferências, restauração, concorrência de gravações, áudio, políticas de segurança e escala física da pixel art. Os testes de interface cobrem luz, chuva, escrita, confirmação de descarte, barco, privacidade do texto, áudio, teclado, telas menores, movimento reduzido e fullscreen real com restauração de estado e foco.
 
 O Playwright usa o **Microsoft Edge instalado** por padrão. Como alternativa, instale seu Chromium e selecione-o no PowerShell:
 
@@ -130,7 +141,7 @@ $env:HAVEN_TEST_BROWSER = 'chromium'
 npm run test:e2e
 ```
 
-O teste desktop verifica o carregamento de produção, a montagem React, o sandbox, a ponte, a gravação e restauração de preferências e a confirmação nativa de descarte. Usa `work/desktop-smoke-profile`, sem alterar as preferências pessoais; a renderização por software fica limitada a esse teste para funcionar em sessões sem GPU disponível.
+O teste desktop verifica o carregamento de produção, a montagem React, o sandbox, a ponte, a gravação e restauração de preferências e a confirmação nativa de descarte. Também entra no modo imersivo por um clique real, verifica fullscreen DOM e nativo, escala, animações e a saída por Esc com restauração da janela normal/maximizada. Usa `work/desktop-smoke-profile`, sem alterar as preferências pessoais; a renderização por software fica limitada a esse teste para funcionar em sessões sem GPU disponível.
 
 Verificações adicionais de integração, sempre com perfis isolados:
 

@@ -1,4 +1,39 @@
-# Validação atual — revisão visual do interior de The Journey
+# Validação atual — Modo Imersivo de The Journey
+
+Verificação de 20 de outubro de 2026, em Windows x64, Node.js 22.18.0 e npm 10.9.3. Resultados desta implementação, separados do histórico abaixo.
+
+| Verificação executada | Resultado |
+| --- | --- |
+| `npm test` | 26 passaram; nenhum falhou |
+| `npm run build` | Build de produção concluído |
+| `npm run test:e2e` no Edge | 26 passaram em 46,1 s; código de saída 0 |
+| `npm run test:desktop` no build final | Passou; fullscreen DOM e nativo, Esc e restauração da janela |
+| `git diff --check` | Sem erros de whitespace |
+| Inspeção visual | Capturas de fullscreen em 1920 × 1080, 2560 × 1440, 1440 × 960, 320 × 240 e Electron abertas e revisadas |
+
+## Comportamentos verificados
+
+- O ícone de expandir de Journey tem nome acessível e tooltip **Modo Imersivo**. O alvo real de `document.fullscreenElement` é somente o viewport da arte: cabeçalho, título, navegação, molduras externas e controles de paisagem ficam fora dele, sem bordas ou rolagem. Os elementos externos também ficam `inert` durante o modo e são restaurados ao sair.
+- O mesmo SVG e a mesma instância da animação permanecem montados. Paisagem selecionada, chuva e pausa são preservadas; parallax e chuva continuam animando quando estavam ativos. O áudio não inicia por entrar em fullscreen e o AudioContext já ativado continua o mesmo, em execução, ao entrar e sair.
+- **Esc** restaura a interface e o foco no botão de entrada. O botão de saída só aparece no canto superior direito com movimento do cursor ou por **Tab**; ele some por inatividade e permanece visível enquanto recebe foco de teclado. Clique e Enter também encerram o modo.
+- A composição mantém 16:9, toda a arte visível e `image-rendering: pixelated` / `shape-rendering: crispEdges`. O ajuste usa escala inteira em pixels físicos e posicionamento alinhado à grade física, considerando DPR. Em 1920 × 1080 (DPR 1), usa escala 4 sem margens; em 2560 × 1440, escala 5 e margens de 80 px nas laterais e 45 px acima/abaixo. DPR 1,25 também foi verificado. Em 320 × 240, reduz proporcionalmente para 320 × 180, centralizado sem recorte.
+- Movimento reduzido mantém a arte estática antes, durante e após fullscreen. Indisponibilidade e recusa da API exibem um status na interface normal, sem ativar um modo falso ou deixar controles inertes; uma nova tentativa com a API real funciona.
+- No Electron, entrada foi feita por evento de mouse real e saída por Escape. O teste confirmou eventos de fullscreen HTML, `BrowserWindow.isFullScreen()`, restauração dos limites normais, estado maximizado, foco, mesma arte e cenário. Sandbox, isolamento, ausência de Node no renderer, duas funções da ponte, preferências e confirmação nativa de descarte continuaram aprovados.
+- Apenas a permissão `fullscreen` recebe uma exceção para o webContents confiável, frame principal e URL local exata. Testes unitários negam outras janelas/frames/URLs, `automatic-fullscreen` e outras permissões. Preload, canais IPC, CSP e dependências não foram ampliados. Arte do vagão, paisagens, The Room e Let It Float não foram alterados.
+
+A primeira execução de interface encontrou uma disputa de foco ao revelar a saída por teclado; o foco passou a aguardar a aplicação da visibilidade no próximo frame. A verificação de centralização também foi ajustada para considerar o alinhamento à grade física em vez de exigir uma origem fracionária em DPR 1,25. A suíte completa foi executada novamente e passou. O teste Electron foi repetido no build final e passou.
+
+Capturas locais, não versionadas: `outputs/Little-Haven-Journey-immersive-1920x1080.png`, `outputs/Little-Haven-Journey-immersive-2560x1440.png`, `outputs/Little-Haven-Journey-immersive-1440x960.png`, `outputs/Little-Haven-Journey-immersive-320x240.png` e `outputs/Little-Haven-Journey-immersive-desktop.png`.
+
+## Limites e verificação manual
+
+O fullscreen precisa ser permitido pelo navegador e acionado por um gesto do usuário. Avisos transitórios de segurança do próprio navegador dependem dele. Margens são intencionais para manter escala inteira; telas menores que a grade original usam redução e podem perder detalhes. Os testes não substituem avaliação manual com leitores de tela, múltiplos monitores ou todas as configurações de DPI/GPU do Windows. O smoke nativo usa um perfil isolado e renderização por software, conforme o padrão anterior.
+
+Não foi executado empacotamento nem atualizado o executável portátil. Para experimentar o build atual, execute `npm start`, entre em Journey, escolha uma paisagem e acione **Modo Imersivo**. Confira Esc, a saída pelo canto/Tab, continuidade das animações e movimento reduzido. Não foram feitos commit ou push.
+
+---
+
+# Validação anterior — revisão visual do interior de The Journey
 
 Revisão de 20 de outubro de 2026, em Windows x64. Esta alteração refaz a arte do interior, mantendo a grade SVG de 480 × 270 e a abertura da janela em `x=83, y=42, largura=316, altura=119`. A paisagem externa, seus loops, estados, navegação, áudio e controles não foram modificados.
 

@@ -1,7 +1,7 @@
 // Run through desktop-smoke.mjs after npm run build. Uses a separate work profile.
 import { app, BrowserWindow, dialog } from 'electron';
 import assert from 'node:assert/strict';
-import { mkdir } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -19,6 +19,140 @@ const finish = (code) => {
   else app.exit(code);
 };
 
+async function waitFor(check, message, timeout = 5_000) {
+  const deadline = Date.now() + timeout;
+  while (Date.now() < deadline) {
+    if (await check()) return;
+    await new Promise((resolve) => setTimeout(resolve, 40));
+  }
+  throw new Error(message);
+}
+
+async function clickRendererButton(window, selector) {
+  const point = await window.webContents.executeJavaScript(`(() => {
+    const button = document.querySelector(${JSON.stringify(selector)});
+    if (!button) throw new Error('Desktop smoke button is missing.');
+    button.scrollIntoView({ block: 'center' });
+    const rect = button.getBoundingClientRect();
+    return { x: Math.round(rect.x + rect.width / 2), y: Math.round(rect.y + rect.height / 2) };
+  })()`);
+  window.show();
+  window.focus();
+  await waitFor(() => window.isFocused(), 'Desktop window could not receive input.');
+  window.webContents.sendInputEvent({ type: 'mouseMove', ...point });
+  window.webContents.sendInputEvent({ type: 'mouseDown', button: 'left', clickCount: 1, ...point });
+  window.webContents.sendInputEvent({ type: 'mouseUp', button: 'left', clickCount: 1, ...point });
+}
+
+async function verifyJourneyImmersive(window) {
+  const contents = window.webContents;
+  const evaluate = (source) => contents.executeJavaScript(source);
+  await evaluate(`document.querySelector('[aria-label="The Journey"]').click(); true;`);
+  await waitFor(() => evaluate(`Boolean(document.querySelector('[aria-label="Modo Imersivo"]'))`), 'Journey immersive entry did not render.');
+  await evaluate(`window.__journeySmokeArt = document.querySelector('svg.journey-art'); true;`);
+
+  let nativeEntries = 0;
+  let nativeExits = 0;
+  const countEntry = () => { nativeEntries += 1; };
+  const countExit = () => { nativeExits += 1; };
+  contents.on('enter-html-full-screen', countEntry);
+  contents.on('leave-html-full-screen', countExit);
+  try {
+    for (const maximized of [false, true]) {
+      if (maximized) window.maximize();
+      else window.unmaximize();
+      await waitFor(() => window.isMaximized() === maximized, 'Pre-fullscreen window state did not settle.');
+      const normalBounds = window.getNormalBounds();
+      const scenery = maximized ? 'sunset' : 'rainy-night';
+      await evaluate(`(() => {
+        const select = document.querySelector('[aria-label="Paisagem da viagem"]');
+        select.value = '${scenery}';
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+      })(); true;`);
+      await waitFor(() => evaluate(`document.querySelector('.journey-scene')?.dataset.scenery === '${scenery}'`), 'Selected scenery did not settle.');
+      await clickRendererButton(window, '[aria-label="Modo Imersivo"]');
+      await waitFor(async () => window.isFullScreen() && await evaluate(`document.fullscreenElement?.classList.contains('immersive-viewport') === true`), 'Journey did not enter native and DOM fullscreen.');
+      assert.equal(nativeEntries, maximized ? 2 : 1, 'Native HTML fullscreen entry event was missing.');
+
+      // Fullscreen sizing may update on the next ResizeObserver/animation frame.
+      await waitFor(() => evaluate(`(() => {
+        const art = document.querySelector('.immersive-art svg.journey-art');
+        const viewport = document.fullscreenElement;
+        const rect = art?.getBoundingClientRect();
+        const frame = viewport?.getBoundingClientRect();
+        if (!rect || !frame) return false;
+        const fit = Math.min(frame.width * devicePixelRatio / 480, frame.height * devicePixelRatio / 270);
+        const scale = (fit >= 1 ? Math.floor(fit) : fit) / devicePixelRatio;
+        return Math.abs(rect.width - 480 * scale) < .2 && Math.abs(rect.height - 270 * scale) < .2;
+      })()`), 'Immersive pixel art did not settle at the expected physical-pixel scale.');
+
+      const state = await evaluate(`(() => {
+        const viewport = document.fullscreenElement;
+        const art = viewport.querySelector('svg.journey-art');
+        const rect = art.getBoundingClientRect();
+        const frame = viewport.getBoundingClientRect();
+        const parallax = art.querySelector('.journey-parallax');
+        const rain = art.querySelector('.journey-rainfall');
+        const outsideControl = document.querySelector('.world-navigation button');
+        outsideControl.focus();
+        return {
+          sameArt: art === window.__journeySmokeArt,
+          scenery: document.querySelector('.journey-scene').dataset.scenery,
+          centered: Math.abs(rect.x - frame.x - (frame.width - rect.width) / 2) < .6 && Math.abs(rect.y - frame.y - (frame.height - rect.height) / 2) < .6,
+          contained: rect.left >= frame.left - .2 && rect.top >= frame.top - .2 && rect.right <= frame.right + .2 && rect.bottom <= frame.bottom + .2,
+          aspectRatio: rect.width / rect.height,
+          pixelated: getComputedStyle(art).imageRendering,
+          noScrolling: viewport.scrollWidth <= viewport.clientWidth && viewport.scrollHeight <= viewport.clientHeight,
+          chromeExcluded: !viewport.contains(document.querySelector('.app-header')) && !viewport.contains(document.querySelector('.world-navigation')) && !viewport.contains(document.querySelector('.journey-controls')),
+          outsideFocusBlocked: document.activeElement !== outsideControl,
+          visibleControls: Array.from(viewport.querySelectorAll('button, input, select, a')).filter((control) => control.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true })).length,
+          animation: getComputedStyle(parallax).animationName,
+          motion: getComputedStyle(parallax).animationPlayState,
+          reducedMotion: matchMedia('(prefers-reduced-motion: reduce)').matches,
+          transform: getComputedStyle(parallax).transform,
+          rainMotion: rain && getComputedStyle(rain).animationPlayState,
+        };
+      })()`);
+      assert.equal(state.sameArt, true, 'Entering fullscreen remounted the scene art.');
+      assert.equal(state.scenery, scenery);
+      assert.equal(state.centered, true, 'Immersive art is not centered.');
+      assert.equal(state.contained, true, 'Immersive art is cropped.');
+      assert.ok(Math.abs(state.aspectRatio - 16 / 9) < .001, 'Immersive art is distorted.');
+      assert.equal(state.pixelated, 'pixelated');
+      assert.equal(state.noScrolling, true, 'Immersive viewport has scrollbars.');
+      assert.equal(state.chromeExcluded, true, 'Normal interface is inside the fullscreen surface.');
+      assert.equal(state.outsideFocusBlocked, true, 'Normal navigation can steal immersive keyboard focus.');
+      assert.equal(state.visibleControls, 0, 'A control remains visible over the immersive art.');
+      if (state.reducedMotion) assert.equal(state.animation, 'none');
+      else {
+        assert.equal(state.motion, 'running');
+        await waitFor(() => evaluate(`getComputedStyle(document.querySelector('.journey-parallax')).transform !== ${JSON.stringify(state.transform)}`), 'Landscape animation stopped in fullscreen.');
+        if (!maximized) assert.equal(state.rainMotion, 'running', 'Rain stopped in fullscreen.');
+      }
+      if (!maximized) {
+        const output = path.join(root, 'outputs', 'Little-Haven-Journey-immersive-desktop.png');
+        await mkdir(path.dirname(output), { recursive: true });
+        await writeFile(output, (await contents.capturePage()).toPNG());
+      }
+
+      contents.sendInputEvent({ type: 'keyDown', keyCode: 'Escape' });
+      contents.sendInputEvent({ type: 'keyUp', keyCode: 'Escape' });
+      await waitFor(async () => !window.isFullScreen() && await evaluate('document.fullscreenElement === null'), 'Escape did not leave native and DOM fullscreen.');
+      await waitFor(() => window.isMaximized() === maximized, 'Fullscreen exit did not restore maximized state.');
+      await waitFor(() => evaluate(`document.activeElement === document.querySelector('[aria-label="Modo Imersivo"]')`), 'Fullscreen exit did not restore entry-button focus.');
+      assert.equal(nativeExits, maximized ? 2 : 1, 'Native HTML fullscreen exit event was missing.');
+      assert.deepEqual(window.getNormalBounds(), normalBounds, 'Fullscreen exit changed normal window bounds.');
+      assert.equal(await evaluate(`document.querySelector('.journey-scene').dataset.scenery`), scenery, 'Fullscreen exit changed the selected scenery.');
+      assert.equal(await evaluate(`document.querySelector('svg.journey-art') === window.__journeySmokeArt`), true, 'Fullscreen exit remounted the scene art.');
+    }
+    await evaluate('delete window.__journeySmokeArt; true;');
+    return 'native/DOM fullscreen, art scaling, motion, Escape, focus and normal/maximized restoration';
+  } finally {
+    contents.removeListener('enter-html-full-screen', countEntry);
+    contents.removeListener('leave-html-full-screen', countExit);
+  }
+}
+
 app.on('browser-window-created', (_event, window) => {
   const errors = [];
   window.webContents.on('console-message', (event) => {
@@ -30,7 +164,7 @@ app.on('browser-window-created', (_event, window) => {
   });
   window.webContents.once('did-finish-load', async () => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await waitFor(() => window.webContents.executeJavaScript(`Boolean(document.querySelector('#root')?.children.length && document.querySelector('.world-navigation'))`), 'React root did not mount.');
       const settings = window.webContents.getLastWebPreferences();
       assert.equal(settings.contextIsolation, true);
       assert.equal(settings.nodeIntegration, false);
@@ -51,6 +185,7 @@ app.on('browser-window-created', (_event, window) => {
       })()`);
       assert.equal(window.getTitle(), 'Little Haven');
       assert.equal(BrowserWindow.getAllWindows().length, 1);
+      result.immersive = await verifyJourneyImmersive(window);
       assert.deepEqual(errors, [], `Renderer console errors: ${errors.join('; ')}`);
       const originalPrompt = dialog.showMessageBoxSync;
       let chosenButton = 0;

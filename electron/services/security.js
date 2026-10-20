@@ -11,6 +11,18 @@ export function getDevelopmentUrl(environment, packaged) {
   return DEVELOPMENT_URL;
 }
 
+export function isAllowedFullscreenPermission({
+  permission, contents, trustedContents, expectedPage, details,
+}) {
+  // The DOM Fullscreen API needs no renderer IPC or additional device permissions.
+  return permission === 'fullscreen'
+    && Boolean(trustedContents)
+    && contents === trustedContents
+    && details?.isMainFrame === true
+    && details.requestingUrl === expectedPage
+    && contents.mainFrame.url === expectedPage;
+}
+
 export function isLocalFile(url, directory) {
   try {
     if (!url.startsWith('file:')) return false;

@@ -2,7 +2,9 @@ import { app, BrowserWindow, dialog, ipcMain, session } from 'electron';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { PreferencesStore } from '../services/preferences.js';
-import { contentSecurityPolicy, getDevelopmentUrl, isAllowedResource } from '../services/security.js';
+import {
+  contentSecurityPolicy, getDevelopmentUrl, isAllowedFullscreenPermission, isAllowedResource,
+} from '../services/security.js';
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const distDirectory = path.join(projectRoot, 'dist');
@@ -27,8 +29,15 @@ function verifySender(event) {
 
 function protectSession() {
   const localSession = session.defaultSession;
-  localSession.setPermissionRequestHandler((_contents, _permission, callback) => callback(false));
-  localSession.setPermissionCheckHandler(() => false);
+  const allowFullscreen = (contents, permission, details) => isAllowedFullscreenPermission({
+    permission, contents, details, trustedContents: window?.webContents, expectedPage,
+  });
+  localSession.setPermissionRequestHandler((contents, permission, callback, details) => {
+    callback(allowFullscreen(contents, permission, details));
+  });
+  localSession.setPermissionCheckHandler((contents, permission, _requestingOrigin, details) => (
+    allowFullscreen(contents, permission, details)
+  ));
   localSession.webRequest.onBeforeRequest((details, callback) => {
     callback({ cancel: !isAllowedResource(details.url, distDirectory, developmentUrl) });
   });

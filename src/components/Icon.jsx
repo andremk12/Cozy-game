@@ -61,6 +61,8 @@ export default function Icon({ name, size = 20, ...props }) {
       </>
     ),
     arrow: <path d="M4 12h16m-6-6 6 6-6 6" />,
+    expand: <path d="M9 3H3v6m12-6h6v6M3 15v6h6m12-6v6h-6" />,
+    collapse: <path d="M3 9h6V3m12 6h-6V3M9 21v-6H3m12 6v-6h6" />,
     check: <path d="m4 12 5 5L20 6" />,
   };
   return (
