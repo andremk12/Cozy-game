@@ -136,12 +136,6 @@
   animation-duration: 8s;
 }
 
-.journey-plant-leaves {
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
-  animation: journey-leaf-rest 14s ease-in-out infinite;
-}
-
 .journey-scene:not(.is-rain-on) .journey-rainfall {
   animation-play-state: paused;
 }
@@ -176,11 +170,6 @@
   35% { opacity: .55; }
   75% { opacity: .3; }
   100% { transform: translate(1px, -5px); opacity: .15; }
-}
-
-@keyframes journey-leaf-rest {
-  0%, 100% { transform: rotate(-.35deg); }
-  50% { transform: rotate(.35deg); }
 }
 
 .journey-scene.is-reduced-motion *,

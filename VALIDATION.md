@@ -1,4 +1,31 @@
-# Validação atual — primeira versão de The Journey
+# Validação atual — revisão visual do interior de The Journey
+
+Revisão de 20 de outubro de 2026, em Windows x64. Esta alteração refaz a arte do interior, mantendo a grade SVG de 480 × 270 e a abertura da janela em `x=83, y=42, largura=316, altura=119`. A paisagem externa, seus loops, estados, navegação, áudio e controles não foram modificados.
+
+O novo interior inclui porta de passagem com soleira, teto facetado, bagageiro metálico com malas, duas poltronas frente a frente com cabeceiras e pedestais fixos, radiador, molduras mecânicas, pega de apoio, luminária de parede e mesa suspensa com chá e ticket. A arte foi separada em `src/scenes/Journey/JourneyCarriage.jsx`; a descrição acessível foi atualizada. Foram retirados tapete, quadro, cortinas, planta e mobiliário doméstico da composição anterior, junto da animação de folhas sem uso.
+
+| Verificação executada nesta revisão | Resultado |
+| --- | --- |
+| `npm test` | 22 passaram; nenhum falhou |
+| `npm run build` | Build concluído; repetido após o ajuste final da placa do vagão |
+| `npm run test:e2e` no Microsoft Edge | 19 passaram em 37,4 s; código de saída 0 |
+| `npx playwright test tests/e2e/journey.spec.js -g "keyboard controls"` | 1 passou após o ajuste final da placa; capturas atualizadas |
+| `git diff --check` | Sem erros de whitespace |
+| Inspeção visual | Três cenários desktop e layout de 360 × 780 abertos e revisados; placa final conferida em desktop e mobile |
+
+As verificações de interface cobrem navegação entre Room, Journey e Let It Float, proteção de rascunhos sintéticos, troca das três paisagens, chuva, pausa/retomada, áudio sem autoplay, teclado, foco, movimento reduzido e layouts menores. Não foram observados erros de renderer/console nem requisições externas nos testes de Journey. A suíte foi executada fora do sandbox para permitir que o Playwright encerrasse seu próprio servidor, conforme a limitação de ambiente registrada na entrega anterior.
+
+A composição mantém a janela como elemento dominante; apenas os encostos recobrem uma pequena parte dos cantos inferiores, como assentos vistos de lado. As silhuetas de porta, poltronas e bagageiro continuam reconhecíveis no mobile. As capturas atualizadas estão em `outputs/Little-Haven-Journey-{rainy-night,forest,sunset,mobile}.png` e não são versionadas.
+
+## Limites desta revisão visual
+
+Porta, ticket e bagagens são detalhes da arte, sem novas interações. As limitações anteriores de três paisagens em loop e áudio apenas de chuva continuam. Não foram executados smoke nativo do Electron, empacotamento ou testes manuais com leitores de tela/DPI variados. The Room, Let It Float, Electron e dependências não foram alterados. Não foi gerado um novo executável portátil, commit ou push.
+
+Para conferir manualmente, execute `npm start` após o build, abra **The Journey** e alterne as três paisagens. Confira também pausa/retomada, navegação e a cena estática com movimento reduzido.
+
+---
+
+# Validação anterior — primeira versão de The Journey
 
 Verificações desta implementação, executadas em Windows x64, Node.js 22.18.0 e npm 10.9.3. O histórico da Fase 1 abaixo permanece separado e não serve como prova de validação desta mudança.
 
