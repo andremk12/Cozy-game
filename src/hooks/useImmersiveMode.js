@@ -2,11 +2,12 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 
 // Fullscreen is transient UI state. The same scene stays mounted; no preferences
 // or scene data pass through the desktop bridge.
-export function useImmersiveMode() {
+export function useImmersiveMode({ contextualOpen = false } = {}) {
   const targetRef = useRef(null);
   const triggerRef = useRef(null);
   const entering = useRef(false);
   const mounted = useRef(true);
+  const restoreFocusFrame = useRef(null);
   const [active, setActive] = useState(false);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState('');
@@ -20,12 +21,16 @@ export function useImmersiveMode() {
     return () => {
       mounted.current = false;
       document.removeEventListener('fullscreenchange', sync);
+      cancelAnimationFrame(restoreFocusFrame.current);
+      restoreFocusFrame.current = null;
       if (document.fullscreenElement === target) void document.exitFullscreen().catch(() => {});
     };
   }, []);
 
   useLayoutEffect(() => {
     if (!active) return undefined;
+    cancelAnimationFrame(restoreFocusFrame.current);
+    restoreFocusFrame.current = null;
     const target = targetRef.current;
     const scroll = { x: window.scrollX, y: window.scrollY };
     const isolated = [];
@@ -48,8 +53,16 @@ export function useImmersiveMode() {
         else element.setAttribute('inert', previous);
       }
       if (!hadClass) root.classList.remove('has-immersive-scene');
-      if (triggerRef.current?.isConnected) triggerRef.current.focus({ preventScroll: true });
       window.scrollTo(scroll.x, scroll.y);
+      // Chromium restores the last focused SVG object after the fullscreen
+      // layout cleanup. Restore the entry control on the following frame so
+      // that native focus restoration cannot overwrite the intended return.
+      restoreFocusFrame.current = requestAnimationFrame(() => {
+        restoreFocusFrame.current = null;
+        if (!mounted.current || document.fullscreenElement || !triggerRef.current?.isConnected) return;
+        triggerRef.current.focus({ preventScroll: true });
+        window.scrollTo(scroll.x, scroll.y);
+      });
     };
   }, [active]);
 
@@ -68,12 +81,15 @@ export function useImmersiveMode() {
     if (!active) return undefined;
     const onKeyDown = (event) => {
       if (event.key !== 'Escape') return;
+      // A modal book or ticket owns the first Escape. Let its native cancel
+      // event run without also asking the Fullscreen API to leave the carriage.
+      if (contextualOpen) return;
       event.preventDefault();
       void exit();
     };
     document.addEventListener('keydown', onKeyDown, true);
     return () => document.removeEventListener('keydown', onKeyDown, true);
-  }, [active, exit]);
+  }, [active, contextualOpen, exit]);
 
   const enter = useCallback(async () => {
     const target = targetRef.current;

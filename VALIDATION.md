@@ -1,4 +1,63 @@
-# Validação atual — Modo Imersivo de The Journey
+# Validação atual — expansão interativa de The Journey
+
+Verificação de 23 de outubro de 2026, em Windows x64 e Node.js 22.18.0. Os resultados históricos abaixo permanecem separados desta entrega.
+
+| Verificação executada | Resultado |
+| --- | --- |
+| `npm test` | 27 passaram; nenhum falhou |
+| `npm run build` | Build concluído; 50 módulos, sem novas dependências |
+| `npm run test:e2e` no Edge, build final | 32 passaram em 55,0 s; código de saída 0 |
+| `npm run test:desktop` no build final | Passou; objetos, Esc contextual, fullscreen DOM/nativo, foco e janela normal/maximizada |
+| `git diff --check` | Sem erros de whitespace |
+
+## Funcionalidades e verificações
+
+- **Interior preservado:** a grade original de 480 × 270, janela, porta de passagem, assentos, bagageiro, mesa suspensa, mala e arte das três paisagens anteriores foram mantidos. Os elementos novos seguem o mesmo desenho SVG com bordas nítidas, sem fotografias, vídeos ou sprites externos.
+- **Luminária:** clique, Enter ou Espaço alternam o estado; vidro, luz quente na parede e reflexo próximo ao assento acompanham a escolha com transição suave. Testes verificam o estado acessível e a opacidade efetiva das duas regiões de iluminação.
+- **Cortinas:** abertura e fechamento em duas folhas plissadas, com deslocamento discreto em passos de pixels. Fechadas, recobrem a janela; abertas, deixam a vista livre entre as bordas. Testes conferem os dois deslocamentos, teclado e preservação do estado ao trocar de paisagem.
+- **Chá:** cada preparo responde com uma pequena animação da xícara e vapor. Depois de 12 segundos o vapor diminui; depois de mais 18 segundos desaparece. O teste usa relógio controlado para validar resfriamento e repreparo, inclusive com o trem parado. Há somente um timeout ativo por estágio, limpo ao preparar novamente ou desmontar a cena.
+- **Livro:** quatro páginas com mensagens e ilustrações originais. A viagem continua animando atrás dele. Testes verificam avanço/retorno, nome acessível, foco inicial, ciclo de Tab/Shift+Tab, Esc, botão de fechamento e retorno ao objeto.
+- **Bilhete:** mostra a paisagem selecionada e sua descrição poética; não há reservas, pagamentos, horários ou destino obrigatório. Diálogo temático usa a mesma disciplina de foco e fechamento do livro.
+- **Snowy Mountains:** montanhas em profundidade, neve lenta em duas escalas, pinheiros nevados e relevo. **Morning Lake:** lago, colinas, amanhecer suave, reflexos, névoa, pássaros e vegetação. Ambos usam três camadas em loops de 320 pixels e respeitam pausa, retomada e movimento reduzido.
+- **Imersão:** mesmo SVG, objetos e estados antes, durante e depois do fullscreen. O primeiro Tab oferece a saída; os seguintes percorrem os objetos. Esc fecha primeiro o contextual. A restauração do foco após a saída aguarda o próximo frame para ocorrer depois da restauração nativa do Chromium. Não foram adicionados menus permanentes.
+- **Acessibilidade e telas pequenas:** controles SVG têm função de botão, nomes, estados, feedback de hover e foco visível. Os diálogos usam semântica modal nativa e ciclo explícito de foco. Movimento reduzido mantém estados estáticos equivalentes. Capturas desktop, fullscreen e de 390px foram abertas e revisadas, além dos testes existentes de outras resoluções e DPR fracionário.
+- **Regressão:** os testes anteriores de Room, Let It Float, rascunho privado, chuva, áudio sem autoplay, preferências, navegação, pausa e escala continuam aprovados. Testes de Journey não observaram erros de renderer nem requisições externas. CSP, preload, canais IPC, lista de preferências, The Room, Garden e Let It Float permanecem sem alteração.
+- **Desktop e segurança:** o teste nativo confirma cliques reais na luminária, livro e bilhete; Esc fecha cada contextual preservando fullscreen DOM/nativo e o foco volta ao objeto. O Esc seguinte sai e restaura a janela normal/maximizada, com a mesma arte. Sandbox, isolamento, ponte, preferências e confirmação nativa de descarte continuam aprovados. Foi necessária uma exceção de `keyboardLock`, limitada ao mesmo webContents/frame principal e URL local exata já confiáveis, somente quando a janela está em fullscreen. Somente o diálogo desktop pede `navigator.keyboard.lock(['Escape'])`, liberado ao fechar/desmontar; não há registro de teclas, captura de texto ou atalhos globais. Teste unitário cobre negação fora de fullscreen e para outras páginas, frames, webContents e permissões.
+
+A primeira rodada encontrou um ciclo de foco incompleto nos diálogos; foi corrigido. Outra rodada identificou o Chromium restaurando o foco no último objeto depois da saída do fullscreen; a reposição foi movida para um frame posterior. As expectativas antigas de três paisagens e seletores que passaram a corresponder a mais de um elemento foram atualizadas. A suíte completa foi executada novamente e passou. A primeira execução isolada no sandbox precisou ser interrompida depois dos casos por ficar presa ao encerrar o servidor; as execuções consolidadas fora dele encerraram normalmente.
+
+O teste nativo adicional revelou que Electron consome o keydown de Escape antes de enviá-lo ao renderer quando está em HTML fullscreen. Isso foi observado com eventos do próprio teste e corresponde à precedência do gerenciador de acesso exclusivo no [código do Electron](https://github.com/electron/electron/blob/main/shell/browser/api/electron_api_web_contents.cc). A [permissão Keyboard Lock documentada pelo Electron](https://www.electronjs.org/docs/latest/api/session) permitiu a correção restrita acima, sem novos canais IPC ou alteração da CSP. A instrumentação temporária foi removida. O helper de cliques nativos também passou a evitar `show()` em uma janela já visível e aguarda a geometria normal assentar depois da saída; a validação final passou.
+
+## Arquivos criados
+
+- `src/scenes/Journey/JourneyObjects.jsx`: cortinas, livro no banco e áreas interativas do cenário.
+- `src/scenes/Journey/useJourneyObjects.js`: estados dos objetos e ciclo do chá, sem persistência.
+- `src/scenes/Journey/JourneyKeepsake.jsx` e `JourneyKeepsake.css`: livro e bilhete contextuais.
+- `src/scenes/Journey/sceneries.js`: catálogo de paisagens, descrições acessíveis e textos dos bilhetes.
+- `src/scenes/Journey/JourneyLandscapes.css`: animações ambientais das novas paisagens.
+- `tests/e2e/journey-interactions.spec.js`: seis casos novos de interação e regressão.
+
+## Arquivos modificados
+
+- `src/scenes/Journey/Journey.jsx`, `Journey.css`, `JourneyCarriage.jsx`, `JourneyLandscape.jsx`: integração dos objetos, iluminação, arte e cenários adicionais.
+- `src/components/ImmersiveViewport/ImmersiveViewport.jsx` e `src/hooks/useImmersiveMode.js`: teclado contextual e restauração de foco.
+- `src/app/App.jsx`: nomes das novas paisagens no indicador de ambiente e dica dos objetos.
+- `tests/e2e/journey.spec.js` e `tests/e2e/immersive.spec.js`: cinco paisagens e navegação de teclado ampliada.
+- `scripts/desktop-smoke-main.mjs`: verificação nativa dos objetos, contextuais e Esc.
+- `electron/main/index.js`, `electron/services/security.js` e `tests/electron-security.test.js`: permissão de Escape contextual restrita e sua cobertura de segurança.
+- `README.md`, `ROADMAP.md` e `VALIDATION.md`: comportamento, estágio do projeto e resultados atuais.
+
+## Limites e continuidade
+
+Luminária, cortinas e chá reiniciam ao sair para outro ambiente; a paisagem, chuva e pausa mantêm seu comportamento anterior de sessão. O chá continua esfriando durante a pausa do trem. As paisagens são loops, sem novos sons de trem. Não foram avaliados leitores de tela manualmente, desempenho em vários computadores ou todas as combinações de monitores, DPI e GPU do Windows. As capturas ficam em `outputs/` e `test-results/`, sem versionamento. Não foi gerado novo executável portátil nem realizados commit, push ou merge.
+
+Próximos refinamentos sugeridos: avaliação em equipamentos com diferentes escalas de tela, teste manual com leitores de tela e sons locais de trilhos com controle explícito do usuário.
+
+Para experimentar, execute `npm start` após o build, abra The Journey e explore os cinco objetos. Alterne as cinco paisagens, pause e retome. Entre no modo imersivo, abra livro ou bilhete e confira que o primeiro Esc fecha o contextual e o seguinte retorna à interface; repita com Tab e com movimento reduzido.
+
+---
+
+# Validação anterior — Modo Imersivo de The Journey
 
 Verificação de 20 de outubro de 2026, em Windows x64, Node.js 22.18.0 e npm 10.9.3. Resultados desta implementação, separados do histórico abaixo.
 

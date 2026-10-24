@@ -6,10 +6,38 @@ import {
   contentSecurityPolicy,
   getDevelopmentUrl,
   isAllowedFullscreenPermission,
+  isAllowedKeyboardLockPermission,
   isAllowedResource,
 } from '../electron/services/security.js';
 
 const directory = path.resolve('dist');
+test('contextual keyboard lock requires native fullscreen and the exact trusted main page', () => {
+  for (const expectedPage of [pathToFileURL(path.join(directory, 'index.html')).href, 'http://127.0.0.1:5173/']) {
+    const contents = { mainFrame: { url: expectedPage } };
+    const request = {
+      permission: 'keyboardLock', fullscreen: true, contents, trustedContents: contents,
+      expectedPage, details: { isMainFrame: true, requestingUrl: expectedPage },
+    };
+    assert.equal(isAllowedKeyboardLockPermission(request), true);
+    for (const fullscreen of [false, undefined, 'true']) {
+      assert.equal(isAllowedKeyboardLockPermission({ ...request, fullscreen }), false);
+    }
+    for (const permission of ['pointerLock', 'automatic-fullscreen', 'media', 'unknown']) {
+      assert.equal(isAllowedKeyboardLockPermission({ ...request, permission }), false);
+    }
+    assert.equal(isAllowedKeyboardLockPermission({ ...request, contents: null }), false);
+    assert.equal(isAllowedKeyboardLockPermission({ ...request, trustedContents: undefined }), false);
+    assert.equal(isAllowedKeyboardLockPermission({ ...request, contents: { mainFrame: { url: expectedPage } } }), false);
+    assert.equal(isAllowedKeyboardLockPermission({ ...request, details: undefined }), false);
+    assert.equal(isAllowedKeyboardLockPermission({ ...request, details: { ...request.details, isMainFrame: false } }), false);
+    for (const requestingUrl of ['https://example.com/', `${expectedPage}?other`, undefined]) {
+      assert.equal(isAllowedKeyboardLockPermission({ ...request, details: { ...request.details, requestingUrl } }), false);
+    }
+    contents.mainFrame.url = 'https://example.com/';
+    assert.equal(isAllowedKeyboardLockPermission(request), false);
+  }
+});
+
 test('development server requires explicit loopback URL and cannot be enabled in a packaged app', () => {
   assert.equal(getDevelopmentUrl({}, false), null);
   assert.equal(

@@ -23,6 +23,14 @@ export function isAllowedFullscreenPermission({
     && contents.mainFrame.url === expectedPage;
 }
 
+export function isAllowedKeyboardLockPermission({ permission, fullscreen, ...request }) {
+  // Electron consumes Escape before DOM events in HTML fullscreen. The local
+  // contextual book/ticket locks only Escape, releasing it when the modal closes.
+  return permission === 'keyboardLock'
+    && fullscreen === true
+    && isAllowedFullscreenPermission({ ...request, permission: 'fullscreen' });
+}
+
 export function isLocalFile(url, directory) {
   try {
     if (!url.startsWith('file:')) return false;

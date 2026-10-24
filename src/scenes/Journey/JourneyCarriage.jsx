@@ -136,7 +136,7 @@ function PassengerSeat({ mirrored = false }) {
   );
 }
 
-function FoldingTable() {
+function FoldingTable({ teaState, teaServing }) {
   return (
     <g>
       {/* Wall hinge and cantilever brace leave the aisle free of table legs. */}
@@ -145,9 +145,11 @@ function FoldingTable() {
       <path d="M209 179h62v4h5v6h-72v-6h5z" fill="#3b5143" />
       <path d="M210 179h60v3h4v4h-68v-4h4z" fill="#b09b72" />
       <path d="M211 180h58v1h-58zM208 185h64v1h-64z" fill="#e0c392" />
-      <path d="M215 177h21v3h-21zM220 166h13v11h-13zM233 169h5v6h-5z" fill="#ddd6b2" />
-      <path d="M222 167h10v2h-10z" fill="#796750" />
-      <path d="M234 170h3v3h-3z" fill="#526e5c" />
+      <g key={teaServing} className={`journey-cup${teaState === 'warm' ? ' is-serving' : ''}`}>
+        <path d="M215 177h21v3h-21zM220 166h13v11h-13zM233 169h5v6h-5z" fill="#ddd6b2" />
+        <path d="M222 167h10v2h-10z" fill={teaState === 'cold' ? '#796750' : '#ac794c'} />
+        <path d="M234 170h3v3h-3z" fill="#526e5c" />
+      </g>
       <g fill="none" stroke="#e2ddbc" strokeWidth="1">
         <path className="journey-steam" d="M223 162v-4h2v-5h-1v-3" />
         <path className="journey-steam journey-steam--late" d="M229 161v-3h-1v-4" />
@@ -160,18 +162,21 @@ function FoldingTable() {
   );
 }
 
-function WallLamp() {
+function WallLamp({ on }) {
   return (
     <g>
-      <g className="journey-lamp-glow" fill="#f2cc89">
-        <path d="M418 57h30v8h10v52h-10v13h-31v-13h-10V70h11z" opacity=".07" />
-        <path d="M422 67h21v7h8v36h-8v9h-23v-9h-7V76h9z" opacity=".12" />
-        <path d="M417 137h35v58h-35z" opacity=".05" />
+      <g className="journey-lamp-illumination" opacity={on ? 1 : 0}>
+        <g className="journey-lamp-glow" fill="#f2cc89">
+          <path d="M418 57h30v8h10v52h-10v13h-31v-13h-10V70h11z" opacity=".07" />
+          <path d="M422 67h21v7h8v36h-8v9h-23v-9h-7V76h9z" opacity=".12" />
+          <path d="M417 137h35v58h-35z" opacity=".05" />
+          <path d="M387 126h29v14h17v61h-71v-20h9v-26h16z" opacity=".055" />
+        </g>
       </g>
       <path d="M422 70h24v4h4v34h-4v4h-24v-4h-4V74h4z" fill="#344e44" />
       <path d="M423 73h22v4h2v27h-2v4h-22v-4h-2V77h2z" fill="#b19b70" />
-      <path d="M425 77h18v26h-18z" fill="#edd69a" />
-      <path d="M427 79h3v21h-3zM425 89h18v2h-18z" fill="#f7e6b6" />
+      <path className="journey-lamp-glass" d="M425 77h18v26h-18z" fill={on ? '#edd69a' : '#747f6f'} />
+      <path className="journey-lamp-glass" d="M427 79h3v21h-3zM425 89h18v2h-18z" fill={on ? '#f7e6b6' : '#a1a58a'} />
       <path d="M422 75h24v3h-24zM422 103h24v3h-24z" fill="#7f8060" />
       <path d="M430 113h9v3h-9zM430 119h9v2h-9z" fill="#a7ae8d" />
       <path d="M430 145h8v4h-8zM432 149h4v49h-4zM430 198h8v4h-8z" fill="#b8bc9a" />
@@ -195,13 +200,17 @@ function Suitcase() {
   );
 }
 
-export function CarriageInterior() {
+export function CarriageInterior({ lampOn = true, teaState = 'cold', teaServing = 0 }) {
   return (
     <g>
-      <WallLamp />
-      <FoldingTable />
+      <WallLamp on={lampOn} />
+      <FoldingTable teaState={teaState} teaServing={teaServing} />
       <PassengerSeat />
       <PassengerSeat mirrored />
+      <g className="journey-lamp-illumination" opacity={lampOn ? 1 : 0} fill="#f2cc89">
+        <path d="M356 146h17v3h-17zM354 149h18v11h-18z" opacity=".12" />
+        <path d="M286 210h60v2h-60zM348 164h7v29h-7z" opacity=".07" />
+      </g>
       <Suitcase />
       <path d="M0 263h480v7H0zM0 0h480v2H0zM0 45h8v218H0zM472 45h8v218h-8z" fill="#1e3531" />
       <path d="M8 263h464v2H8z" fill="#89947a" />

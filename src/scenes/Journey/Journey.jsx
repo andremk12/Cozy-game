@@ -4,13 +4,11 @@ import ImmersiveViewport from '../../components/ImmersiveViewport/ImmersiveViewp
 import { useImmersiveMode } from '../../hooks/useImmersiveMode.js';
 import JourneyLandscape from './JourneyLandscape.jsx';
 import { CarriageShell, TrainWindowFrame, CarriageInterior } from './JourneyCarriage.jsx';
+import { JourneyCurtains, JourneyObjectControls } from './JourneyObjects.jsx';
+import JourneyKeepsake from './JourneyKeepsake.jsx';
+import { useJourneyObjects } from './useJourneyObjects.js';
+import { SCENERIES } from './sceneries.js';
 import './Journey.css';
-
-const SCENERIES = [
-  { id: 'rainy-night', label: 'Noite chuvosa', description: 'uma noite azul, com montanhas, pinheiros e pequenas casas iluminadas' },
-  { id: 'forest', label: 'Floresta', description: 'uma floresta verde, com pinheiros próximos e montanhas ao longe' },
-  { id: 'sunset', label: 'Pôr do sol', description: 'um pôr do sol dourado e rosado sobre um lago entre montanhas' },
-];
 
 function MovementIcon({ paused }) {
   return (
@@ -38,7 +36,8 @@ export default function Journey({
   const selectedScenery = SCENERIES.find((item) => item.id === scenery) || SCENERIES[0];
   const effectiveRain = selectedScenery.id === 'rainy-night' && rainOn;
   const [hidden, setHidden] = useState(() => document.hidden);
-  const immersive = useImmersiveMode();
+  const objects = useJourneyObjects();
+  const immersive = useImmersiveMode({ contextualOpen: Boolean(objects.keepsake) });
 
   useEffect(() => {
     const updateVisibility = () => setHidden(document.hidden);
@@ -54,21 +53,23 @@ export default function Journey({
   ].filter(Boolean).join(' ');
 
   return (
-    <section className={sceneClassName} data-scenery={selectedScenery.id} aria-label="The Journey: uma viagem sem pressa">
-      <ImmersiveViewport targetRef={immersive.targetRef} active={immersive.active} onExit={immersive.exit}>
+    <section className={sceneClassName} data-scenery={selectedScenery.id} data-tea-state={objects.teaState} data-lamp-on={objects.lampOn} aria-label="The Journey: uma viagem sem pressa">
+      <ImmersiveViewport targetRef={immersive.targetRef} active={immersive.active} onExit={immersive.exit} contextualOpen={Boolean(objects.keepsake)}>
       <svg
         className="journey-art"
         viewBox="0 0 480 270"
         xmlns="http://www.w3.org/2000/svg"
         shapeRendering="crispEdges"
-        role="img"
+        role="group"
         aria-labelledby={`journey-title-${uniqueId} journey-desc-${uniqueId}`}
       >
         <title id={`journey-title-${uniqueId}`}>Seu cantinho em um trem tranquilo</title>
         <desc id={`journey-desc-${uniqueId}`}>
           Um vagão em pixel art visto de lado, com poltronas de encosto alto frente a frente,
           bagageiro metálico, porta de passagem, mala e luminária lateral. Uma mesinha fixa
-          sustenta chá e um ticket de viagem. Pela janela panorâmica, {selectedScenery.description}.
+          sustenta chá e um bilhete de viagem; um livro repousa no banco. Explore a luminária,
+          as cortinas, a xícara, o livro e o bilhete com clique ou Tab e Enter.
+          Pela janela panorâmica, {selectedScenery.description}.
         </desc>
         <defs>
           <clipPath id={windowId}><rect x="83" y="42" width="316" height="119" /></clipPath>
@@ -82,8 +83,12 @@ export default function Journey({
         <CarriageShell />
         <JourneyLandscape scenery={selectedScenery.id} windowId={windowId} rainId={rainId} nearRainId={nearRainId} rainOn={effectiveRain} />
         <TrainWindowFrame />
-        <CarriageInterior />
+        <JourneyCurtains open={objects.curtainsOpen} onToggle={objects.toggleCurtains} windowId={windowId} />
+        <CarriageInterior lampOn={objects.lampOn} teaState={objects.teaState} teaServing={objects.teaServing} />
+        <JourneyObjectControls objects={objects} />
       </svg>
+      {objects.keepsake && <JourneyKeepsake kind={objects.keepsake} scenery={selectedScenery} onClose={objects.closeKeepsake} />}
+      <p className="sr-only" role="status">{objects.teaState === 'warm' ? 'Chá servido. O vapor sobe da xícara.' : objects.teaState === 'cooling' ? 'O chá esfria devagar.' : ''}</p>
       </ImmersiveViewport>
       <div className="journey-controls" role="group" aria-label="Controles da viagem">
         <div className="journey-scenery-control">

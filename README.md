@@ -2,7 +2,7 @@
 
 Um pequeno refúgio desktop em pixel art: uma noite de chuva, uma luz quente e um lugar onde você pode apenas existir. Sem contas, metas, pontuações ou serviços em nuvem.
 
-A fundação da Fase 1 entrega **The Room** e o ritual **Let It Float**. O aplicativo também oferece uma primeira versão interativa de **The Journey**, uma viagem contemplativa de trem. **The Garden** permanece identificado como planejado.
+A fundação da Fase 1 entrega **The Room** e o ritual **Let It Float**. O aplicativo também oferece **The Journey**, uma viagem contemplativa de trem com cinco paisagens e pequenos objetos interativos. **The Garden** permanece identificado como planejado.
 
 O comando `npm run package:win` gera o executável em `outputs/desktop/Little-Haven-0.1.0-x64.exe`. Depois de gerado, abra esse arquivo para usar o aplicativo sem instalar Node.js. A distribuição é portátil e ainda não possui assinatura digital. O código-fonte editável fica na raiz deste projeto; dependências, builds, executáveis e perfis de teste são locais e não são versionados no Git.
 
@@ -47,17 +47,18 @@ A instalação de dependências, o primeiro download do runtime Electron e as fe
 - Escolha **Let it float** para dobrar o papel e acompanhar o barquinho pelo rio. O texto não é exibido no barco.
 - **Cancelar** e a navegação para outro ambiente pedem confirmação quando existe um rascunho. Fechar ou recarregar a janela desktop também permite continuar escrevendo antes de descartar.
 - Ao final, volte ao quarto. Durante a animação, **Concluir sem animação** permite chegar diretamente ao momento final.
-- Escolha **The Journey** para entrar em um vagão acolhedor. Em **Paisagem da viagem**, alterne entre noite chuvosa, floresta e pôr do sol, com paisagens em movimento contínuo pela janela.
+- Escolha **The Journey** para entrar em um vagão acolhedor. Em **Paisagem da viagem**, alterne entre noite chuvosa, floresta, pôr do sol, **Snowy Mountains** e **Morning Lake**, com paisagens em movimento contínuo pela janela. As montanhas têm neve lenta e pinheiros nevados; o lago ao amanhecer tem reflexos, névoa e pássaros distantes.
+- Explore os objetos do vagão: acenda ou apague a **luminária**, abra ou feche as **cortinas**, prepare **chá**, leia o **livro** no banco e consulte o **bilhete** sobre a mesa. O livro tem quatro páginas originais; o bilhete acompanha a paisagem selecionada. A xícara pode ser preparada novamente: o vapor diminui após 12 segundos e termina após mais 18 segundos, mesmo com o trem parado.
 - Pause ou retome a viagem pelos controles abaixo do cenário; a pausa congela as animações. Na paisagem noturna, ligue ou desligue a chuva. O botão de retorno leva ao quarto.
 - Em The Journey, o botão com ícone de expandir e tooltip **Modo Imersivo** abre o cenário em tela cheia.
 
-O botão de som inicia uma chuva suave sintetizada no dispositivo. O volume começa em 25% e tem ganho de saída limitado. No quarto e em Let It Float, essa camada acompanha a chuva do quarto; em The Journey, só toca na paisagem noturna com a chuva da viagem ligada. Floresta e pôr do sol são silenciosos. Mesmo com a preferência de áudio salva, cada abertura exige um novo clique em **Retomar som**; o aplicativo não inicia áudio sozinho.
+O botão de som inicia uma chuva suave sintetizada no dispositivo. O volume começa em 25% e tem ganho de saída limitado. No quarto e em Let It Float, essa camada acompanha a chuva do quarto; em The Journey, só toca na paisagem noturna com a chuva da viagem ligada. As outras quatro paisagens são silenciosas. Mesmo com a preferência de áudio salva, cada abertura exige um novo clique em **Retomar som**; o aplicativo não inicia áudio sozinho.
 
 Os objetos, a navegação e os botões funcionam com **Tab**, **Enter** ou **Espaço**, com foco visível. O volume e a seleção de paisagem aceitam as setas do teclado. Os diálogos mantêm o foco e **Esc** preserva o rascunho. A preferência de movimento reduzido do sistema interrompe as animações ambientais e conclui o ritual com uma alternativa estática. Na viagem, mantém a cena estática e desabilita o controle de pausa; a troca de paisagem e o retorno ao quarto continuam disponíveis.
 
 ### Modo Imersivo de The Journey
 
-Em tela cheia, a arte do vagão e da paisagem fica centralizada, sem o cabeçalho, títulos, navegação ou controles de paisagem da interface normal. Pressione **Esc** para voltar. Um botão temporário de saída aparece ao mover o cursor para o canto superior direito ou ao usar **Tab**, com foco visível; ele desaparece quando deixa de ser usado.
+Em tela cheia, a arte do vagão e da paisagem fica centralizada, sem o cabeçalho, títulos, navegação ou controles de paisagem da interface normal. Os cinco objetos continuam utilizáveis. Pressione **Esc** para voltar; quando livro ou bilhete estiver aberto, o primeiro **Esc** fecha apenas esse elemento e devolve o foco ao objeto. Um botão temporário de saída aparece ao mover o cursor para o canto superior direito ou no primeiro **Tab**, com foco visível; os próximos **Tab** percorrem os objetos e retornam à saída. O botão desaparece quando deixa de ser usado. Os diálogos mantêm o foco e têm botões de fechamento próprios.
 
 A composição preserva a proporção de 480 × 270, sem recorte ou distorção, com margens na cor do cenário (`#1e3531`). O ajuste usa escala inteira em pixels físicos, considerando o `devicePixelRatio` do monitor, sempre que uma grade inteira cabe na área disponível. Quando nem a grade original cabe, usa uma redução fracionária para manter toda a arte visível.
 
@@ -80,7 +81,7 @@ Somente estas preferências são persistidas:
 
 No Electron, o arquivo é `preferences.json` dentro de `app.getPath('userData')`, normalmente `%APPDATA%\Little Haven` no Windows. O processo principal valida os campos e grava o JSON de forma atômica. Campos desconhecidos são rejeitados. No modo de navegador, essas quatro preferências usam a chave `haven.preferences.v1` do `localStorage`; esse armazenamento é independente do desktop.
 
-Paisagem, pausa e chuva de The Journey ficam apenas no estado React da sessão. Essas escolhas permanecem ao trocar de ambiente e reiniciam ao reabrir ou recarregar o aplicativo. A viagem não adiciona preferências persistentes e sua chuva é independente da preferência `rainOn` do quarto.
+Paisagem, pausa e chuva de The Journey ficam apenas no estado React da sessão. Essas escolhas permanecem ao trocar de ambiente e reiniciam ao reabrir ou recarregar o aplicativo. Luminária, cortinas e chá pertencem à visita atual ao vagão e reiniciam ao sair para outro ambiente. Todos os estados são preservados ao trocar de paisagem ou entrar e sair do modo imersivo. A viagem não adiciona preferências persistentes e sua chuva é independente da preferência `rainOn` do quarto.
 
 ## Arquitetura
 
@@ -120,7 +121,7 @@ O renderer usa `contextIsolation: true`, `nodeIntegration: false` e `sandbox: tr
 
 O processo principal usa ESM. O preload tem extensão **`.cjs`** porque o sandbox fornece um ambiente CommonJS limitado, sem um carregador ESM completo. Isso permite manter o sandbox e oferecer apenas a interface necessária. Consulte a [segurança do Electron](https://www.electronjs.org/docs/latest/tutorial/security), o [sandbox de processos](https://www.electronjs.org/docs/latest/tutorial/sandbox) e as [regras de ESM](https://www.electronjs.org/docs/latest/tutorial/esm).
 
-Em produção, o Electron carrega `dist/index.html`, bloqueia requisições de rede e arquivos fora do bundle, nega novas janelas, downloads e navegações externas. A única exceção à negação de permissões é `fullscreen`, limitada ao frame principal da janela e à página local confiável esperada; `automatic-fullscreen` e as demais permissões continuam negadas. O modo imersivo usa a DOM Fullscreen API, sem adicionar funções ao preload ou novos canais IPC. A CSP permanece a mesma, restringindo scripts a arquivos locais e impedindo conexões. O desenvolvimento habilita apenas o servidor local explícito `127.0.0.1:5173` e seu WebSocket; esse modo é ignorado no aplicativo empacotado. Não há backend, autenticação, telemetria ou atualização automática.
+Em produção, o Electron carrega `dist/index.html`, bloqueia requisições de rede e arquivos fora do bundle, nega novas janelas, downloads e navegações externas. A permissão `fullscreen` é limitada ao frame principal da janela e à página local confiável esperada. Para que Esc feche primeiro livro ou bilhete no desktop, `keyboardLock` também recebe uma exceção para esse mesmo frame/URL, somente quando a janela já está em fullscreen. O diálogo solicita apenas a tecla Escape e libera a captura ao fechar ou desmontar; não captura texto nem registra teclas. `automatic-fullscreen`, `pointerLock` e as demais permissões continuam negadas. O modo imersivo usa a DOM Fullscreen API, sem adicionar funções ao preload ou novos canais IPC. A CSP permanece a mesma, restringindo scripts a arquivos locais e impedindo conexões. O desenvolvimento habilita apenas o servidor local explícito `127.0.0.1:5173` e seu WebSocket; esse modo é ignorado no aplicativo empacotado. Não há backend, autenticação, telemetria ou atualização automática.
 
 ## Testes
 
@@ -131,7 +132,7 @@ npm run build
 npm run test:desktop
 ```
 
-Os testes unitários cobrem o ritual, a lista permitida de preferências, restauração, concorrência de gravações, áudio, políticas de segurança e escala física da pixel art. Os testes de interface cobrem luz, chuva, escrita, confirmação de descarte, barco, privacidade do texto, áudio, teclado, telas menores, movimento reduzido e fullscreen real com restauração de estado e foco.
+Os testes unitários cobrem o ritual, a lista permitida de preferências, restauração, concorrência de gravações, áudio, políticas de segurança e escala física da pixel art. Os testes de interface cobrem luz, chuva, escrita, confirmação de descarte, barco, privacidade do texto, áudio, teclado, telas menores, movimento reduzido e fullscreen real com restauração de estado e foco. Na viagem, incluem os cinco objetos, abertura das cortinas, iluminação, preparo e resfriamento do chá, páginas do livro, bilhete contextual e as cinco paisagens com pausa e retomada.
 
 O Playwright usa o **Microsoft Edge instalado** por padrão. Como alternativa, instale seu Chromium e selecione-o no PowerShell:
 
@@ -164,6 +165,6 @@ O quarto, o rio, o barquinho, o vagão, as paisagens e os ícones são desenhos 
 
 ## Limitações e continuidade
 
-A versão atual oferece um quarto, um ritual, uma viagem de trem e uma camada sonora de chuva. The Journey tem três paisagens em loop, sem destino, progressão, missões ou contagem de tempo. Não há sons próprios do trem ou dos trilhos, novas trilhas de áudio ou interações adicionais dentro do vagão. Garden segue como proposta planejada. Não há personalização, histórico de textos, sincronização ou cultivo.
+A versão atual oferece um quarto, um ritual, uma viagem de trem e uma camada sonora de chuva. The Journey tem cinco paisagens em loop e cinco objetos interativos, sem destino, progressão, missões ou contagem de tempo de viagem. Não há sons próprios do trem ou dos trilhos nem novas trilhas de áudio. Garden segue como proposta planejada. Não há personalização, histórico de textos, sincronização ou cultivo.
 
 As próximas etapas incluem refinar a experiência em janelas e dispositivos reais, revisar acessibilidade e desempenho, evoluir a ambientação da viagem e implementar o jardim sem punições por ausência. O plano completo está em [`ROADMAP.md`](ROADMAP.md).

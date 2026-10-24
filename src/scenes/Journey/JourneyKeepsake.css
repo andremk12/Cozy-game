@@ -1,0 +1,250 @@
+.journey-keepsake {
+  position: fixed;
+  inset: 0;
+  width: min(580px, calc(100vw - 40px));
+  max-width: none;
+  max-height: calc(100dvh - 40px);
+  margin: auto;
+  padding: 10px;
+  overflow: auto;
+  border: 0;
+  border-radius: 0;
+  background: #526354;
+  color: #374c43;
+  box-shadow: 0 0 0 3px #263c35, 5px 7px 0 3px #172c29;
+  font-family: 'Pixelify Sans', sans-serif;
+  font-size: 17px;
+  line-height: 1.5;
+  cursor: auto;
+  color-scheme: light;
+}
+
+.journey-keepsake::backdrop {
+  background: #122c2659;
+}
+
+.journey-keepsake h2,
+.journey-keepsake p {
+  margin: 0;
+}
+
+.journey-keepsake h2 {
+  font-size: clamp(23px, 4vw, 30px);
+  font-weight: 400;
+  line-height: 1.15;
+}
+
+.journey-keepsake-overline {
+  display: block;
+  color: #66705a;
+  font-size: 11px;
+  letter-spacing: 1px;
+  line-height: 1.6;
+}
+
+.journey-book-spread {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 4px solid #b7a67e;
+  background: #e4d8b4;
+}
+
+.journey-book-leaf {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 17px;
+  min-width: 0;
+  padding: 27px 24px 32px;
+}
+
+.journey-book-leaf--left {
+  border-right: 3px solid #b9a984;
+  text-align: center;
+  box-shadow: inset -5px 0 #d3c59d;
+}
+
+.journey-book-leaf--right {
+  justify-content: flex-start;
+  padding-top: 48px;
+  background: #ecdfbc;
+  box-shadow: inset 4px 0 #ddd0aa;
+}
+
+.journey-book-picture {
+  display: block;
+  width: 100%;
+  border: 3px solid #b3a580;
+  image-rendering: pixelated;
+}
+
+.journey-book-detail {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.journey-book-message {
+  font-size: 20px;
+  line-height: 1.6;
+}
+
+.journey-book-page-number {
+  margin-top: auto;
+  padding-top: 20px;
+  color: #74745b;
+  font-size: 12px;
+  text-align: center;
+}
+
+.journey-keepsake-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 9px;
+  padding-top: 12px;
+}
+
+.journey-keepsake-actions button {
+  min-height: 38px;
+  padding: 6px 10px;
+  border: 2px solid #b6b393;
+  border-radius: 0;
+  background: #40574b;
+  color: #efe1bb;
+  box-shadow: 0 2px #2b4038;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.journey-keepsake-actions button:not(:disabled):hover {
+  background: #344e42;
+  border-color: #e5cd9b;
+}
+
+.journey-keepsake-actions button:disabled {
+  border-color: #7a8771;
+  background: #4b6052;
+  color: #b8c0a4;
+  cursor: default;
+}
+
+.journey-keepsake-actions button:focus-visible {
+  outline: 2px solid #ffe1a1;
+  outline-offset: 3px;
+}
+
+.journey-keepsake--ticket {
+  width: min(500px, calc(100vw - 40px));
+  padding: 12px;
+}
+
+.journey-ticket-paper {
+  display: grid;
+  grid-template-columns: 1fr 70px;
+  background: #e5d3a5;
+  /* Square notches keep the perforation on the same crisp pixel grid. */
+  clip-path: polygon(0 6px, 6px 6px, 6px 0, calc(100% - 6px) 0, calc(100% - 6px) 6px, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 6px calc(100% - 6px), 0 calc(100% - 6px));
+}
+
+.journey-ticket-main {
+  padding: 24px;
+}
+
+.journey-ticket-main h2 {
+  margin-top: 7px;
+}
+
+.journey-ticket-rule {
+  display: block;
+  height: 4px;
+  margin: 18px 0 15px;
+  border-top: 1px solid #ac9a72;
+  border-bottom: 1px solid #ac9a72;
+}
+
+.journey-ticket-scenery {
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+.journey-ticket-description {
+  padding-top: 12px;
+  font-size: 17px;
+}
+
+.journey-ticket-note {
+  display: block;
+  margin-top: 20px;
+  color: #6b7459;
+  font-size: 12px;
+}
+
+.journey-ticket-stub {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  border-left: 2px dashed #a18f66;
+  color: #6b7459;
+  font-size: 16px;
+  letter-spacing: 3px;
+}
+
+.journey-ticket-stub svg {
+  display: block;
+  width: 32px;
+  image-rendering: pixelated;
+}
+
+.journey-keepsake-actions--ticket {
+  justify-content: center;
+}
+
+@media (max-width: 520px) {
+  .journey-keepsake {
+    width: calc(100vw - 28px);
+    padding: 7px;
+  }
+
+  .journey-book-leaf {
+    gap: 12px;
+    padding: 21px 13px;
+  }
+
+  .journey-book-leaf--right {
+    padding-top: 32px;
+  }
+
+  .journey-book-message {
+    font-size: 17px;
+  }
+
+  .journey-book-detail {
+    font-size: 12px;
+  }
+
+  .journey-keepsake-actions {
+    gap: 6px;
+  }
+
+  .journey-keepsake-actions button {
+    padding: 6px;
+    font-size: 12px;
+  }
+
+  .journey-ticket-paper {
+    grid-template-columns: 1fr 50px;
+  }
+
+  .journey-ticket-main {
+    padding: 20px 16px;
+  }
+
+  .journey-ticket-stub {
+    padding: 9px;
+  }
+}

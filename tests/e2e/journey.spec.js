@@ -5,6 +5,8 @@ const sceneryOptions = [
   ['rainy-night', 'Noite chuvosa'],
   ['forest', 'Floresta'],
   ['sunset', 'Pôr do sol'],
+  ['snowy-mountains', 'Snowy Mountains'],
+  ['morning-lake', 'Morning Lake'],
 ];
 
 test.beforeEach(async ({ page }) => {
@@ -155,7 +157,7 @@ test('journey navigation preserves the writing guard and discards only after con
   expect(await page.locator('body').innerText()).not.toContain(syntheticDraft);
 });
 
-test('three sceneries have independent rain and keep their choices only for this session', async ({
+test('five sceneries have independent rain and keep their choices only for this session', async ({
   page,
 }) => {
   await page.goto('/');
@@ -233,7 +235,7 @@ test('the landscape actually moves, every layer freezes on pause and motion resu
   await expect.poll(() => transforms(page)).not.toEqual(pausedForest);
 });
 
-test('reduced motion starts all three landscapes static while the scenery and rain remain usable', async ({
+test('reduced motion starts all five landscapes static while the scenery and rain remain usable', async ({
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
@@ -353,7 +355,7 @@ test('keyboard controls have visible focus, small layouts fit and each scenery h
   await tabTo(page, selection);
   await expectVisibleFocus(selection);
   await page.keyboard.press('End');
-  await expectScenery(page, 'sunset', 'Pôr do sol');
+  await expectScenery(page, 'morning-lake', 'Morning Lake');
   await page.keyboard.press('Enter');
   const pause = page.getByRole('button', { name: 'Pausar movimento', exact: true });
   await tabTo(page, pause);

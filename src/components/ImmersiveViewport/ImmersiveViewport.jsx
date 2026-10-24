@@ -7,6 +7,7 @@ export default function ImmersiveViewport({
   targetRef,
   active,
   onExit,
+  contextualOpen = false,
   width = 480,
   height = 270,
   children,
@@ -63,10 +64,27 @@ export default function ImmersiveViewport({
   }
 
   function onKeyDown(event) {
-    if (!active || event.key !== 'Tab') return;
-    event.preventDefault();
+    if (!active || contextualOpen || event.key !== 'Tab') return;
     clearTimeout(timer.current);
-    if (exitRef.current === document.activeElement) return;
+    const target = targetRef.current;
+    const focused = document.activeElement;
+    const objects = [...target.querySelectorAll('[tabindex="0"], button:not([disabled]), a[href]')]
+      .filter((element) => element !== exitRef.current && element.getClientRects().length > 0);
+    const first = objects[0];
+    const last = objects[objects.length - 1];
+
+    // Keep the initial exit shortcut, then let Tab visit the carriage objects.
+    // Only wrap the boundaries: the rest of their DOM order remains native.
+    if (focused === exitRef.current && first) {
+      event.preventDefault();
+      (event.shiftKey ? last : first).focus({ preventScroll: true });
+      return;
+    }
+    const needsExit = focused === target
+      || focused === exitRef.current
+      || (event.shiftKey ? focused === first : focused === last);
+    if (!needsExit) return;
+    event.preventDefault();
     focusRequested.current = true;
     if (exitVisible) {
       focusRequested.current = false;

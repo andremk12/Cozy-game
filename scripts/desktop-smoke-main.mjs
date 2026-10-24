@@ -36,12 +36,54 @@ async function clickRendererButton(window, selector) {
     const rect = button.getBoundingClientRect();
     return { x: Math.round(rect.x + rect.width / 2), y: Math.round(rect.y + rect.height / 2) };
   })()`);
-  window.show();
+  if (!window.isVisible()) window.show();
   window.focus();
   await waitFor(() => window.isFocused(), 'Desktop window could not receive input.');
   window.webContents.sendInputEvent({ type: 'mouseMove', ...point });
   window.webContents.sendInputEvent({ type: 'mouseDown', button: 'left', clickCount: 1, ...point });
   window.webContents.sendInputEvent({ type: 'mouseUp', button: 'left', clickCount: 1, ...point });
+}
+
+async function verifyJourneyContextualObjects(window) {
+  const contents = window.webContents;
+  const evaluate = (source) => contents.executeJavaScript(source);
+  const lampSelector = '.journey-object[aria-label="Luminária de leitura"]';
+  const lampOn = await evaluate(`document.querySelector(${JSON.stringify(lampSelector)}).getAttribute('aria-pressed') === 'true'`);
+  for (const expectedOn of [!lampOn, lampOn]) {
+    await clickRendererButton(window, lampSelector);
+    await waitFor(() => evaluate(`(() => {
+      const lamp = document.querySelector(${JSON.stringify(lampSelector)});
+      return lamp.getAttribute('aria-pressed') === '${expectedOn}'
+        && document.querySelector('.journey-scene').dataset.lampOn === '${expectedOn}'
+        && [...document.querySelectorAll('.journey-lamp-illumination')].every((light) => light.getAttribute('opacity') === '${expectedOn ? 1 : 0}');
+    })()`), 'A real click did not update the Journey lamp state and illumination.');
+  }
+
+  for (const [label, kind, title] of [
+    ['Abrir livro', 'book', 'Pequenas paisagens'],
+    ['Consultar bilhete', 'ticket', 'Bilhete de viagem'],
+  ]) {
+    const selector = `.journey-object[aria-label="${label}"]`;
+    await clickRendererButton(window, selector);
+    await waitFor(() => evaluate(`Boolean(document.querySelector('dialog.journey-keepsake--${kind}[open]'))`), `A real click did not open the Journey ${kind}.`);
+    assert.equal(await evaluate(`(() => {
+      const contextual = document.querySelector('dialog.journey-keepsake--${kind}');
+      const heading = document.getElementById(contextual.getAttribute('aria-labelledby'));
+      return contextual.matches(':modal')
+        && contextual.contains(document.activeElement)
+        && heading.textContent.trim() === ${JSON.stringify(title)};
+    })()`), true, `The Journey ${kind} did not open as a named modal with keyboard focus.`);
+    assert.equal(window.isFullScreen(), true, `Opening the Journey ${kind} left native fullscreen.`);
+    assert.equal(await evaluate(`document.fullscreenElement?.classList.contains('immersive-viewport') === true`), true, `Opening the Journey ${kind} left DOM fullscreen.`);
+
+    await waitFor(() => evaluate(`document.querySelector('dialog.journey-keepsake')?.dataset.keyboardLock === 'true'`), 'The contextual Escape key was not captured in native fullscreen.');
+    contents.sendInputEvent({ type: 'keyDown', keyCode: 'Escape' });
+    contents.sendInputEvent({ type: 'keyUp', keyCode: 'Escape' });
+    await waitFor(() => evaluate(`!document.querySelector('dialog.journey-keepsake[open]')`), `Escape did not close the Journey ${kind}.`);
+    assert.equal(window.isFullScreen(), true, `The first Escape closed native fullscreen instead of only the Journey ${kind}.`);
+    assert.equal(await evaluate(`document.fullscreenElement?.classList.contains('immersive-viewport') === true`), true, `The first Escape closed DOM fullscreen instead of only the Journey ${kind}.`);
+    await waitFor(() => evaluate(`document.activeElement === document.querySelector(${JSON.stringify(selector)})`), `Closing the Journey ${kind} did not restore its object's focus.`);
+  }
 }
 
 async function verifyJourneyImmersive(window) {
@@ -135,18 +177,22 @@ async function verifyJourneyImmersive(window) {
         await writeFile(output, (await contents.capturePage()).toPNG());
       }
 
+      await verifyJourneyContextualObjects(window);
+      assert.equal(nativeExits, maximized ? 1 : 0, 'A contextual Escape unexpectedly left native HTML fullscreen.');
+
       contents.sendInputEvent({ type: 'keyDown', keyCode: 'Escape' });
       contents.sendInputEvent({ type: 'keyUp', keyCode: 'Escape' });
       await waitFor(async () => !window.isFullScreen() && await evaluate('document.fullscreenElement === null'), 'Escape did not leave native and DOM fullscreen.');
       await waitFor(() => window.isMaximized() === maximized, 'Fullscreen exit did not restore maximized state.');
       await waitFor(() => evaluate(`document.activeElement === document.querySelector('[aria-label="Modo Imersivo"]')`), 'Fullscreen exit did not restore entry-button focus.');
       assert.equal(nativeExits, maximized ? 2 : 1, 'Native HTML fullscreen exit event was missing.');
+      await waitFor(() => JSON.stringify(window.getNormalBounds()) === JSON.stringify(normalBounds), 'Fullscreen exit did not restore normal window bounds.');
       assert.deepEqual(window.getNormalBounds(), normalBounds, 'Fullscreen exit changed normal window bounds.');
       assert.equal(await evaluate(`document.querySelector('.journey-scene').dataset.scenery`), scenery, 'Fullscreen exit changed the selected scenery.');
       assert.equal(await evaluate(`document.querySelector('svg.journey-art') === window.__journeySmokeArt`), true, 'Fullscreen exit remounted the scene art.');
     }
     await evaluate('delete window.__journeySmokeArt; true;');
-    return 'native/DOM fullscreen, art scaling, motion, Escape, focus and normal/maximized restoration';
+    return 'native/DOM fullscreen, art scaling, motion, lamp clicks, book/ticket contextual Escape and focus, normal/maximized restoration';
   } finally {
     contents.removeListener('enter-html-full-screen', countEntry);
     contents.removeListener('leave-html-full-screen', countExit);

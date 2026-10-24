@@ -3,7 +3,7 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { PreferencesStore } from '../services/preferences.js';
 import {
-  contentSecurityPolicy, getDevelopmentUrl, isAllowedFullscreenPermission, isAllowedResource,
+  contentSecurityPolicy, getDevelopmentUrl, isAllowedFullscreenPermission, isAllowedKeyboardLockPermission, isAllowedResource,
 } from '../services/security.js';
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -29,14 +29,16 @@ function verifySender(event) {
 
 function protectSession() {
   const localSession = session.defaultSession;
-  const allowFullscreen = (contents, permission, details) => isAllowedFullscreenPermission({
-    permission, contents, details, trustedContents: window?.webContents, expectedPage,
-  });
+  const allowScenePermission = (contents, permission, details) => {
+    const request = { permission, contents, details, trustedContents: window?.webContents, expectedPage };
+    return isAllowedFullscreenPermission(request)
+      || isAllowedKeyboardLockPermission({ ...request, fullscreen: window?.isFullScreen() });
+  };
   localSession.setPermissionRequestHandler((contents, permission, callback, details) => {
-    callback(allowFullscreen(contents, permission, details));
+    callback(allowScenePermission(contents, permission, details));
   });
   localSession.setPermissionCheckHandler((contents, permission, _requestingOrigin, details) => (
-    allowFullscreen(contents, permission, details)
+    allowScenePermission(contents, permission, details)
   ));
   localSession.webRequest.onBeforeRequest((details, callback) => {
     callback({ cancel: !isAllowedResource(details.url, distDirectory, developmentUrl) });

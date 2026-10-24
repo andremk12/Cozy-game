@@ -1,0 +1,41 @@
+/* Original SVG pixel landscapes. Parent Journey rules pause every animation,
+   including these ambient details, and disable them for reduced motion. */
+.journey-snowfall {
+  animation: journey-falling-snow 22s linear infinite;
+}
+
+.journey-snowfall--near {
+  animation-duration: 15s;
+  animation-delay: -8s;
+}
+
+.journey-lake-mist {
+  animation: journey-lake-mist 18s ease-in-out infinite;
+}
+
+.journey-lake-reflections {
+  animation: journey-lake-reflections 11s ease-in-out infinite;
+}
+
+.journey-lake-birds {
+  animation: journey-lake-birds 16s ease-in-out infinite;
+}
+
+@keyframes journey-falling-snow {
+  to { transform: translateY(48px); }
+}
+
+@keyframes journey-lake-mist {
+  0%, 100% { opacity: .38; }
+  50% { opacity: .23; }
+}
+
+@keyframes journey-lake-reflections {
+  0%, 100% { opacity: .82; }
+  50% { opacity: .57; }
+}
+
+@keyframes journey-lake-birds {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}

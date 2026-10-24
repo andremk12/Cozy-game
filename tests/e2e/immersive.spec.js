@@ -187,6 +187,8 @@ test('the exit control appears at the upper corner or with Tab, hides when idle 
   await page.waitForTimeout(2000);
   await expect(exit).toHaveCSS('opacity', '1');
   await page.keyboard.press('Tab');
+  await expect(page.getByRole('button', { name: 'Cortinas da janela', exact: true })).toBeFocused();
+  await page.keyboard.press('Shift+Tab');
   await expect(exit).toBeFocused();
   await page.keyboard.press('Enter');
   await expect.poll(() => page.evaluate(() => document.fullscreenElement === null)).toBe(true);
@@ -263,13 +265,14 @@ test('reduced motion remains static throughout fullscreen and after returning', 
 
 test('unavailable or denied fullscreen keeps the normal interface usable and permits a real retry', async ({ page }) => {
   await openJourney(page);
+  const error = page.locator('.journey-immersive-error');
   // Only the failure paths are simulated; the final retry uses the browser API.
   await page.evaluate(() => {
     Object.defineProperty(document, 'fullscreenEnabled', { configurable: true, value: false });
   });
   await entryButton(page).click();
-  await expect(page.getByRole('status')).toContainText('A tela cheia não está disponível');
-  await expect(page.getByRole('status')).toBeVisible();
+  await expect(error).toContainText('A tela cheia não está disponível');
+  await expect(error).toBeVisible();
   await expect(entryButton(page)).toBeEnabled();
   expect(await page.evaluate(() => document.fullscreenElement === null)).toBe(true);
   expect(await page.locator('.haven-app [inert]').count()).toBe(0);
@@ -281,8 +284,8 @@ test('unavailable or denied fullscreen keeps the normal interface usable and per
       Promise.reject(new DOMException('Synthetic fullscreen denial', 'NotAllowedError'));
   });
   await entryButton(page).click();
-  await expect(page.getByRole('status')).toContainText('Não foi possível abrir o Modo Imersivo');
-  await expect(page.getByRole('status')).toBeVisible();
+  await expect(error).toContainText('Não foi possível abrir o Modo Imersivo');
+  await expect(error).toBeVisible();
   await expect(entryButton(page)).toBeEnabled();
   expect(await page.evaluate(() => document.fullscreenElement === null)).toBe(true);
   expect(await page.locator('.haven-app [inert]').count()).toBe(0);

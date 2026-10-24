@@ -56,10 +56,14 @@ export default function App() {
         ? { icon: 'garden', label: 'Floresta' }
         : journeyScenery === 'sunset'
           ? { icon: 'sunset', label: 'Pôr do sol' }
-          : {
-              icon: journeyRainOn ? 'rain' : 'moon',
-              label: journeyRainOn ? 'Noite chuvosa' : 'Noite tranquila',
-            }
+          : journeyScenery === 'snowy-mountains'
+            ? { icon: 'journey', label: 'Snowy Mountains' }
+            : journeyScenery === 'morning-lake'
+              ? { icon: 'sunset', label: 'Morning Lake' }
+              : {
+                  icon: journeyRainOn ? 'rain' : 'moon',
+                  label: journeyRainOn ? 'Noite chuvosa' : 'Noite tranquila',
+                }
       : {
           icon: preferences.rainOn ? 'rain' : 'moon',
           label: preferences.rainOn ? 'Uma noite de chuva' : 'Uma noite tranquila',
@@ -250,7 +254,7 @@ export default function App() {
                 </>
               ) : world === 'journey' ? (
                 <>
-                  <Icon name="journey" size={13} /> Sem destino, sem pressa. A paisagem faz companhia.
+                  <Icon name="journey" size={13} /> Explore a luminária, as cortinas, o chá, o livro e o bilhete.
                 </>
               ) : world === 'float' ? (
                 <>

@@ -143,6 +143,75 @@
   animation-duration: 8s;
 }
 
+.journey-lamp-illumination {
+  transition: opacity 650ms ease;
+  pointer-events: none;
+}
+
+.journey-lamp-glass {
+  transition: fill 650ms ease;
+}
+
+.journey-object {
+  cursor: pointer;
+  pointer-events: bounding-box;
+  outline: none;
+  touch-action: manipulation;
+}
+
+.journey-object-hit {
+  fill: transparent;
+  stroke: transparent;
+  stroke-width: 1;
+}
+
+.journey-object:hover .journey-object-hit {
+  fill: #edd69a0c;
+  stroke: #e1be8070;
+}
+
+.journey-object:focus-visible {
+  outline: 2px solid #e1be80;
+  outline-offset: 3px;
+}
+
+.journey-object:focus-visible .journey-object-hit {
+  stroke: #f3db9f;
+  stroke-dasharray: 3 2;
+}
+
+.journey-curtain {
+  transition: transform 900ms steps(32, end);
+}
+
+.journey-curtain--left.is-open { transform: translateX(-139px); }
+.journey-curtain--right.is-open { transform: translateX(139px); }
+
+.journey-cup.is-serving {
+  transform-origin: 226px 177px;
+  animation: journey-serve-tea 900ms steps(6, end) both;
+}
+
+.journey-scene[data-tea-state='cooling'] .journey-steam {
+  opacity: .18;
+  animation-name: journey-cooling-tea;
+}
+
+.journey-scene[data-tea-state='cold'] .journey-steam {
+  opacity: 0;
+  animation: none;
+}
+
+@keyframes journey-serve-tea {
+  0%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-2px); }
+}
+
+@keyframes journey-cooling-tea {
+  0%, 100% { opacity: .06; transform: translateY(0); }
+  50% { opacity: .2; transform: translateY(-3px); }
+}
+
 .journey-scene:not(.is-rain-on) .journey-rainfall {
   animation-play-state: paused;
 }
