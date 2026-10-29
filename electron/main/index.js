@@ -3,8 +3,10 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { PreferencesStore } from '../services/preferences.js';
 import { GardenStore } from '../services/garden.js';
+import { MemoryCornerStore } from '../services/memoryCorner.js';
+import { decodeMemoryImage, registerMemoryCorner, registerMemoryScheme } from '../services/memoryBridge.js';
 import {
-  contentSecurityPolicy, getDevelopmentUrl, isAllowedFullscreenPermission, isAllowedKeyboardLockPermission, isAllowedResource,
+  contentSecurityPolicy, getDevelopmentUrl, isAllowedFullscreenPermission, isAllowedKeyboardLockPermission, isAllowedResource, parseMemoryImageUrl,
 } from '../services/security.js';
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -15,12 +17,14 @@ const expectedPage = developmentUrl ? `${developmentUrl}/` : pathToFileURL(entry
 let window;
 let preferences;
 let garden;
+let memory;
 let quitting = false;
 
 app.setName('Little Haven');
 app.setAppUserModelId('studio.littlehaven.desktop');
 // Application-wide sandboxing also protects any future renderer.
 app.enableSandbox();
+registerMemoryScheme();
 
 function verifySender(event) {
   if (!window || event.sender !== window.webContents || event.senderFrame !== window.webContents.mainFrame
@@ -43,6 +47,11 @@ function protectSession() {
     allowScenePermission(contents, permission, details)
   ));
   localSession.webRequest.onBeforeRequest((details, callback) => {
+    if (details.url.startsWith('haven-memory:')) {
+      callback({ cancel: !window || window.isDestroyed() || !parseMemoryImageUrl(details.url) || details.webContentsId !== window.webContents.id
+        || details.resourceType !== 'image' || window.webContents.mainFrame.url !== expectedPage });
+      return;
+    }
     callback({ cancel: !isAllowedResource(details.url, distDirectory, developmentUrl) });
   });
   localSession.webRequest.onHeadersReceived((details, callback) => {
@@ -105,8 +114,11 @@ async function createWindow() {
 app.whenReady().then(async () => {
   preferences = new PreferencesStore(path.join(app.getPath('userData'), 'preferences.json'));
   garden = new GardenStore(path.join(app.getPath('userData'), 'garden.json'));
+  memory = new MemoryCornerStore(path.join(app.getPath('userData'), 'memory-corner'), { decodeImage: decodeMemoryImage });
   await preferences.get();
   protectSession();
+  registerMemoryCorner({ ipcMain, session: session.defaultSession, dialog, store: memory,
+    verifySender, getWindow: () => window });
   ipcMain.handle('haven:preferences:get', async (event) => {
     verifySender(event);
     return preferences.get();
@@ -140,5 +152,6 @@ app.on('before-quit', (event) => {
   if (!preferences || quitting) return;
   event.preventDefault();
   quitting = true;
-  Promise.allSettled([preferences.flush(), garden?.flush()]).finally(() => app.quit());
+  Promise.allSettled([preferences.flush(), garden?.flush(), memory?.flush()])
+    .then(() => memory?.cleanup?.()).catch(() => {}).finally(() => app.quit());
 });

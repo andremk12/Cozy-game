@@ -1,4 +1,78 @@
-# Validação atual — Áudio 2.0 e Cozy Sound Mixer
+# Validação atual — The Memory Corner
+
+Verificação de **29 de outubro de 2026**, em Windows x64, Node.js **22.18.0**, Electron **44.9.0** e Microsoft Edge **156.0.4314.50**. As verificações abaixo foram executadas nesta implementação. Os registros anteriores permanecem como histórico, sem substituir os resultados atuais.
+
+| Verificação executada | Resultado |
+| --- | --- |
+| `npm test` no código final | **110 passaram**, zero falhas |
+| `npm run build` (também executado por `test:e2e`) | Concluído; **95 módulos**, sem novas dependências |
+| `npx playwright test tests/e2e/memory-corner.spec.js` após corrigir seletores do harness | **10 passaram**, código de saída 0 |
+| `npm run test:e2e` no build final | **70 passaram** em aproximadamente 1,6 minuto; código de saída 0 |
+| `npm run test:memory` no build final | Passou; duas fases em **processos Electron distintos**, com o mesmo perfil sintético |
+| `npm run test:desktop` após aguardar respostas reais dos controles | Passou; quarto, jardim, viagem, companheiro, mixer, segurança, imersão e descarte nativo |
+| `node scripts/memory-performance.mjs` | Ensaio completo passou; 12 imagens sintéticas de 4000 × 3000, viewer, teclado, reload e capturas |
+| Inspeção visual | Capturas desktop, mobile e nativa abertas e revisadas; a captura nativa final inclui as luzes acima do quadro |
+
+## Funcionalidades e preservação verificadas
+
+- **Experiência própria:** The Memory Corner aparece como quinto ambiente, com mural de madeira/cortiça, parede, caixa de lembranças, flores e luzes originais em SVG. Fotografias e bilhetes são elementos HTML nativos sobre a arte, sem herdar a escala pixelada do cenário. Três temas e decorações opcionais preservam o conteúdo.
+- **Fotografias reais:** importação múltipla por diálogo nativo; PNG horizontal de 1920 × 1080, JPEG de 400 × 240 com EXIF Orientation 6 e WebP de 1280 × 960 foram realmente decodificados no Electron. O JPEG foi exibido em orientação retrato de 240 × 400, inclusive na miniatura. Formatos não suportados, bytes inválidos, dimensões excessivas, CRC PNG incorreto e tamanhos fora do limite são rejeitados. SVG, GIF e imagens animadas não entram no mural.
+- **Originais:** hashes SHA-256 das cópias gerenciadas permaneceram idênticos às fontes sintéticas. As fontes foram apagadas e as cópias continuaram disponíveis após reload e após encerrar/reabrir o Electron em outro processo. Os testes de serviço também recriam a store a partir do disco e recriam uma miniatura ausente sem modificar o original.
+- **Qualidade:** mural usa miniaturas PNG de até 640 pixels; o viewer solicita somente o original aberto, mantém proporção e `object-fit: contain`, com zoom, ajuste à janela, rolagem e deslocamento. Fotos usam `image-rendering: auto` e orientação de imagem; nenhuma compressão substitui os originais. Cinco molduras e legendas são metadados e apresentação.
+- **Bilhetes:** criação, edição, cinco cores, três papéis, lembretes opcionais, multiline, acentos, caracteres combinados e Unicode foram verificados. Texto é guardado em JSON e renderizado como texto nativo, sem HTML executável nem rasterização. Rascunhos dos editores só entram no documento ao confirmar.
+- **Organização:** arrasto grava somente ao soltar; setas, Shift+setas e botões oferecem alternativas. Coordenadas relativas ficam entre 0 e 1, com cartões contidos pela área lógica; pequenas inclinações e ordem de sobreposição persistem. Remoção exige confirmação, desfazer recupera o último cartão durante a visita e referências compartilhadas não apagam originais ainda utilizados.
+- **Persistência:** `board.json` é um envelope versionado separado das preferências, com assets internos, textos e posições; originais ficam em `images/` e derivados em `thumbnails/`. Escrita temporária sincronizada e rename atômico, fila de operações e flush no encerramento normal. Dados corrompidos ou de versões futuras não são sobrescritos automaticamente. Erros mantêm a sessão e permitem tentar novamente; um documento reparado pode ser relido sem reiniciar.
+- **Backup completo:** `.haven-memory` v1 contém magic, metadados UTF-8 limitados e bytes originais sequenciais com SHA-256. Não há caminhos de entrada, base64 de fotos ou descompressão de arquivo arbitrário. A restauração pede confirmação, valida todo o pacote e todas as imagens em staging, instala IDs novos e só então troca o envelope. Truncamento, checksum incorreto, versões incompatíveis, dados extras e tentativas de traversal mantiveram o mural existente. Roundtrip em outra store e reabertura em outro processo passaram.
+- **Segurança:** preload expõe cinco operações específicas sem receber caminhos de arquivo. Schema e origem/frame IPC são validados; IDs desconhecidos, variantes indevidas, URLs com query/traversal e acesso `file://` fora do bundle foram rejeitados. Diretórios gerenciados não aceitam junctions/symlinks. O protocolo `haven-memory://local/<UUID>/(thumbnail|original)` serve só imagens autorizadas na janela principal. Sandbox, isolamento, Node desabilitado, frames negados, scripts locais e `connect-src 'none'` foram mantidos. A CSP libera somente essa origem local adicional de imagens no desktop.
+- **Decoder:** janela oculta curta com sessão efêmera, sandbox, sem Node e sem rede; Chromium considera EXIF/WebP, cria uma miniatura e fecha o bitmap. Só bytes limitados entram nela, sem caminhos, notas ou preferências. Leituras e regenerações de previews são serializadas para evitar múltiplos decoders simultâneos.
+- **Áudio e imersão:** entrar no mural preservou preset, camadas, master, mute, fontes e o único AudioContext já ativo. Não houve autoplay. Fullscreen conserva o mesmo mural e qualidade nativa; Esc contextual, M para mixer, C para My Companion e retorno de foco passaram no navegador e no Electron.
+- **Privacidade do ritual:** textos sintéticos de Let It Float ficaram ausentes do JSON/IndexedDB do mural, preferências e demais armazenamentos. A confirmação ao navegar, descarte e texto efêmero continuam cobertos pela suíte completa. Fotos e bilhetes do mural são conteúdo persistente criado explicitamente, sem ligação automática com o ritual.
+- **Fallback web:** IndexedDB separado com originais e miniaturas em registros Blob; nada de fotografias completas em localStorage. Falha transitória ao abrir o banco pode ser recuperada e versões futuras permanecem protegidas. Backup completo é uma função desktop, indicada assim na interface.
+
+## Revisões e execuções intermediárias
+
+A revisão reproduziu uma corrida em duas tentativas simultâneas de leitura, que podia substituir uma edição recente por um snapshot antigo. A recuperação agora bloqueia edições durante uma única leitura; o caso tem teste de regressão. Também foram corrigidos retry durante importação/restauração, cache de aquisição de imagem rejeitada e abertura de IndexedDB com falha transitória. Os 110 unitários finais incluem essas correções.
+
+A primeira execução focada de interface teve seis falhas nos seletores exatos de labels com selects aninhados; o harness passou a localizar os comboboxes por nome acessível. Os dez casos e a suíte completa posterior passaram. O smoke nativo novo precisou identificar a primeira janela de produção, aguardar diálogos e a transição de foco antes dos cliques/teclas. O smoke geral revelou leituras antecipadas de mute e confirmação de preferências; passou após aguardar os estados reais, sem relaxar critérios ou modificar o áudio/companheiro do produto.
+
+Os testes de Electron e navegador foram executados fora do sandbox do terminal, mantendo o sandbox do aplicativo habilitado. O teste proposital de backup truncado produz uma mensagem genérica esperada do handler IPC, sem conteúdo de fotografias ou bilhetes. Avisos de MockTimers, `NO_COLOR`/`FORCE_COLOR`, finais de linha e os chunks de áudio acima de 500 kB não são falhas do mural. O custo de disco dos módulos de áudio preexistentes continua documentado abaixo.
+
+## Desempenho e inspeção visual
+
+Ensaio com **Intel Core i5-13450HX, 24 GiB RAM, Windows 10.0.26200, Edge headless 156.0.4314.50**, viewport 1440 × 960 e áudio desligado. Doze imagens sintéticas de 4000 × 3000 em PNG/JPEG/WebP, total de **5.708.548 bytes**, foram importadas em **1,895 s**, incluindo transferência do seletor de teste.
+
+- Mural: **12 miniaturas 640 × 480**, renderização `auto`, **zero leituras de originais antes do viewer**.
+- Viewer: 12 originais abertos individualmente, 12 leituras; ao fechar todos, restaram somente as 12 URLs de miniaturas montadas. Originais tiveram URLs revogadas.
+- Heap JavaScript após GC solicitado via CDP: aproximadamente **3,27 MB antes**, **4,11 MB após importar**, **4,56 MB após os viewers** e **3,92 MB após reload**. DOM: 237 elementos após importação/viewers e 236 após reload.
+- Observação contemplativa de 15 s: nenhum intervalo de callback acima de 33,5 ms e nenhuma tarefa longa nesse período. Importação/viewers registraram tarefas longas de aproximadamente **357 ms e 69 ms**; não foram omitidas nem atribuídas ao período de contemplação.
+- Teclado, ordem de sobreposição e posições após reload passaram. Capturas de composição com três imagens e dois bilhetes em desktop, DPR 2 e mobile 390 px; sem overflow horizontal.
+
+Heap JavaScript **não inclui todos os buffers de imagens, alocações nativas, IndexedDB ou GPU**. Callbacks headless não comprovam FPS apresentados por monitor físico. O ensaio usa imagens sintéticas compressíveis e uma máquina; não estabelece um orçamento universal para 60 fotografias grandes, sessões longas ou outros equipamentos. O smoke Electron registra uma fotografia dos processos em `outputs/memory-smoke.json`, sem pretensão de profiling completo.
+
+Artefatos locais, não versionados: `outputs/memory-performance.json`, `outputs/memory-smoke.json`, `outputs/Little-Haven-Memory-{desktop,dpr2,mobile,original,stress-desktop}.png` e `outputs/Little-Haven-Memory-Corner-{desktop,mobile,immersive,native}.png`.
+
+## Arquivos e limites
+
+Criados:
+
+- `src/scenes/MemoryCorner/{MemoryCorner,MemoryBoard,MemoryDialogs}.jsx` e `MemoryCorner.css`: cena, cartões, editores, viewer e personalização.
+- `src/hooks/useMemoryBoard.js`, `src/services/memory.js` e `memoryDatabase.js`: estado, gravação, fila, tratamento de falhas, imagens sob demanda e IndexedDB web.
+- `shared/memory.js` e `memoryImage.js`: schema, limites, inspeção dos bytes e miniaturas no Chromium.
+- `electron/services/memoryCorner.js`, `memoryBackup.js`, `memoryBridge.js`, `memory-decoder.html`, `memory-decoder.js` e `electron/preload/memory-decoder.cjs`: cópias, backup, protocolo, diálogos e decoder isolado.
+- `scripts/memory-smoke.mjs`, `memory-smoke-main.mjs` e `memory-performance.mjs`: verificações nativas/reabertura e ensaio visual.
+- `tests/memory{,-bridge,-database,-renderer,-storage}.test.js`, `memory-fixture.js` e `tests/e2e/memory-corner.spec.js`: regressões e fixtures sintéticas.
+
+Modificados: `src/app/App.jsx`, `App.css`, `src/components/Icon.jsx`, `electron/main/index.js`, `electron/preload/index.cjs`, `electron/services/security.js`, `index.html`, `package.json`, `scripts/desktop-smoke-main.mjs`, `README.md`, `ROADMAP.md` e este arquivo. Nenhuma nova dependência, engine, backend ou recurso remoto foi adicionado. Nenhuma cena anterior foi reconstruída.
+
+Limites atuais: até 60 itens, 20 MiB por imagem, 40 MP e 16.000 pixels por lado; cota de originais reserva espaço para um backup de até 512 MiB. Há desfazer da última remoção durante a visita, sem histórico geral. Imagens animadas não são suportadas. O companheiro não foi acrescentado ao cenário do mural, mas seu painel global continua acessível. Dados e backups não são criptografados pelo aplicativo; dependem da proteção do dispositivo. O fechamento normal espera operações aceitas, sem promessa de recuperar alterações ainda não confirmadas ou falhas de sistema/disco.
+
+Não foram realizados testes com Narrador, ensaios prolongados, profiling abrangente de buffers/GPU, corpus diversificado de fotografias reais ou todos os monitores/DPI. Esses são os próximos refinamentos recomendados antes de distribuição pública ampla. Não houve empacotamento, commit, push, merge ou release nesta tarefa.
+
+Para conferir manualmente: execute `npm start` após o build, abra **The Memory Corner**, importe uma fotografia horizontal e outra vertical, edite moldura/legenda, escreva um bilhete multilinha e reorganize com mouse e teclado. Amplie a foto e ajuste o zoom. Em **Seu cantinho**, troque o tema e exporte um backup; restaure-o somente após guardar uma cópia do mural atual. Feche e reabra o aplicativo, confira a posição e a imagem mesmo após mover sua fonte. Teste M/C/Esc na imersão e confirme que Let It Float continua protegendo e descartando seu próprio rascunho.
+
+---
+
+# Validação anterior — Áudio 2.0 e Cozy Sound Mixer
 
 Verificação de **29 de outubro de 2026**, em Windows x64, Node.js 22.18.0 e Microsoft Edge. As alterações locais anteriores de Garden e Journey foram preservadas; os registros abaixo permanecem como histórico e não substituem os testes desta mudança.
 

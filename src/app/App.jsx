@@ -3,10 +3,12 @@ import Room from '../scenes/Room/Room.jsx';
 import LetItFloat from '../scenes/LetItFloat/LetItFloat.jsx';
 import Journey from '../scenes/Journey/Journey.jsx';
 import Garden from '../scenes/Garden/Garden.jsx';
+import MemoryCorner from '../scenes/MemoryCorner/MemoryCorner.jsx';
 import { initialRitual, ritualReducer } from '../scenes/LetItFloat/ritual.js';
 import { usePreferences } from '../hooks/usePreferences.js';
 import { useReducedMotion } from '../hooks/useReducedMotion.js';
 import { useGarden } from '../hooks/useGarden.js';
+import { useMemoryBoard } from '../hooks/useMemoryBoard.js';
 import { AudioEngine } from '../services/audio/AudioEngine.js';
 import { AUDIO_PRESETS } from '../services/audio/audioPresets.js';
 import { cloneAudioLayers, createPresetMix } from '../../shared/audio.js';
@@ -31,6 +33,7 @@ const worlds = [
     icon: 'journey',
   },
   { id: 'float', name: 'Let It Float', sub: 'Um respiro, um recomeço', icon: 'boat' },
+  { id: 'memory', name: 'The Memory Corner', sub: 'A Place for What Matters', icon: 'memory' },
 ];
 
 export default function App() {
@@ -38,6 +41,7 @@ export default function App() {
   const reducedMotion = useReducedMotion();
   const [world, setWorld] = useState('room');
   const gardenState = useGarden({ active: world === 'garden' });
+  const memory = useMemoryBoard({ active: world === 'memory' });
   const [pendingWorld, setPendingWorld] = useState(null);
   const [ritual, dispatch] = useReducer(ritualReducer, initialRitual);
   const [audioActive, setAudioActive] = useState(false);
@@ -62,10 +66,10 @@ export default function App() {
   const suggestedPreset = world === 'journey' ? 'peaceful-journey'
     : world === 'garden' ? gardenState.garden.atmosphere === 'night' ? 'quiet-night' : 'morning-garden'
       : 'rainy-evening';
-  const atmosphereKey = world === 'garden' ? `garden:${gardenState.garden.atmosphere}:${gardenState.garden.weather}`
+  const atmosphereKey = world === 'memory' ? 'memory' : world === 'garden' ? `garden:${gardenState.garden.atmosphere}:${gardenState.garden.weather}`
     : world === 'journey' ? `journey:${journeyScenery}:${journeyRainOn}` : `room:${preferences.rainOn}`;
   const weather =
-    world === 'garden' ? {
+    world === 'memory' ? { icon: 'memory', label: 'Lembranças por perto' } : world === 'garden' ? {
       icon: gardenState.garden.weather === 'rain' ? 'rain' : gardenState.garden.atmosphere === 'night' ? 'moon' : 'sunset',
       label: `${gardenState.garden.atmosphere === 'night' ? 'Noite tranquila' : gardenState.garden.atmosphere === 'sunset' ? 'Pôr do sol' : 'Dia ensolarado'}${gardenState.garden.weather === 'rain' ? ' · Chuva suave' : ''}`,
     } : world === 'journey'
@@ -113,7 +117,7 @@ export default function App() {
     previousAtmosphere.current = atmosphereKey;
     // Restore the saved mix untouched on launch. Only subsequent scenery/weather
     // changes follow the environment; a manually edited Custom always travels intact.
-    if (previous === null || previous === atmosphereKey) return;
+    if (previous === null || previous === atmosphereKey || world === 'memory') return;
     if (!AUDIO_PRESETS.find((preset) => preset.id === suggestedPreset)?.available) return;
     setPreference('mixer', (current) => {
       if (current.preset === 'custom') return current;
@@ -330,7 +334,7 @@ export default function App() {
             <span className="frame-dot" />
             <span>{selected.sub}</span>
             <span className="frame-coordinate">
-              {String(worlds.findIndex((item) => item.id === world) + 1).padStart(2, '0')} / 04
+              {String(worlds.findIndex((item) => item.id === world) + 1).padStart(2, '0')} / {String(worlds.length).padStart(2, '0')}
             </span>
           </div>
           <div className={`scene-content world-${world}`} key={world}>
@@ -358,6 +362,8 @@ export default function App() {
                 onBack={() => moveTo('room')}
                 companion={companion}
               />
+            ) : world === 'memory' ? (
+              <MemoryCorner memory={memory} reducedMotion={reducedMotion} onBack={() => moveTo('room')} />
             ) : world === 'float' ? (
               <LetItFloat
                 ritual={ritual}
@@ -380,6 +386,8 @@ export default function App() {
                 <>
                   <Icon name="journey" size={13} /> Explore a luminária, as cortinas, o chá, o livro e o bilhete.
                 </>
+              ) : world === 'memory' ? (
+                <><Icon name="memory" size={13} /> Algumas lembranças merecem um lugar por perto. Fotografias e bilhetes ficam neste dispositivo.</>
               ) : world === 'float' ? (
                 <>
                   <Icon name="lock" size={13} /> Seu texto fica apenas nesta sessão e é descartado

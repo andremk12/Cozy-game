@@ -236,6 +236,9 @@
 }
 .world-tabs {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  min-width: 0;
   gap: 5px;
   padding: 5px;
   border: 1px solid #8ba18429;
@@ -469,6 +472,11 @@
     font-size: 9px;
     padding: 9px 7px;
     flex: 1;
+    min-width: 0;
+  }
+  .world-tab > span:not(.selected-dot) {
+    text-align: center;
+    line-height: 1.5;
   }
   .world-tab small {
     display: none;

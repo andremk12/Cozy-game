@@ -91,6 +91,7 @@ async function verifyCompanion(window) {
   await waitFor(() => evaluate(`!document.querySelector('g.companion')`), 'Companion visibility did not hide the character.');
   await clickRendererButton(window, visibility);
   await waitFor(() => evaluate(`document.querySelector('g.companion')?.getAttribute('aria-label') === 'Fazer carinho em Mochi Smoke'`), 'Companion did not reappear with its chosen name.');
+  await waitFor(() => evaluate(`window.haven.getPreferences().then(({ companion }) => companion.enabled === true && companion.name === 'Mochi Smoke')`), 'Companion changes did not finish saving.');
   const saved = await evaluate(`window.haven.getPreferences().then(({ companion }) => companion)`);
   assert.equal(saved.name, 'Mochi Smoke');
   assert.equal(saved.enabled, true);
@@ -149,6 +150,7 @@ async function verifySoundMixer(window) {
   // A profile from a preceding smoke run may contain a remembered mute.
   if (await evaluate(`document.querySelector('.mixer-mute')?.getAttribute('aria-pressed') === 'true'`)) {
     await clickRendererButton(window, '.mixer-mute');
+    await waitFor(() => evaluate(`document.querySelector('.mixer-mute')?.getAttribute('aria-pressed') === 'false'`), 'The remembered mute did not clear.');
   }
   await clickRendererButton(window, '.mixer-start');
   for (const [id, expected] of [
@@ -167,8 +169,9 @@ async function verifySoundMixer(window) {
   assert.equal(await evaluate('window.__desktopMixerProbe.contexts.length'), 1, 'Mixer duplicated its AudioContext.');
   assert.equal(await evaluate(`Boolean(document.querySelector('.mixer-notice'))`), false, 'A local sound failed to load.');
   await clickRendererButton(window, '.mixer-mute');
-  assert.equal(await evaluate(`document.querySelector('.mixer-mute').getAttribute('aria-pressed')`), 'true');
+  await waitFor(() => evaluate(`document.querySelector('.mixer-mute')?.getAttribute('aria-pressed') === 'true'`), 'Mute did not update after its native click.');
   await clickRendererButton(window, '.mixer-mute');
+  await waitFor(() => evaluate(`document.querySelector('.mixer-mute')?.getAttribute('aria-pressed') === 'false'`), 'Unmute did not update after its native click.');
   await choose('rainy-evening');
   await clickRendererButton(window, '[aria-label="Fechar mixer"]');
   return 'all 12 local layers decoded/started, four presets, mute, one context, no autoplay';
@@ -427,7 +430,7 @@ app.on('browser-window-created', (_event, window) => {
       const result = await window.webContents.executeJavaScript(`(async () => {
         if (!document.querySelector('#root')?.children.length) throw new Error('React root is empty.');
         if (typeof window.require !== 'undefined' || typeof window.process !== 'undefined') throw new Error('Node leaked to the renderer.');
-        if (Object.keys(window.haven).sort().join(',') !== 'getGarden,getPreferences,saveGarden,savePreferences') throw new Error('Unexpected bridge API.');
+        if (Object.keys(window.haven).sort().join(',') !== 'getGarden,getPreferences,memoryExport,memoryGet,memoryImport,memoryRestore,memorySave,saveGarden,savePreferences') throw new Error('Unexpected bridge API.');
         const initial = await window.haven.getPreferences();
         await window.haven.savePreferences({ lampOn: !initial.lampOn, volume: 0.1 });
         const changed = await window.haven.getPreferences();
@@ -490,6 +493,7 @@ app.on('browser-window-created', (_event, window) => {
       finish(0);
     } catch (error) {
       console.error(`Desktop smoke failed: ${error.message}`);
+      if (error.stack) console.error(error.stack);
       if (errors.length) console.error(`Renderer diagnostics: ${errors.join('; ')}`);
       finish(1);
     }

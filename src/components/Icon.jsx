@@ -35,6 +35,7 @@ export default function Icon({ name, size = 20, ...props }) {
       </>
     ),
     mixer: <path d="M5 3v6m0 4v8M12 3v11m0 4v3M19 3v3m0 4v11M2 9h6v4H2zM9 14h6v4H9zM16 6h6v4h-6z" />,
+    memory: <><path d="M3 3h18v18H3zM6 6h12v10H6zM6 13l4-4 4 5 2-2 2 2M8 19h8" /><path d="M15 8h.01" /></>,
     companion: <path d="M4 11V3l6 4h4l6-4v8l1 4-3 6H6l-3-6 1-4Zm4 2h.01M16 13h.01M10 17h4m-2-2v2M1 14l5 1m-5 3 5-1m17-3-5 1m5 3-5-1" />,
     wind: <path d="M3 8h11c4 0 4-5 1-5-2 0-3 1-3 2M2 12h17c4 0 4 6 0 6-2 0-3-1-3-2M4 16h6c3 0 3 5 0 5" />,
     leaves: <path d="M12 21V11M12 16C5 17 2 12 3 7c5-1 9 2 9 7 0-8 4-12 10-11 0 7-3 11-10 11M6 11l6 5m0-5 6-5" />,

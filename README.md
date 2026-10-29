@@ -2,7 +2,7 @@
 
 Um pequeno refúgio desktop em pixel art: uma noite de chuva, uma luz quente e um lugar onde você pode apenas existir. Sem contas, metas, pontuações ou serviços em nuvem.
 
-A fundação da Fase 1 entrega **The Room** e o ritual **Let It Float**. O aplicativo também oferece **The Journey**, uma viagem contemplativa de trem com cinco paisagens e pequenos objetos interativos, e **The Garden**, um jardim original para plantar, cuidar e contemplar sem cobranças.
+A fundação da Fase 1 entrega **The Room** e o ritual **Let It Float**. O aplicativo também oferece **The Journey**, uma viagem contemplativa de trem com cinco paisagens e pequenos objetos interativos, **The Garden**, um jardim para plantar e contemplar sem cobranças, e **The Memory Corner**, um mural pessoal de fotografias e bilhetes.
 
 O comando `npm run package:win` gera o executável em `outputs/desktop/Little-Haven-0.1.0-x64.exe`. Depois de gerado, abra esse arquivo para usar o aplicativo sem instalar Node.js. A distribuição é portátil e ainda não possui assinatura digital. O código-fonte editável fica na raiz deste projeto; dependências, builds, executáveis e perfis de teste são locais e não são versionados no Git.
 
@@ -38,6 +38,7 @@ A instalação de dependências, o primeiro download do runtime Electron e as fe
 | `npm test` | Executar os testes unitários. |
 | `npm run test:e2e` | Gerar o build e executar os testes da interface. |
 | `npm run test:desktop` | Abrir e verificar o Electron com um perfil de teste isolado; exige build prévio. |
+| `npm run test:memory` | Verificar importação, originais, backup, privacidade e imersão do mural no Electron, com fotografias sintéticas e perfil isolado. |
 
 ## Primeiros momentos no refúgio
 
@@ -57,6 +58,31 @@ A instalação de dependências, o primeiro download do runtime Electron e as fe
 - Explore os pontos de decoração para colocar banco, lanternas, pedras e cogumelos. Há vasos de terracota ou madeira, lanternas que podem ser apagadas, borboletas, vagalumes noturnos e peixes que respondem ao toque no lago.
 - Procure o **gato laranja entre as plantas**: orelhas e cauda espiam em um dos três arbustos. Clique ou use Tab e Enter para chamá-lo; ele aparece, pisca e volta a se esconder. Não exige alimento ou cuidados.
 - Em **Luz e clima**, escolha dia, pôr do sol ou noite, com clima limpo ou chuva suave. O jardim possui o mesmo **Modo Imersivo** da viagem; o baú de ferramentas e a placa de atmosfera mantêm os controles acessíveis dentro do cenário.
+
+### The Memory Corner — A Place for What Matters
+
+Escolha **The Memory Corner** na navegação para entrar em um cantinho com mural de cortiça, madeira, pequenas flores e luzes. Ele começa vazio: você escolhe o que deseja manter por perto.
+
+- **Add a Memory** abre o seletor do computador e aceita várias fotografias JPG/JPEG, PNG ou WebP. O conteúdo real é validado e decodificado; SVG, GIF e imagens animadas não são aceitos. Cada imagem pode ter até **20 MiB**, **40 megapixels** e **16.000 pixels por lado**. O mural comporta **60 itens**; o conjunto de originais tem uma cota um pouco inferior a **512 MiB**, reservando espaço para os metadados do backup. Mensagens de erro explicam os limites.
+- Selecione uma fotografia e escolha **Editar** para acrescentar ou remover uma legenda e escolher Polaroid, madeira clara, madeira escura, papel fotográfico ou detalhes florais. As fotos mantêm proporção, nitidez e cores; as molduras não alteram os arquivos.
+- **Write a Note** cria um bilhete com até 2.000 caracteres, acentos, Unicode e múltiplas linhas. Escolha uma das cinco cores e papel simples, pautado ou com borda artesanal. **A Little Reminder** oferece oito mensagens opcionais, que só entram no mural após sua confirmação. O texto permanece texto nativo, legível, sem rasterização.
+- Arraste os cartões para reorganizar. Selecione com Tab/Espaço e use as setas (Shift move um pouco mais) ou os botões direcionais. É possível inclinar em −8°, −4°, 0°, +4° e +8° e alterar a sobreposição. As posições relativas se adaptam à janela; o arrasto só grava ao soltar.
+- Dois cliques, **Enter** ou **Ampliar** abrem a fotografia original ou o bilhete inteiro. Fotos oferecem zoom, ajuste à janela, arrasto e barras de rolagem; somente o original aberto é carregado. **Remover** pede confirmação, e **Desfazer remoção** recupera o último cartão durante a visita. Os arquivos da pasta de origem permanecem intactos.
+- **Seu cantinho** oferece Warm Memories, Moonlight Notes e Garden Keepsakes, além de luzes, flores e estrelas opcionais. O **Modo Imersivo** reutiliza o mecanismo existente com fotografias e textos em resolução nativa. M abre o mixer, C abre My Companion e Esc fecha primeiro o diálogo ou as ferramentas, depois sai da imersão. O gatinho permanece nos ambientes anteriores; não foi acrescentado sobre o mural.
+
+Ao entrar no mural, a combinação de áudio atual continua sem troca automática nem reprodução inesperada. O volume, mute, Custom e os controles do Cozy Sound Mixer são compartilhados com os demais ambientes.
+
+#### Armazenamento e backup das lembranças
+
+No desktop, `app.getPath('userData')/memory-corner/` guarda `board.json`, `images/` e `thumbnails/`. O JSON versionado contém os textos, legendas, posições, tema e referências internas, sem caminhos de origem ou fotografias em base64. Os originais são copiados **byte por byte**, incluindo sua resolução e metadados, com identificadores UUID. Mover ou apagar a fonte não remove a cópia do aplicativo. Miniaturas PNG de até 640 pixels são derivadas e recriáveis; a visualização ampliada usa o original com orientação de exibição respeitada. Fotografias nunca recebem `image-rendering: pixelated`.
+
+O decodificador do Chromium trabalha em uma janela oculta de curta duração, com sandbox, isolamento e sessão efêmera sem rede. Ele considera EXIF e WebP, gera a miniatura e libera o bitmap; não altera os bytes originais. Isso evita depender da [API nativeImage, que não considera EXIF](https://www.electronjs.org/docs/latest/api/native-image). A janela principal recebe somente URLs internas `haven-memory://local/<UUID>/thumbnail` ou `/original`, nunca acesso a caminhos arbitrários.
+
+Cada alteração confirmada é enviada imediatamente para gravação atômica. O fechamento normal aguarda as operações aceitas. Falhas deixam a sessão disponível, com aviso e **Tentar novamente**; documentos corrompidos ou de versões futuras ficam protegidos contra sobrescrita automática. Remoções deixam a cópia disponível para desfazer durante a sessão; cópias sem referência são limpas no encerramento normal. Não há promessa de eliminação forense, recuperação de mudanças não confirmadas ou proteção contra falha de disco/encerramento forçado.
+
+Em **Seu cantinho → Exportar backup**, escolha um destino para o arquivo **`.haven-memory`**. Ele inclui os originais intactos, mensagens, legendas, posições, ordem, tema e decorações, em formato binário versionado, sem compressão ou fotos dentro de JSON. A restauração é explícita, pede confirmação e valida estrutura, limites, hashes SHA-256 e decodificação das imagens antes de trocar os metadados. Se falhar, o mural atual permanece. Exporte uma cópia do mural atual antes de substituí-lo se quiser conservar os dois. O pacote pode ser restaurado em outra instalação desta versão; uma captura de tela não substitui esse backup.
+
+As lembranças ficam **somente neste computador**, sem upload, análise, sincronização ou criptografia implementada pelo aplicativo. Proteja o computador e os backups conforme sua preferência. No desenvolvimento pelo navegador, o mural usa um banco IndexedDB separado (`little-haven-memory-v1`), com imagens em registros Blob, independente dos dados desktop. Backup/restauração completos são oferecidos no desktop. O conteúdo do **Let It Float continua efêmero e nunca entra no mural automaticamente**.
 
 ### Little Companion
 
@@ -127,6 +153,9 @@ electron/
   preload/index.cjs             Ponte mínima isolada para preferências
   services/preferences.js       Validação e gravação local
   services/security.js          Políticas de recursos e CSP
+  services/memoryCorner.js       Originais, miniaturas e metadados atômicos do mural
+  services/memoryBackup.js       Pacote local restaurável com hashes e limites
+  services/memoryBridge.js       Diálogos nativos, protocolo de imagens e decoder isolado
 src/
   app/App.jsx                   Navegação e coordenação das experiências
   components/                   Ícones, confirmação, mixer e viewport imersivo
@@ -136,6 +165,7 @@ src/
   scenes/LetItFloat/            Escrita, estados do ritual e rio
   scenes/Journey/               Vagão, paisagens e controles da viagem
   scenes/Garden/                Jardim, plantas, ferramentas, decoração e fauna
+  scenes/MemoryCorner/          Mural, cartões, editores e visualizações ampliadas
   services/audio/               Motor compartilhado, camadas, biblioteca e presets
   services/                     Preferências e persistência do jardim
   styles/                       Estilos e fontes locais
@@ -147,6 +177,8 @@ scripts/                        Inicialização de desenvolvimento e teste nativ
 shared/garden.js                Modelo puro, crescimento, posições e validação do jardim
 shared/audio.js                 Schema do mixer e configurações dos presets
 shared/companion.js             Nome Unicode e preferências limitadas do companheiro
+shared/memory.js                Schema e limites do mural; inspeção segura de imagens
+shared/memoryImage.js           Miniaturas com orientação no Chromium
 tests/                          Testes unitários e de interface
 ```
 
@@ -156,11 +188,11 @@ O hook `useImmersiveMode` coordena a DOM Fullscreen API e o componente `Immersiv
 
 ### Limites de segurança do desktop
 
-O renderer usa `contextIsolation: true`, `nodeIntegration: false` e `sandbox: true`. A ponte expõe somente `window.haven.getPreferences()`, `window.haven.savePreferences(prefs)`, `window.haven.getGarden()` e `window.haven.saveGarden(snapshot)`. Há validação na ponte e no processo principal, incluindo a origem do pedido IPC. Campos desconhecidos ou posições incompatíveis do jardim são rejeitados.
+O renderer usa `contextIsolation: true`, `nodeIntegration: false` e `sandbox: true`. A ponte expõe `window.haven.getPreferences()`, `savePreferences(prefs)`, `getGarden()` e `saveGarden(snapshot)`, mais cinco ações explícitas do mural: `memoryGet()`, `memorySave(board)`, `memoryImport()`, `memoryExport()` e `memoryRestore()`. Há validação na ponte e no processo principal, incluindo a origem do pedido IPC. As ações de arquivo não recebem caminhos do renderer; os destinos e fontes são escolhidos por diálogos nativos. Campos desconhecidos são rejeitados antes do IPC.
 
 O processo principal usa ESM. O preload tem extensão **`.cjs`** porque o sandbox fornece um ambiente CommonJS limitado, sem um carregador ESM completo. Isso permite manter o sandbox e oferecer apenas a interface necessária. Consulte a [segurança do Electron](https://www.electronjs.org/docs/latest/tutorial/security), o [sandbox de processos](https://www.electronjs.org/docs/latest/tutorial/sandbox) e as [regras de ESM](https://www.electronjs.org/docs/latest/tutorial/esm).
 
-Em produção, o Electron carrega `dist/index.html`, bloqueia requisições de rede e arquivos fora do bundle, nega novas janelas, downloads e navegações externas. A permissão `fullscreen` é limitada ao frame principal da janela e à página local confiável esperada. Para que Esc feche primeiro livro ou bilhete no desktop, `keyboardLock` também recebe uma exceção para esse mesmo frame/URL, somente quando a janela já está em fullscreen. O diálogo solicita apenas a tecla Escape e libera a captura ao fechar ou desmontar; não captura texto nem registra teclas. `automatic-fullscreen`, `pointerLock` e as demais permissões continuam negadas. O modo imersivo usa a DOM Fullscreen API, sem adicionar funções ao preload ou novos canais IPC. A CSP permanece a mesma, restringindo scripts a arquivos locais e impedindo conexões. O desenvolvimento habilita apenas o servidor local explícito `127.0.0.1:5173` e seu WebSocket; esse modo é ignorado no aplicativo empacotado. Não há backend, autenticação, telemetria ou atualização automática.
+Em produção, o Electron carrega `dist/index.html`, bloqueia requisições de rede e arquivos fora do bundle, nega novas janelas solicitadas pelo conteúdo, downloads e navegações externas. A exceção de imagens do mural usa somente o protocolo local com UUID autorizado e tipo de recurso `image`, na janela principal; o renderer não recebe acesso `file://` ao diretório pessoal. A permissão `fullscreen` é limitada ao frame principal da janela e à página local confiável esperada. Para que Esc feche primeiro um diálogo no desktop, `keyboardLock` também recebe uma exceção para esse mesmo frame/URL, somente quando a janela já está em fullscreen. O diálogo solicita apenas a tecla Escape e libera a captura ao fechar ou desmontar; não captura texto nem registra teclas. `automatic-fullscreen`, `pointerLock` e as demais permissões continuam negadas. O modo imersivo usa a DOM Fullscreen API, sem novos canais IPC de tela cheia. A CSP mantém scripts locais, frames negados e `connect-src 'none'`; a origem de imagem `haven-memory://local` é autorizada apenas para as fotografias gerenciadas. O desenvolvimento habilita apenas o servidor local explícito `127.0.0.1:5173` e seu WebSocket; esse modo é ignorado no aplicativo empacotado. Não há backend, autenticação, telemetria ou atualização automática.
 
 ## Testes
 
@@ -187,6 +219,10 @@ npm run test:e2e
 
 O teste desktop verifica o carregamento de produção, a montagem React, o sandbox, a ponte, a gravação e restauração de preferências e a confirmação nativa de descarte. Também entra no modo imersivo por um clique real, verifica fullscreen DOM e nativo, escala, animações e a saída por Esc com restauração da janela normal/maximizada. Usa `work/desktop-smoke-profile`, sem alterar as preferências pessoais; a renderização por software fica limitada a esse teste para funcionar em sessões sem GPU disponível.
 
+`npm run test:memory` usa outro perfil temporário, fotografias sintéticas e respostas de diálogos limitadas às próprias fixtures. Exercita a aplicação real, o decoder, a ponte e o protocolo de imagens. Os testes unitários específicos cobrem schema, posições, persistência, concorrência, falhas, exclusão segura e pacotes inválidos; a interface acrescenta notas, imagens, temas, teclado, imersão e separação do ritual.
+
+Após o build, `node scripts/memory-performance.mjs` executa um ensaio com 12 imagens sintéticas de 4000 × 3000, miniaturas, originais abertos individualmente, teclado, restauração e capturas desktop/DPR 2/mobile. Usa servidor em porta livre e contexto efêmero, sem perfil pessoal; registra `outputs/memory-performance.json`. As medidas de heap JavaScript não abrangem todos os buffers de imagens, processos nativos ou GPU.
+
 Verificações adicionais de integração, sempre com perfis isolados:
 
 ```powershell
@@ -210,6 +246,8 @@ O motor compartilhado fica em `src/services/audio/`, com um único AudioContext 
 
 ## Limitações e continuidade
 
-A versão atual oferece quarto, ritual, viagem e jardim. The Journey tem cinco paisagens em loop, cinco objetos interativos e camadas locais de trem, sem destino, progressão, missões ou contagem de tempo de viagem. O jardim usa pontos predefinidos: quatro canteiros fixos e quatro vasos reorganizáveis, sem arrastar e soltar ou transplante entre canteiros e vasos. O gato escolhe um esconderijo por visita, sem deslocamento entre eles. Não há histórico de textos, sincronização, economia ou obrigações de cultivo.
+A versão atual oferece quarto, ritual, viagem, jardim e mural de lembranças. The Journey tem cinco paisagens em loop, cinco objetos interativos e camadas locais de trem, sem destino, progressão, missões ou contagem de tempo de viagem. O jardim usa pontos predefinidos: quatro canteiros fixos e quatro vasos reorganizáveis, sem arrastar e soltar ou transplante entre canteiros e vasos. O gato escolhe um esconderijo por visita, sem deslocamento entre eles. Não há histórico dos textos do ritual, sincronização, economia ou obrigações de cultivo. Os bilhetes explicitamente fixados no Memory Corner são persistentes e independentes do ritual.
+
+O mural não possui desfazer geral, arrasto entre ambientes, sincronização ou suporte a imagens animadas. A remoção pode ser desfeita durante a visita; depois de sair da cena, o último cartão removido não é oferecido novamente. O backup usa formato próprio v1 e está disponível no desktop. Ensaios abrangentes de heap, telas/GPU e leitor de tela continuam necessários antes de distribuição pública ampla.
 
 As próximas etapas incluem refinar a experiência em janelas e dispositivos reais, revisar acessibilidade e desempenho e ampliar os detalhes dos ambientes. O plano completo está em [`ROADMAP.md`](ROADMAP.md).

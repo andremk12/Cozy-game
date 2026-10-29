@@ -42,6 +42,7 @@ export function isLocalFile(url, directory) {
 }
 
 export function isAllowedResource(url, directory, developmentUrl) {
+  if (parseMemoryImageUrl(url)) return true;
   if (url.startsWith('data:') || url.startsWith('blob:')) return true;
   if (isLocalFile(url, directory)) return true;
   if (!developmentUrl) return false;
@@ -54,13 +55,21 @@ export function isAllowedResource(url, directory, developmentUrl) {
   }
 }
 
+// Match the raw URL: URL pathname normalization must never turn a traversal,
+// encoded separator, credentials or query into an authorized memory resource.
+export function parseMemoryImageUrl(url) {
+  if (typeof url !== 'string') return null;
+  const match = /^haven-memory:\/\/local\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\/(thumbnail|original)$/.exec(url);
+  return match ? { imageId: match[1], variant: match[2] } : null;
+}
+
 export function contentSecurityPolicy(developmentUrl) {
   const connection = developmentUrl ? `${developmentUrl} ws://127.0.0.1:5173` : "'none'";
   return [
     "default-src 'self'",
     developmentUrl ? "script-src 'self' 'unsafe-inline'" : "script-src 'self'",
     "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' data:",
+    "img-src 'self' data: haven-memory://local",
     "font-src 'self'",
     "media-src 'self' blob:",
     `connect-src ${connection}`,

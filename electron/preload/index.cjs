@@ -77,8 +77,53 @@ function validGarden(garden) {
     )) && unique(garden.decorations);
 }
 
+// Memory notes are deliberately persistent, explicitly created content. This
+// bounded schema is separate from preferences and the ephemeral ritual draft.
+function safeMemory(board) {
+  const exact = (value, keys) => value && typeof value === 'object' && !Array.isArray(value)
+    && Object.keys(value).length === keys.length && keys.every((key) => Object.hasOwn(value, key));
+  const id = (value) => typeof value === 'string'
+    && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(value);
+  const text = (value, max) => typeof value === 'string' && value.length <= max
+    && !/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f\p{Cs}]/u.test(value);
+  if (!exact(board, ['version', 'theme', 'decorations', 'items']) || board.version !== 1
+    || !['warm', 'moonlight', 'garden'].includes(board.theme)
+    || !exact(board.decorations, ['lights', 'flowers', 'stars'])
+    || !Object.values(board.decorations).every((value) => typeof value === 'boolean')
+    || !Array.isArray(board.items) || board.items.length > 60) throw new TypeError('Invalid memory board.');
+  const ids = new Set();
+  for (const item of board.items) {
+    const common = ['id', 'kind', 'x', 'y', 'rotation'];
+    const fields = item?.kind === 'photo' ? ['imageId', 'frame', 'caption'] : ['text', 'paper', 'style'];
+    if (!exact(item, [...common, ...fields]) || !id(item.id) || ids.has(item.id)
+      || !Number.isFinite(item.x) || !Number.isFinite(item.y) || item.x < 0 || item.x > 1 || item.y < 0 || item.y > 1
+      || ![-8, -4, 0, 4, 8].includes(item.rotation)) throw new TypeError('Invalid memory item.');
+    ids.add(item.id);
+    if (item.kind === 'photo') {
+      if (!id(item.imageId) || !['polaroid', 'light-wood', 'dark-wood', 'simple', 'floral'].includes(item.frame)
+        || !text(item.caption, 300)) throw new TypeError('Invalid memory photo.');
+    } else if (item.kind !== 'note' || !text(item.text, 2000) || !item.text.trim()
+      || !['beige', 'rose', 'sage', 'blue', 'lilac'].includes(item.paper)
+      || !['plain', 'lined', 'torn'].includes(item.style)) throw new TypeError('Invalid memory note.');
+  }
+  return { version: 1, theme: board.theme, decorations: { ...board.decorations }, items: board.items.map((item) => ({ ...item })) };
+}
+
+const memoryWithoutArguments = (channel, args) => args.length
+  ? Promise.reject(new TypeError('Unexpected memory arguments.')) : ipcRenderer.invoke(channel);
+
 // The sandboxed renderer receives no filesystem, Node.js, or generic IPC access.
 contextBridge.exposeInMainWorld('haven', Object.freeze({
+  memoryGet: (...args) => memoryWithoutArguments('haven:memory:get', args),
+  memoryImport: (...args) => memoryWithoutArguments('haven:memory:import', args),
+  memoryExport: (...args) => memoryWithoutArguments('haven:memory:export', args),
+  memoryRestore: (...args) => memoryWithoutArguments('haven:memory:restore', args),
+  memorySave: (...args) => {
+    try {
+      if (args.length !== 1) throw new TypeError('Invalid memory save.');
+      return ipcRenderer.invoke('haven:memory:save', safeMemory(args[0]));
+    } catch { return Promise.reject(new TypeError('Invalid memory board.')); }
+  },
   getGarden: () => ipcRenderer.invoke('haven:garden:get'),
   saveGarden: (garden) => {
     if (!validGarden(garden)) {

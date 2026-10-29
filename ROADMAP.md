@@ -1,6 +1,6 @@
 # Roadmap — Little Haven
 
-O desenvolvimento avança por pequenas experiências completas, preservando o funcionamento local, a privacidade, a estética cozy e a ausência de cobranças. A Fase 1, The Garden e a expansão interativa de The Journey estão implementadas. A numeração registra a organização original do roadmap, sem exigir uma ordem de entrega.
+O desenvolvimento avança por pequenas experiências completas, preservando o funcionamento local, a privacidade, a estética cozy e a ausência de cobranças. A Fase 1, The Garden, a expansão interativa de The Journey e The Memory Corner estão implementadas. A numeração registra a organização original do roadmap, sem exigir uma ordem de entrega.
 
 ## Fase 1 — Fundação, quarto interativo e ritual dos pensamentos — implementada
 
@@ -62,3 +62,16 @@ Limites e evoluções planejadas:
 - Ampliar testes de regressão e validar resolução e escala do Windows.
 - Consolidar empacotamento, integridade, assinatura e distribuição desktop.
 - Manter todos os ambientes utilizáveis sem conexão com a internet.
+
+## The Memory Corner — A Place for What Matters — implementado
+
+- Ambiente próprio com mural original em pixel art, três temas e decorações opcionais; fotografias e textos em DOM nativo nítido.
+- Importação múltipla JPG/PNG/WebP por diálogo nativo, validação dos bytes/dimensões, cópias originais intactas, miniaturas orientadas e viewer com zoom/deslocamento.
+- Cinco molduras, legendas opcionais, bilhetes Unicode/multilinha com cinco cores e três papéis, oito lembretes escolhidos explicitamente.
+- Posicionamento relativo por arrasto ou teclado/botões, inclinação e ordem visual; remoção confirmada e desfazer durante a visita.
+- Persistência local própria com gravação atômica e tratamento de erros; versões futuras ou dados inválidos não são sobrescritos automaticamente.
+- Backup binário completo `.haven-memory`, restaurável por importação explícita e validada antes de substituir o mural. Originais não são comprimidos nem embutidos em JSON.
+- Áudio compartilhado sem autoplay/troca ao entrar, modo imersivo reutilizado e atalhos M/C/Esc. Sem texto do ritual no mural, upload, telemetria ou análise.
+- Limites iniciais: 60 itens, 20 MiB por imagem, 40 MP/16.000 pixels por lado e pacote de até 512 MiB. Desenvolvimento web usa IndexedDB Blob separado; backup completo é desktop.
+
+Próximos refinamentos: medição de heap com muitos originais grandes, ensaios de monitores/GPU/DPI e Narrador, evolução versionada do formato de backup e presença opcional do companheiro fora da área das lembranças. Não há metas, recompensas, cobranças de retorno ou funcionalidades sociais.
