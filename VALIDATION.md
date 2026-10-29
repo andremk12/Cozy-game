@@ -1,4 +1,127 @@
-# Validação atual — The Memory Corner
+# Validação atual — primeira Beta 0.2.0-beta.1
+
+Verificação de **29 de outubro de 2026**, branch `feature/little-heaven-improvements`, árvore inicialmente limpa. Ambiente validado: **Windows x64, build 10.0.26200**, Node.js de desenvolvimento **22.18.0**, npm **10.9.3**, Electron **44.10.0** (Node interno **24.22.1**) e Microsoft Edge. Nenhum commit, push, merge ou publicação foi realizado. Dados pessoais existentes não foram usados, apagados ou sobrescritos; testes desktop utilizaram perfis isolados e conteúdo sintético.
+
+**Resultado:** nenhum bloqueador conhecido permaneceu nas verificações executadas. O portátil foi gerado, aberto e encerrado nesta máquina e está disponível para testes limitados com amigos, considerando as limitações abaixo. Isso não representa certificação de produção ou compatibilidade com todos os computadores Windows.
+
+## Executável final e distribuição
+
+| Informação verificada | Resultado |
+| --- | --- |
+| Versão | `0.2.0-beta.1` — experimental, identificada na interface e nos metadados |
+| Nome | `Little-Haven-0.2.0-beta.1-x64.exe` |
+| Caminho | `outputs/desktop/Little-Haven-0.2.0-beta.1-x64.exe` |
+| Caminho absoluto | `C:\Users\Andre\OneDrive\Área de Trabalho\joguinho\Cozy-game\outputs\desktop\Little-Haven-0.2.0-beta.1-x64.exe` |
+| Tamanho | **119.674.290 bytes — 114,13 MiB** |
+| Assinatura verificada pelo Windows | **`NotSigned`**, sem certificado digital |
+| Inicialização portátil | Extração, React/arte local, ponte, carta e encerramento passaram |
+| Ícone | Ícone extraído do próprio `.exe` e inspecionado: casa original do Little Haven |
+
+**SHA-256 deste executável:**
+
+```text
+BAE3288EB7FBB8EAFDE727752109E5BBCC97421A9F050122F6D0BDCDC532EDDF
+```
+
+Compartilhe esse `.exe`, `TESTING.md`, `BETA_NOTES.md`, `SHA256SUMS.txt` e, se desejar o histórico técnico, `VALIDATION.md`, reunidos em `outputs/desktop/`. Não envie `win-unpacked`, perfis de usuário, `work/`, fotos, backups pessoais ou código de desenvolvimento. O hash corresponde a este build; regenerar o arquivo exige recalculá-lo. O SmartScreen pode avisar sobre fornecedor desconhecido; confira origem e integridade sem desativar antivírus ou outras proteções.
+
+O aplicativo empacotado abriu a partir de `app.asar`, sem servidor Vite e com o contexto de rede colocado offline. O lançador portátil foi aberto por seu caminho final. **Não houve teste em máquina limpa sem Node.js/VS Code instalados**, em outras versões de Windows ou em outra arquitetura. O executável incorpora o runtime Electron; a ausência dessas ferramentas ainda requer ensaio externo para confirmar o comportamento num ambiente limpo.
+
+## Easter egg e arquivos relevantes
+
+A estrela SVG original ao lado da marca no cabeçalho abre a carta com um único clique, Enter ou Espaço. O diálogo usa papel bege, envelope/flores/estrelas em pixel art, texto integral fornecido por André, assinatura e controles discretos de contato. A rolagem mantém o texto e o rodapé utilizáveis em janelas menores; o fechamento por botão/Esc devolve o foco à estrela. A abertura não remonta o cenário, descarta rascunhos ou interrompe áudio. O modo imersivo continua isolando o cabeçalho e seu teclado. Movimento reduzido remove a animação de abertura e o deslocamento da estrela.
+
+- `src/components/developer/DeveloperLetter.jsx` e `DeveloperLetter.css`: carta, arte vetorial original, teclado, estilo e fallback do e-mail.
+- `src/components/developer/developerLetterContent.js`: texto facilmente editável; `shared/developer.js`: contatos públicos confirmados pelo usuário (`andre.michalsky12@gmail.com` e o perfil LinkedIn informado).
+- `src/app/App.jsx`: estrela, identificação Beta e abertura da carta sem troca de ambiente.
+- `electron/services/developerContacts.js`, `electron/preload/index.cjs` e `electron/main/index.js`: `openDeveloperContact('email' | 'linkedin')`; a origem IPC e o argumento são validados. O processo principal resolve somente `mailto:` do endereço configurado e HTTPS do perfil configurado. A URL Unicode do LinkedIn é normalizada; nenhuma URL arbitrária, conteúdo do ritual, foto ou bilhete é aceito nesse canal.
+- `electron/services/singleInstance.js`: um escritor por perfil; a segunda execução restaura/focaliza a janela existente antes de inicializar stores.
+- `package.json` e `package-lock.json`: Beta, autoria e atualizações fixadas pelo npm; `tests/developer-contacts.test.js`, `tests/single-instance.test.js` e `tests/e2e/developer-letter.spec.js`: regressões novas.
+- `scripts/package-smoke.mjs`, `portable-smoke.mjs`, `desktop-smoke-main.mjs`, `inspect-package.mjs` e `beta-performance*.mjs`: validação de distribuição, segurança, persistência e consumo, fora do aplicativo distribuído.
+
+Na prévia web, os contatos usam links nativos. No desktop, os testes interceptaram `shell.openExternal` para verificar os destinos sem abrir programas externos. A carta oferece endereço selecionável e cópia explícita quando o e-mail falha; erro de clipboard mantém a cópia manual disponível. Não foi verificada a presença de um cliente de e-mail padrão nem a abertura real desse perfil no navegador do usuário. A carta inteira funciona offline; acessar o LinkedIn exige internet por escolha do usuário.
+
+## Auditoria, classificação e correções
+
+| Classificação | Problema encontrado | Correção/resultado |
+| --- | --- | --- |
+| Importante — integridade | Instâncias simultâneas do mesmo perfil podiam manter snapshots divergentes e sobrescrever mural/jardim/preferências | Trava nativa de instância, testada com segundo processo real; ele encerra e restaura a primeira janela, mantendo os arquivos idênticos |
+| Importante — dependências | `npm audit` inicial: Electron com aviso alto e `fast-uri` transitivo com avisos moderados/baixos | Electron `44.9.0 → 44.10.0`, `fast-uri 3.1.8 → 3.1.9`; auditoria completa final retornou **zero vulnerabilidades** |
+| Menor — validação desatualizada | Smokes antigos esperavam apenas duas funções da ponte e nome fixo do portátil 0.1.0 | Testes passam a conferir a ponte real, a versão atual e o cenário completo da Beta |
+| Bloqueadores | Nenhum identificado nas verificações finais | Aplicação inicia, navega, preserva dados sintéticos e inclui os recursos essenciais |
+
+Fontes primárias dos avisos corrigidos: [Electron — certificados intermediários eMudhra](https://github.com/electron/electron/security/advisories/GHSA-jr5w-w6x2-84p9) e [fast-uri — normalização de esquema](https://github.com/fastify/fast-uri/security/advisories/GHSA-w74x-v6f9-j3xg). O aviso do Electron se aplica a conexões TLS; as políticas locais de rede permanecem bloqueadas. A atualização mantém a mesma versão principal, sem abrir permissões para contornar o problema.
+
+Revisão estática confirmou `contextIsolation: true`, `nodeIntegration: false`, `sandbox: true`, `webSecurity: true`, preload mínimo, CSP e bloqueios de navegação, webviews, downloads e novas janelas. A origem/frame principal continua sendo conferida no IPC. O único mecanismo novo de abertura externa resolve os dois destinos públicos permitidos. Fotografias continuam acessíveis por UUID/protocolo interno, sem caminhos de origem retornados ao renderer. Não foram acrescentados backend, login, telemetria, análise de conteúdo ou rede obrigatória.
+
+O `app.asar` final contém **556 entradas**, somente nas raízes previstas. Foram conferidos ícone, entrada, main/preload, serviços e licenças de áudio/fontes. Não foram encontrados perfis, testes, scripts, arquivos de dados pessoais ou correspondências na busca limitada de assinaturas de tokens/chaves. Essa inspeção estática não garante reconhecer toda forma possível de segredo. Relatório local: `outputs/package-inspection.json`.
+
+## Testes realmente executados nesta preparação
+
+| Comando/verificação | Resultado final |
+| --- | --- |
+| `npm test` | **117 passaram**, zero falhas |
+| `npm run build` | Concluído; **100 módulos**; repetido pelos scripts de interface/empacotamento |
+| `npm run test:e2e` | **74 passaram em 1,8 minuto**, saída 0 |
+| `npm run test:desktop` | Passou: segurança, preferências, companion, 12 camadas de áudio, presets e imersão nativa |
+| `npm run test:memory` | Passou: PNG/JPEG com EXIF/WebP, bytes originais, fonte removida, bilhetes, backup válido/truncado e nova execução |
+| `npm run package:win` | Concluído, portátil x64 efetivamente gerado |
+| `node scripts/package-smoke.mjs` | Passou no app empacotado: offline, cinco ambientes, foto com hash, restart, contatos interceptados, áudio e trava nativa |
+| `node scripts/portable-smoke.mjs` | Passou no `.exe` final: extraiu, abriu quarto/carta e encerrou |
+| `node scripts/inspect-package.mjs` | Passou: recursos, versão, licenças, raízes e busca limitada de credenciais |
+| `node scripts/beta-performance.mjs` | Seis amostras finais válidas, janela visível/minimizada e áudio contínuo; saída 0 |
+| `npm audit --json` | Zero vulnerabilidades em toda a árvore consultada; saída 0 |
+| `Get-AuthenticodeSignature` e `Get-FileHash` | `NotSigned`; SHA-256 e tamanho registrados acima |
+| `git diff --check` | Sem erros de whitespace |
+| Inspeção visual | Carta desktop/360 px, rodapé e ícone do executável abertos e revisados |
+
+A primeira execução E2E terminou com 73 aprovações e uma asserção nova incorreta: elementos fora da camada de fullscreen conservam caixas de layout. A verificação foi corrigida para conferir exclusão da árvore fullscreen e `inert`, sem mudar a imersão; os quatro testes da carta e depois a suíte inteira passaram. O primeiro smoke desktop detectou o título antigo esperado pelo teste; a identificação nativa e sua asserção foram alinhadas à Beta, e o smoke completo passou. A primeira medição de desempenho foi interrompida quando a janela ficou visível durante a coleta minimizada do jardim; não foi usada para comparação. O ensaio recebeu registro de eventos nativos/renderer e foi repetido, com seis amostras válidas.
+
+O teste intencional de backup truncado registra erro IPC genérico esperado e confirma que o mural existente permanece. Avisos de MockTimers, cores de terminal e módulos de áudio grandes não são falhas dos testes. Não foram mascarados erros da aplicação. Smokes nativos e Edge usam perfis isolados; alguns smokes solicitam renderização por software para viabilizar automação nesta sessão, mantendo o sandbox do aplicativo.
+
+## Cobertura funcional e integridade
+
+- **Room:** luz e chuva, objetos/caderno, animação/pausa quando oculto, preferências e navegação verificadas.
+- **Garden:** cinco espécies, plantio, estágios 2/8/20 minutos incluindo ausência, rega limitada por estágio, vasos/decor, substituição/remoção confirmada, fauna/gato, clima, restauração e imersão verificados. Sem morte por ausência ou posicionamento livre.
+- **Journey:** cinco paisagens, movimento/pausa, luminária, cortinas, chá/resfriamento, livro/bilhete, teclado/imersão/contexto Esc e continuidade sonora verificados. Estados da viagem permanecem de sessão.
+- **Let It Float:** escrita, cancelamento/proteção do rascunho, animação completa e alternativa estática, descarte antes da animação e ausência do sentinela sintético nos armazenamentos/IPC/requisições observados. Não há promessa de eliminação forense da memória do sistema.
+- **Memory Corner:** cópias intactas e hashes de originais, EXIF, miniaturas, viewer/zoom, bilhetes Unicode, edição/remoção/desfazer, posição/ordem/tema, restauração em novo processo, backup íntegro e rejeição de pacotes/arquivos inválidos. Nenhuma fotografia pessoal foi usada. Schema v1 e formatos atuais foram preservados; testes incluem dados anteriores/inválidos/futuros sem sobrescrita automática.
+- **Companion:** carinho/poses/percursos, nome Unicode, renomeação/cancelamento, visibilidade/pelagem e persistência verificadas. É silencioso e não aparece no ritual ou sobre o mural.
+- **Mixer:** ausência de autoplay, 12 camadas locais realmente decodificadas, sinal nos buffers, volumes independentes/master, mute, quatro presets/Custom, fades, navegação e liberação de recursos verificados. A carta mantém o mesmo AudioContext em execução.
+- **Acessibilidade/visual:** mouse/Tab/Enter/Espaço/Esc, foco, janelas pequenas, movimento reduzido e escala da pixel art cobertos pelas suítes. Carta inspecionada em 1440×960 e 360×640; teste adicional em 760×600.
+
+## Desempenho medido e limites
+
+Ensaio curto com **Intel Core i5-13450HX, 16 processadores lógicos, 23,69 GiB RAM**, Electron de produção e perfil novo, sem fotos. Não foi solicitada renderização por software pelo script, porém o Electron informou **composição/rasterização por software nesta sessão**. Resultados não caracterizam desempenho de GPU física. Cada amostra durou aproximadamente oito segundos, após estabilização, e registrou eventos de visibilidade para rejeitar amostras interrompidas.
+
+| Estado | CPU, 100% = um processador lógico | CPU normalizada à máquina | Memória privada, MiB |
+| --- | ---: | ---: | ---: |
+| Room visível, sem áudio | 37,58% | 2,349% | 226,94 |
+| Room minimizado, sem áudio | 0,14% | 0,008% | 229,64 |
+| Garden visível, sem áudio | 37,56% | 2,347% | 245,65 |
+| Garden minimizado, sem áudio | 0,42% | 0,026% | 238,85 |
+| Journey visível, com áudio | 36,08% | 2,255% | 292,98 |
+| Journey minimizado, com áudio | 1,59% | 0,099% | 275,62 |
+
+As três cenas ficaram explicitamente pausadas e sem animações em execução enquanto minimizadas. O AudioContext do trem permaneceu `running`. CPU soma deltas de tempo acumulado dos processos estáveis entre os limites; memória privada soma `privateBytes`, e working set pode contar páginas compartilhadas mais de uma vez. Detalhes, unidades, eventos e processos: `outputs/beta-performance.json`; documentação das unidades: [CPUUsage](https://www.electronjs.org/docs/latest/api/structures/cpu-usage) e [MemoryInfo](https://www.electronjs.org/docs/latest/api/structures/memory-info).
+
+Esses números não demonstram ausência de vazamentos por horas/dias, desempenho com 60 originais grandes, FPS em monitor físico ou conforto sonoro. Não foram repetidos os antigos ensaios longos de Garden/Memory nesta preparação. O build continua avisando sobre módulos locais de áudio maiores que 500 kB; são carregados sob demanda para manter áudio offline e CSP restrita.
+
+## Problemas conhecidos, testes pendentes e próximos passos
+
+- Sem certificado digital; SmartScreen e reputação do arquivo dependem do Windows. Nenhuma proteção foi contornada.
+- Pendente máquina limpa sem ferramentas de desenvolvimento, outras versões Windows, GPUs/DPI/múltiplos monitores, Narrador/leitores de tela e avaliação sonora humana em dispositivos diferentes.
+- Pendente abertura real dos contatos nos aplicativos padrão do Windows e validação externa do perfil informado. Testes verificaram clique, destino exato, chamada ao shell e rejeição de destinos arbitrários.
+- Pendente ensaio prolongado de CPU/RAM/buffers/GPU e mural com muitos arquivos grandes. Nenhuma alegação de otimização universal.
+- Mural limitado a 60 itens/20 MiB por foto/40 MP/16.000 px por lado, sem imagens animadas, sincronização, criptografia ou histórico geral. Backup v1 é desktop e não inclui jardim/preferências.
+- Dados confirmados sobrevivem ao encerramento normal; mudanças ainda não salvas, falhas de energia/disco ou encerramento forçado não têm garantia de recuperação. Mantenha originais e backups externos.
+- Jardim com pontos fixos; viagem em loop; três camadas de trem derivam da mesma gravação licenciada; companion visual e silencioso.
+
+Teste manual sugerido: abra o `.exe`, percorra os cinco ambientes, ative/misture sons e teste M/C/Esc na imersão. Nomeie o companheiro, plante, crie um bilhete e importe somente cópias de fotos para teste; reabra e confira os dados, exporte/restaure um backup sintético. Descubra a estrela junto à marca, leia a carta e teste seus contatos se desejar. Use [TESTING.md](TESTING.md) para o questionário voluntário; envie relatos pelo canal combinado, sem expor fotos, textos ou a pasta de dados pessoais. Prioridades seguintes: compatibilidade em outras máquinas, leitores de tela, sessão longa e feedback dos amigos.
+
+---
+
+# Histórico — The Memory Corner (anterior à Beta)
 
 Verificação de **29 de outubro de 2026**, em Windows x64, Node.js **22.18.0**, Electron **44.9.0** e Microsoft Edge **156.0.4314.50**. As verificações abaixo foram executadas nesta implementação. Os registros anteriores permanecem como histórico, sem substituir os resultados atuais.
 

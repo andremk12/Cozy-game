@@ -430,7 +430,7 @@ app.on('browser-window-created', (_event, window) => {
       const result = await window.webContents.executeJavaScript(`(async () => {
         if (!document.querySelector('#root')?.children.length) throw new Error('React root is empty.');
         if (typeof window.require !== 'undefined' || typeof window.process !== 'undefined') throw new Error('Node leaked to the renderer.');
-        if (Object.keys(window.haven).sort().join(',') !== 'getGarden,getPreferences,memoryExport,memoryGet,memoryImport,memoryRestore,memorySave,saveGarden,savePreferences') throw new Error('Unexpected bridge API.');
+        if (Object.keys(window.haven).sort().join(',') !== 'getGarden,getPreferences,memoryExport,memoryGet,memoryImport,memoryRestore,memorySave,openDeveloperContact,saveGarden,savePreferences') throw new Error('Unexpected bridge API.');
         const initial = await window.haven.getPreferences();
         await window.haven.savePreferences({ lampOn: !initial.lampOn, volume: 0.1 });
         const changed = await window.haven.getPreferences();
@@ -451,7 +451,7 @@ app.on('browser-window-created', (_event, window) => {
         await window.haven.saveGarden(originalGarden.garden);
         return { title: document.title, bridge: 'ok', preferences: 'ok', garden: 'ok', react: 'mounted' };
       })()`);
-      assert.equal(window.getTitle(), 'Little Haven');
+      assert.equal(window.getTitle(), 'Little Haven — Beta');
       assert.equal(BrowserWindow.getAllWindows().length, 1);
       result.companion = await verifyCompanion(window);
       result.audioMixer = await verifySoundMixer(window);

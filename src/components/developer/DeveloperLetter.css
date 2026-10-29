@@ -1,0 +1,40 @@
+.brand-group { display: flex; align-items: center; gap: 12px; }
+.brand-surprise { display: grid; place-items: center; width: 34px; height: 38px; padding: 4px; border: 0; background: transparent; cursor: pointer; border-radius: 4px; }
+.brand-surprise svg { transition: transform 180ms ease, filter 180ms ease; }
+.brand-surprise:hover svg, .brand-surprise:focus-visible svg { transform: translateY(-2px); filter: drop-shadow(0 0 4px #e5c17e66); }
+.beta-label { display: block; margin-top: 7px; font-size: 8px; color: #b9c5aa; letter-spacing: .3px; }
+.developer-letter { width: min(580px, calc(100% - 32px)); max-height: calc(100dvh - 32px); padding: 0; overflow: hidden; border: 3px solid #9b805c; border-radius: 3px; background: #f4e7c9; color: #514637; color-scheme: light; box-shadow: 0 0 0 2px #d7be93, 0 20px 70px #071b1599; animation: letter-unfold 200ms ease-out; }
+.developer-letter::backdrop { background: #10251fcc; }
+.developer-letter-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 18px 8px; border-bottom: 1px solid #c3aa7c77; background: #ecdbb7; }
+.developer-letter-top > span { font-size: 9px; letter-spacing: 2px; color: #756044; }
+.developer-letter-top button { display: grid; place-items: center; padding: 8px; border: 1px solid #ab926b66; border-radius: 3px; background: transparent; color: #615039; cursor: pointer; }
+.developer-letter-scroll { max-height: calc(100dvh - 106px); padding: 14px 36px 28px; overflow: auto; scrollbar-color: #b09a73 #eadbbd; }
+.developer-letter-art { display: block; margin: 0 auto 12px; }
+.developer-letter h2 { margin: 0 0 24px; font: 400 27px/1.3 'Fraunces', Georgia, serif; color: #574535; }
+.developer-letter p { margin: 0 0 16px; font-size: 14px; line-height: 1.85; }
+.developer-letter .developer-letter-greeting { font-weight: 600; }
+.developer-letter .developer-letter-signature { margin-top: 24px; font: 500 22px/1.6 'Fraunces', Georgia, serif; color: #6e7352; }
+.developer-letter .developer-letter-surprise { font-size: 13px; }
+.developer-letter .developer-letter-postscript { font-size: 12px; color: #716047; }
+.developer-letter-contacts { margin-top: 24px; padding-top: 17px; border-top: 1px solid #b89f7877; }
+.developer-letter-contacts > p:first-child { font: 400 17px 'Fraunces', Georgia, serif; }
+.developer-letter-contacts > div { display: flex; flex-wrap: wrap; gap: 12px; }
+.developer-letter-contacts a, .developer-email-fallback button { display: inline-flex; align-items: center; gap: 7px; padding: 8px 12px; border: 1px solid #af9a7477; border-radius: 3px; color: #4e5942; font-size: 12px; text-decoration: none; background: #e5ddbd; cursor: pointer; }
+.developer-letter-contacts a:hover, .developer-email-fallback button:hover { background: #d9d4af; }
+.developer-letter .developer-contact-notice { margin-top: 14px; font-size: 12px; }
+.developer-email-fallback { align-items: center; margin-top: 12px; font-size: 12px; overflow-wrap: anywhere; }
+.developer-letter :focus-visible { outline: 2px solid #6c7148; outline-offset: 3px; }
+.developer-letter-scroll:focus-visible { outline-offset: -4px; }
+@keyframes letter-unfold { from { opacity: .4; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 600px) {
+  .app-header { height: auto; min-height: 108px; flex-wrap: wrap; gap: 12px; padding: 14px 0; }
+  .header-right { margin-left: auto; }
+  .brand-group { gap: 6px; }
+  .developer-letter-scroll { padding: 14px 22px 24px; }
+  .developer-letter h2 { font-size: 24px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .developer-letter { animation: none; }
+  .brand-surprise svg { transition: none; }
+  .brand-surprise:hover svg, .brand-surprise:focus-visible svg { transform: none; }
+}

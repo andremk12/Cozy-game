@@ -1,9 +1,11 @@
-import { app, BrowserWindow, dialog, ipcMain, session } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, session, shell } from 'electron';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { PreferencesStore } from '../services/preferences.js';
 import { GardenStore } from '../services/garden.js';
 import { MemoryCornerStore } from '../services/memoryCorner.js';
+import { registerDeveloperContacts } from '../services/developerContacts.js';
+import { lockDesktopInstance } from '../services/singleInstance.js';
 import { decodeMemoryImage, registerMemoryCorner, registerMemoryScheme } from '../services/memoryBridge.js';
 import {
   contentSecurityPolicy, getDevelopmentUrl, isAllowedFullscreenPermission, isAllowedKeyboardLockPermission, isAllowedResource, parseMemoryImageUrl,
@@ -22,6 +24,7 @@ let quitting = false;
 
 app.setName('Little Haven');
 app.setAppUserModelId('studio.littlehaven.desktop');
+const primaryInstance = lockDesktopInstance(app, () => window);
 // Application-wide sandboxing also protects any future renderer.
 app.enableSandbox();
 registerMemoryScheme();
@@ -69,7 +72,7 @@ async function createWindow() {
     height: 960,
     minWidth: 760,
     minHeight: 600,
-    title: 'Little Haven',
+    title: 'Little Haven — Beta',
     icon: path.join(projectRoot, 'public/assets/icons/haven.png'),
     backgroundColor: '#191d32',
     autoHideMenuBar: true,
@@ -111,7 +114,7 @@ async function createWindow() {
   else await window.loadFile(entryFile);
 }
 
-app.whenReady().then(async () => {
+if (primaryInstance) app.whenReady().then(async () => {
   preferences = new PreferencesStore(path.join(app.getPath('userData'), 'preferences.json'));
   garden = new GardenStore(path.join(app.getPath('userData'), 'garden.json'));
   memory = new MemoryCornerStore(path.join(app.getPath('userData'), 'memory-corner'), { decodeImage: decodeMemoryImage });
@@ -119,6 +122,7 @@ app.whenReady().then(async () => {
   protectSession();
   registerMemoryCorner({ ipcMain, session: session.defaultSession, dialog, store: memory,
     verifySender, getWindow: () => window });
+  registerDeveloperContacts({ ipcMain, verifySender, openExternal: (destination) => shell.openExternal(destination) });
   ipcMain.handle('haven:preferences:get', async (event) => {
     verifySender(event);
     return preferences.get();

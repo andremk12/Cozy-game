@@ -4,7 +4,9 @@ Um pequeno refúgio desktop em pixel art: uma noite de chuva, uma luz quente e u
 
 A fundação da Fase 1 entrega **The Room** e o ritual **Let It Float**. O aplicativo também oferece **The Journey**, uma viagem contemplativa de trem com cinco paisagens e pequenos objetos interativos, **The Garden**, um jardim para plantar e contemplar sem cobranças, e **The Memory Corner**, um mural pessoal de fotografias e bilhetes.
 
-O comando `npm run package:win` gera o executável em `outputs/desktop/Little-Haven-0.1.0-x64.exe`. Depois de gerado, abra esse arquivo para usar o aplicativo sem instalar Node.js. A distribuição é portátil e ainda não possui assinatura digital. O código-fonte editável fica na raiz deste projeto; dependências, builds, executáveis e perfis de teste são locais e não são versionados no Git.
+Esta é a **Beta experimental 0.2.0 (`0.2.0-beta.1`)**, destinada aos primeiros testes com amigos. O comando `npm run package:win` gera o executável em `outputs/desktop/Little-Haven-0.2.0-beta.1-x64.exe`. Depois de gerado, abra esse arquivo para usar o aplicativo sem instalar Node.js. A distribuição é portátil e não possui assinatura digital; o Windows pode mostrar avisos do SmartScreen. Confira origem e SHA-256 sem desativar proteções. O código-fonte editável fica na raiz deste projeto; dependências, builds, executáveis e perfis de teste são locais e não são versionados no Git.
+
+O guia para compartilhar com os visitantes está em [TESTING.md](TESTING.md), as novidades e limitações em [BETA_NOTES.md](BETA_NOTES.md), e os resultados atuais, tamanho e SHA-256 em [VALIDATION.md](VALIDATION.md). Fotografias importantes devem ter cópias de segurança fora do aplicativo.
 
 ## Executar no Windows
 
@@ -120,6 +122,14 @@ O cenário permanece no mesmo DOM ao entrar e sair: paisagem selecionada, chuva,
 
 ## Privacidade e preferências
 
+### Uma pequena surpresa
+
+A estrela em pixel art ao lado da marca abre uma carta pessoal de André por clique, Enter ou Espaço. O papel tem rolagem, foco protegido e fechamento por botão ou Esc, devolvendo o foco à estrela. A carta mantém cenário, rascunho e áudio; funciona offline e respeita movimento reduzido. O texto fica em `src/components/developer/developerLetterContent.js` e os contatos públicos confirmados em `shared/developer.js`.
+
+E-mail e LinkedIn só abrem após acionamento explícito. No desktop, `openDeveloperContact('email' | 'linkedin')` valida a origem IPC e resolve o destino exato no processo principal, sem aceitar URLs da interface. Se a abertura do e-mail falhar, o endereço pode ser copiado por escolha do usuário. A prévia web utiliza links nativos.
+
+### Dados locais
+
 O rascunho existe somente no estado React da sessão. Ao confirmar **Let it float**, seu conteúdo é removido desse estado **antes** da animação; descartar ou reiniciar o ritual também limpa o estado. O texto não é enviado ao processo principal, a arquivos, ao armazenamento do navegador, a logs ou à rede. Não há análise de emoções, IA ou aconselhamento.
 
 Limpar o estado da aplicação não promete eliminação forense de dados da memória do sistema operacional, de capturas de tela ou de ferramentas externas.
@@ -188,7 +198,7 @@ O hook `useImmersiveMode` coordena a DOM Fullscreen API e o componente `Immersiv
 
 ### Limites de segurança do desktop
 
-O renderer usa `contextIsolation: true`, `nodeIntegration: false` e `sandbox: true`. A ponte expõe `window.haven.getPreferences()`, `savePreferences(prefs)`, `getGarden()` e `saveGarden(snapshot)`, mais cinco ações explícitas do mural: `memoryGet()`, `memorySave(board)`, `memoryImport()`, `memoryExport()` e `memoryRestore()`. Há validação na ponte e no processo principal, incluindo a origem do pedido IPC. As ações de arquivo não recebem caminhos do renderer; os destinos e fontes são escolhidos por diálogos nativos. Campos desconhecidos são rejeitados antes do IPC.
+O renderer usa `contextIsolation: true`, `nodeIntegration: false` e `sandbox: true`. A ponte expõe `window.haven.getPreferences()`, `savePreferences(prefs)`, `getGarden()` e `saveGarden(snapshot)`, cinco ações explícitas do mural (`memoryGet()`, `memorySave(board)`, `memoryImport()`, `memoryExport()` e `memoryRestore()`) e `openDeveloperContact(id)` para os dois destinos públicos configurados. Há validação na ponte e no processo principal, incluindo a origem do pedido IPC. As ações de arquivo não recebem caminhos do renderer; os destinos e fontes são escolhidos por diálogos nativos. Campos desconhecidos são rejeitados antes do IPC. Somente uma instância pode escrever em cada perfil: abrir novamente restaura e focaliza a janela existente.
 
 O processo principal usa ESM. O preload tem extensão **`.cjs`** porque o sandbox fornece um ambiente CommonJS limitado, sem um carregador ESM completo. Isso permite manter o sandbox e oferecer apenas a interface necessária. Consulte a [segurança do Electron](https://www.electronjs.org/docs/latest/tutorial/security), o [sandbox de processos](https://www.electronjs.org/docs/latest/tutorial/sandbox) e as [regras de ESM](https://www.electronjs.org/docs/latest/tutorial/esm).
 
@@ -230,9 +240,11 @@ node scripts/development-smoke.mjs
 npm run package:win
 node scripts/package-smoke.mjs
 node scripts/portable-smoke.mjs
+node scripts/inspect-package.mjs
+node scripts/beta-performance.mjs
 ```
 
-Elas verificam, respectivamente, o ciclo real de desenvolvimento e encerramento do Vite, o aplicativo empacotado e seu lançamento portátil. O teste portátil abre temporariamente uma porta local de depuração só para inspecionar sua própria janela e a encerra ao terminar. Essa opção não é utilizada na abertura normal do aplicativo.
+Elas verificam o ciclo real de desenvolvimento e encerramento do Vite, o aplicativo empacotado e seu lançamento portátil. O teste portátil abre temporariamente uma porta local de depuração só para inspecionar sua própria janela e a encerra ao terminar. Essa opção não é utilizada na abertura normal do aplicativo. `inspect-package` confere recursos, licenças, versão, raízes e padrões limitados de credenciais no arquivo `app.asar`, sem ler perfis pessoais. O ensaio `beta-performance` usa outro perfil isolado e seis amostras de oito segundos para registrar CPU/RAM de Room/Garden/Journey visíveis e minimizados, além de pausa visual e continuidade do áudio. Amostras curtas não comprovam ausência de vazamentos em sessões prolongadas.
 
 Os resultados e limites das verificações desta entrega estão em [`VALIDATION.md`](VALIDATION.md).
 

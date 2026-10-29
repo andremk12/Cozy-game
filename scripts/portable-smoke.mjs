@@ -1,11 +1,14 @@
 import { spawn } from 'node:child_process';
 import net from 'node:net';
 import path from 'node:path';
+import { readFile, mkdtemp } from 'node:fs/promises';
 import assert from 'node:assert/strict';
 import { chromium } from 'playwright-core';
 
 const root = process.cwd();
-const executable = path.join(root, 'outputs/desktop/Little-Haven-0.1.0-x64.exe');
+const { version } = JSON.parse(await readFile(path.join(root, 'package.json'), 'utf8'));
+const executable = path.join(root, `outputs/desktop/Little-Haven-${version}-x64.exe`);
+const profile = await mkdtemp(path.join(root, 'work/portable-beta-'));
 const server = net.createServer();
 await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
 const port = server.address().port;
@@ -14,7 +17,7 @@ const environment = { ...process.env };
 delete environment.ELECTRON_RUN_AS_NODE;
 delete environment.LITTLE_HAVEN_DEV_URL;
 const processHandle = spawn(executable, [
-  `--user-data-dir=${path.join(root, 'work/portable-smoke-profile')}`,
+  `--user-data-dir=${profile}`,
   `--remote-debugging-port=${port}`,
   '--disable-gpu',
 ], { cwd: root, env: environment, windowsHide: true, stdio: 'ignore' });
@@ -36,8 +39,12 @@ try {
   assert.ok(page, 'Portable app did not load its packaged renderer.');
   await page.waitForSelector('.room-art');
   assert.equal(await page.getByRole('button', { name: 'Abrir caderno', exact: true }).count(), 1);
-  assert.deepEqual(await page.evaluate(() => Object.keys(window.haven).sort()), ['getPreferences', 'savePreferences']);
+  assert.deepEqual(await page.evaluate(() => Object.keys(window.haven).sort()), ['getGarden', 'getPreferences', 'memoryExport', 'memoryGet', 'memoryImport', 'memoryRestore', 'memorySave', 'openDeveloperContact', 'saveGarden', 'savePreferences']);
   assert.ok(page.url().includes('app.asar'));
+  await page.getByRole('button', { name: 'Uma pequena surpresa', exact: true }).click();
+  await page.getByRole('dialog').waitFor({ state: 'visible' });
+  assert.ok(await page.getByText('Oi! Eu sou o André.', { exact: true }).isVisible());
+  await page.getByRole('button', { name: 'Fechar carta', exact: true }).click();
   await page.close();
   await browser.close();
   browser = null;

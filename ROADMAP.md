@@ -57,6 +57,8 @@ Limites e evoluções planejadas:
 
 ## Fase 5 — Polimento, otimização, acessibilidade e distribuição desktop — evolução contínua
 
+- Primeira Beta experimental `0.2.0-beta.1`: carta do desenvolvedor acessível, contatos externos restritos, proteção contra instâncias concorrentes, dependências de segurança atualizadas e guia voluntário de testes. Resultados atuais e integridade do portátil em `VALIDATION.md`; recursos e limites em `BETA_NOTES.md`.
+
 - Revisar teclado, leitores de tela, contraste, foco e movimento reduzido.
 - Medir desempenho e consumo de memória em diferentes computadores.
 - Ampliar testes de regressão e validar resolução e escala do Windows.

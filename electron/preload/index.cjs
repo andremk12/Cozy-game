@@ -114,6 +114,9 @@ const memoryWithoutArguments = (channel, args) => args.length
 
 // The sandboxed renderer receives no filesystem, Node.js, or generic IPC access.
 contextBridge.exposeInMainWorld('haven', Object.freeze({
+  openDeveloperContact: (...args) => args.length === 1 && ['email', 'linkedin'].includes(args[0])
+    ? ipcRenderer.invoke('haven:developer:open-contact', args[0])
+    : Promise.reject(new TypeError('Invalid developer contact.')),
   memoryGet: (...args) => memoryWithoutArguments('haven:memory:get', args),
   memoryImport: (...args) => memoryWithoutArguments('haven:memory:import', args),
   memoryExport: (...args) => memoryWithoutArguments('haven:memory:export', args),

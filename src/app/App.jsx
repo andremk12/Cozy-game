@@ -16,6 +16,8 @@ import Icon from '../components/Icon.jsx';
 import ConfirmLeave from '../components/ConfirmLeave.jsx';
 import SoundMixer from '../components/audio/SoundMixer.jsx';
 import CompanionPanel from '../components/companion/CompanionPanel.jsx';
+import DeveloperLetter, { PixelStar } from '../components/developer/DeveloperLetter.jsx';
+import { version } from '../../package.json';
 import './App.css';
 
 const worlds = [
@@ -49,6 +51,8 @@ export default function App() {
   const [audioStatus, setAudioStatus] = useState({ playing: false, layers: {}, error: '' });
   const [mixerOpen, setMixerOpen] = useState(false);
   const [companionOpen, setCompanionOpen] = useState(false);
+  const [letterOpen, setLetterOpen] = useState(false);
+  const letterOpener = useRef(null);
   const [fullscreenTarget, setFullscreenTarget] = useState(null);
   const mixerOpener = useRef(null);
   const companionOpener = useRef(null);
@@ -232,15 +236,20 @@ export default function App() {
       else document.fullscreenElement?.focus({ preventScroll: true });
     });
   }
+  function closeLetter() {
+    setLetterOpen(false);
+    requestAnimationFrame(() => letterOpener.current?.focus({ preventScroll: true }));
+  }
   const companion = {
     settings: preferences.companion,
-    paused: companionOpen || mixerOpen || Boolean(pendingWorld),
+    paused: companionOpen || mixerOpen || letterOpen || Boolean(pendingWorld),
     onInteract: (event) => { if (!preferences.companion.introduced) openCompanion(event); },
   };
 
   return (
     <div className="haven-app">
       <header className="app-header">
+        <div className="brand-group">
         <a
           className="brand"
           href="#room"
@@ -256,8 +265,13 @@ export default function App() {
               little haven<span className="brand-dot">.</span>
             </span>
             <span className="brand-tagline">A COZY PLACE TO BREATHE</span>
+            <span className="beta-label">Beta {version} · experimental</span>
           </span>
         </a>
+        <button ref={letterOpener} type="button" className="brand-surprise" title="Uma pequena surpresa ✨"
+          aria-label="Uma pequena surpresa" aria-haspopup="dialog" aria-expanded={letterOpen}
+          onClick={() => setLetterOpen(true)}><PixelStar /></button>
+        </div>
         <div className="header-right">
           <span className="local-note">
             <span /> Seu mundo, no seu tempo
@@ -456,6 +470,7 @@ export default function App() {
           </p>
         )}
       </main>
+      {letterOpen && <DeveloperLetter onClose={closeLetter} />}
       {companionOpen && <CompanionPanel settings={preferences.companion} welcome={!preferences.companion.introduced}
         reducedMotion={reducedMotion} storageError={storageError} target={fullscreenTarget || document.body}
         onChange={(value) => setPreference('companion', value)} onClose={closeCompanion} />}
