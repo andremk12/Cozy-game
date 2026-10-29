@@ -1,0 +1,239 @@
+[
+  {
+    "id": "birds",
+    "file": "birds.wav",
+    "bytes": 1836092,
+    "sha256": "04beaf07a44c7d4a03af13bde02f0d773fbeda0c9b08ac13bf4468b848378454",
+    "duration": 28.68825,
+    "peak": 0.6,
+    "rms": 0.04352189782386881,
+    "rate": 32000,
+    "originalDurations": [
+      30.68825
+    ],
+    "processing": {
+      "id": "birds",
+      "source": "birds.ogg",
+      "start": 2,
+      "duration": 32,
+      "lowpass": 8500,
+      "rms": 0.1
+    },
+    "sources": [
+      {
+        "file": "birds.ogg",
+        "sha256": "359e4e3f9da9d75aac64cede511c7e3ef8b461f9d9f8c230f8f80e44c4b3e35f"
+      }
+    ]
+  },
+  {
+    "id": "fire",
+    "file": "fire.wav",
+    "bytes": 1744910,
+    "sha256": "2de875e0ae87ff298ba397bcba5844563b9f05310114230c71d205e6a3e1b66c",
+    "duration": 27.26353125,
+    "peak": 0.6,
+    "rms": 0.04283719218974174,
+    "rate": 32000,
+    "originalDurations": [
+      29.26353125
+    ],
+    "processing": {
+      "id": "fire",
+      "source": "fire.wav",
+      "start": 2,
+      "duration": 30,
+      "lowpass": 6500,
+      "rms": 0.13
+    },
+    "sources": [
+      {
+        "file": "fire.wav",
+        "sha256": "85ca0cc60d0c037fff8b185e31ad1fcdbda6ce45eee17c3ee1318d1b8f59e330"
+      }
+    ]
+  },
+  {
+    "id": "stream",
+    "file": "stream.wav",
+    "bytes": 1920044,
+    "sha256": "059f50b8a991234839aef28272f1fb21adb51f87901676f16f495238af91d208",
+    "duration": 30,
+    "peak": 0.6,
+    "rms": 0.08313097203137465,
+    "rate": 32000,
+    "originalDurations": [
+      31.896
+    ],
+    "processing": {
+      "id": "stream",
+      "source": "stream-waterfall/stream1.ogg",
+      "start": 1,
+      "duration": 30,
+      "lowpass": 7000,
+      "rms": 0.13
+    },
+    "sources": [
+      {
+        "file": "stream-waterfall/stream1.ogg",
+        "sha256": "c0b5256f20db94654493e4c32fdb3c25cffa6a8d41f6871969d0922147d28e65"
+      }
+    ]
+  },
+  {
+    "id": "crickets",
+    "file": "crickets.wav",
+    "bytes": 704044,
+    "sha256": "c4451c2cd945c5435b690bba4cc68f9adecbea37175b769b57c815fee1fb178e",
+    "duration": 11,
+    "peak": 0.5145125412882365,
+    "rms": 0.09,
+    "rate": 32000,
+    "originalDurations": [
+      11.4520625
+    ],
+    "processing": {
+      "id": "crickets",
+      "source": "crickets.mp3",
+      "start": 0,
+      "duration": 11,
+      "lowpass": 8500,
+      "rms": 0.09
+    },
+    "sources": [
+      {
+        "file": "crickets.mp3",
+        "sha256": "5b5bd1f744087888c5623543c3ff80be9c2ce106093993e7c8a8492b0280b2c0"
+      }
+    ]
+  },
+  {
+    "id": "train-track",
+    "file": "train-track.wav",
+    "bytes": 1344044,
+    "sha256": "cd9cd586cb4aa63790ed794c5a293e1ad078fa56e5b192bbbb19e3db14a00f44",
+    "duration": 21,
+    "peak": 0.6,
+    "rms": 0.11141135816737391,
+    "rate": 32000,
+    "originalDurations": [
+      25.5471875
+    ],
+    "processing": {
+      "id": "train-track",
+      "source": "train.ogg",
+      "start": 4,
+      "duration": 21,
+      "highpass": 70,
+      "lowpass": 3000,
+      "rms": 0.13
+    },
+    "sources": [
+      {
+        "file": "train.ogg",
+        "sha256": "d71499799236d8b9d0312e3f0779e19b8ce69cb1ceb56b82e83931f9e9ff3142"
+      }
+    ]
+  },
+  {
+    "id": "train-wheels",
+    "file": "train-wheels.wav",
+    "bytes": 1344044,
+    "sha256": "0b02674ca529fd10d6146dc61a30f8095673adfbb04a4a4f535d920578590a3b",
+    "duration": 21,
+    "peak": 0.5364294492046858,
+    "rms": 0.09,
+    "rate": 32000,
+    "originalDurations": [
+      25.5471875
+    ],
+    "processing": {
+      "id": "train-wheels",
+      "source": "train.ogg",
+      "start": 4,
+      "duration": 21,
+      "highpass": 550,
+      "lowpass": 5000,
+      "rms": 0.09
+    },
+    "sources": [
+      {
+        "file": "train.ogg",
+        "sha256": "d71499799236d8b9d0312e3f0779e19b8ce69cb1ceb56b82e83931f9e9ff3142"
+      }
+    ]
+  },
+  {
+    "id": "carriage",
+    "file": "carriage.wav",
+    "bytes": 1344044,
+    "sha256": "f18bf79e32edf34ffb5892a207d48da184d60111756c6907173abe63739a99cf",
+    "duration": 21,
+    "peak": 0.4699790552179205,
+    "rms": 0.1,
+    "rate": 32000,
+    "originalDurations": [
+      25.5471875
+    ],
+    "processing": {
+      "id": "carriage",
+      "source": "train.ogg",
+      "start": 4,
+      "duration": 21,
+      "lowpass": 320,
+      "rms": 0.1
+    },
+    "sources": [
+      {
+        "file": "train.ogg",
+        "sha256": "d71499799236d8b9d0312e3f0779e19b8ce69cb1ceb56b82e83931f9e9ff3142"
+      }
+    ]
+  },
+  {
+    "id": "leaves",
+    "file": "leaves.wav",
+    "bytes": 1792044,
+    "sha256": "b7c30dfd70b097018ecf041ee2570080957ac59989c511e59d2187f73e9a8427",
+    "duration": 28,
+    "peak": 0.6,
+    "rms": 0.016389005206301127,
+    "rate": 32000,
+    "originalDurations": [
+      0.85240625,
+      0.9939375,
+      0.6346875,
+      0.77275
+    ],
+    "processing": {
+      "id": "leaves",
+      "sources": [
+        "rustle/rustle02.flac",
+        "rustle/rustle05.flac",
+        "rustle/rustle09.flac",
+        "rustle/rustle12.flac"
+      ],
+      "duration": 28,
+      "lowpass": 6000,
+      "rms": 0.08
+    },
+    "sources": [
+      {
+        "file": "rustle/rustle02.flac",
+        "sha256": "1e01e752b2165d78482bd91ef8b859541601ae4de6b7cf6178e935cce0036c69"
+      },
+      {
+        "file": "rustle/rustle05.flac",
+        "sha256": "b7e85badf26220810e38eb9ae37eedaaeb9d743e1251a757c8faedb2a2d80a30"
+      },
+      {
+        "file": "rustle/rustle09.flac",
+        "sha256": "efa9b55ed26bc570da99c4348f2f6fbdf4b8be098029581bef27db8a1d0065e3"
+      },
+      {
+        "file": "rustle/rustle12.flac",
+        "sha256": "cddcf2912ee7fc6a9bcac783e24e3576c7c2f1fb2d5abe1fc3eb22fd036ddd6b"
+      }
+    ]
+  }
+]

@@ -64,12 +64,14 @@ export default function ImmersiveViewport({
   }
 
   function onKeyDown(event) {
-    if (!active || contextualOpen || event.key !== 'Tab') return;
+    if (!active || contextualOpen || targetRef.current?.querySelector('dialog[open]') || event.key !== 'Tab') return;
     clearTimeout(timer.current);
     const target = targetRef.current;
     const focused = document.activeElement;
-    const objects = [...target.querySelectorAll('[tabindex="0"], button:not([disabled]), a[href]')]
-      .filter((element) => element !== exitRef.current && element.getClientRects().length > 0);
+    const objects = [...target.querySelectorAll('[tabindex="0"], button, a[href], input, select, textarea')]
+      .filter((element) => element !== exitRef.current && !element.disabled
+        && element.getAttribute('tabindex') !== '-1' && !element.closest('[inert], [hidden]')
+        && element.getClientRects().length > 0);
     const first = objects[0];
     const last = objects[objects.length - 1];
 
@@ -98,7 +100,7 @@ export default function ImmersiveViewport({
       className={`immersive-viewport${active ? ' is-immersive' : ''}${active && (exitVisible || exitFocused) ? ' is-exit-visible' : ''}`}
       tabIndex={active ? -1 : undefined}
       role={active ? 'region' : undefined}
-      aria-label={active ? 'Cenário em tela cheia. Pressione Esc para sair ou Tab para acessar o botão de saída.' : undefined}
+      aria-label={active ? 'Cenário em tela cheia. Pressione Esc para sair, M para ajustar os sons, C para My Companion ou Tab para acessar o botão de saída.' : undefined}
       onPointerMove={onPointerMove}
       onPointerLeave={() => setExitVisible(false)}
       onKeyDownCapture={onKeyDown}

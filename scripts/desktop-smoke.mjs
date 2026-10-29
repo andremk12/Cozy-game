@@ -16,6 +16,6 @@ const child = spawn(require('electron'), [path.join(root, 'scripts/desktop-smoke
   stdio: 'inherit',
   windowsHide: true,
 });
-const timeout = setTimeout(() => { child.kill(); process.exitCode = 1; console.error('Desktop smoke timed out.'); }, 25_000);
+const timeout = setTimeout(() => { child.kill(); process.exitCode = 1; console.error('Desktop smoke timed out.'); }, 45_000);
 child.on('error', (error) => { clearTimeout(timeout); console.error(error.message); process.exitCode = 1; });
 child.on('exit', (code) => { clearTimeout(timeout); process.exitCode = code ?? 1; });

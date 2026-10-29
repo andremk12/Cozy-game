@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { createPresetMix } from '../shared/audio.js';
 import {
   DEFAULT_PREFERENCES,
   normalizePreferences,
@@ -18,7 +19,7 @@ async function removeTestDirectory(directory) {
   await rm(resolved, { recursive: true, force: true });
 }
 
-test('disk recovery keeps only four known preferences and bounds volume', () => {
+test('disk recovery keeps only known preferences and bounds volume', () => {
   assert.deepEqual(
     normalizePreferences({
       lampOn: false,
@@ -28,6 +29,7 @@ test('disk recovery keeps only four known preferences and bounds volume', () => 
       thought: 'private',
     }),
     {
+      ...DEFAULT_PREFERENCES,
       lampOn: false,
       rainOn: true,
       audioEnabled: true,
@@ -69,7 +71,7 @@ test('local preferences restore, serialize concurrent updates and never retain e
       store.save({ rainOn: false }),
     ]);
     const restored = await new PreferencesStore(file).get();
-    assert.deepEqual(restored, { lampOn: false, rainOn: false, audioEnabled: false, volume: 0.4 });
+    assert.deepEqual(restored, { ...DEFAULT_PREFERENCES, lampOn: false, rainOn: false, audioEnabled: false, volume: 0.4 });
     assert.deepEqual(
       Object.keys(JSON.parse(await readFile(file, 'utf8'))).sort(),
       Object.keys(DEFAULT_PREFERENCES).sort(),
@@ -77,6 +79,18 @@ test('local preferences restore, serialize concurrent updates and never retain e
     const copy = await store.get();
     copy.volume = 0.8;
     assert.equal((await store.get()).volume, 0.4);
+    const mixer = createPresetMix('custom');
+    mixer.muted = true;
+    mixer.layers.fire = { enabled: true, volume: 0 };
+    mixer.customLayers = structuredClone(mixer.layers);
+    await store.save({ mixer });
+    mixer.layers.fire.volume = 0.9;
+    const reopened = await new PreferencesStore(file).get();
+    assert.deepEqual(reopened.mixer.layers.fire, { enabled: true, volume: 0 });
+    assert.equal(reopened.mixer.muted, true);
+    const nestedCopy = await store.get();
+    nestedCopy.mixer.customLayers.fire.volume = 0.9;
+    assert.equal((await store.get()).mixer.customLayers.fire.volume, 0);
   } finally {
     await removeTestDirectory(directory);
   }

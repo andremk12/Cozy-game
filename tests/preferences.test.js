@@ -70,6 +70,7 @@ test('browser fallback restores and saves only the allowed preferences', async (
   await store.flush();
   assert.deepEqual(storage.writes, [
     {
+      ...DEFAULT_PREFERENCES,
       lampOn: false,
       rainOn: false,
       audioEnabled: false,
@@ -122,6 +123,7 @@ test('edits made before asynchronous restore win and untouched settings are rest
   await ready;
   await store.flush();
   assert.deepEqual(store.getSnapshot().preferences, {
+    ...DEFAULT_PREFERENCES,
     lampOn: true,
     rainOn: false,
     audioEnabled: true,
@@ -150,7 +152,7 @@ test('IPC saves are serialized and late save replies cannot overwrite newer choi
   firstWrite.resolve();
   await store.flush();
   assert.equal(writes.length, 2);
-  assert.deepEqual(writes[1], { lampOn: false, rainOn: false, audioEnabled: false, volume: 0.6 });
+  assert.deepEqual(writes[1], { ...DEFAULT_PREFERENCES, lampOn: false, rainOn: false, audioEnabled: false, volume: 0.6 });
   assert.deepEqual(store.getSnapshot().preferences, writes[1]);
 });
 

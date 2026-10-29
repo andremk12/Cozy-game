@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { installAudioProbe, audioSnapshot, openMixer, closeMixer, layerRow, presetSelect } from './helpers/audio.js';
 
 const diagnostics = new WeakMap();
 const sceneryOptions = [
@@ -284,61 +285,56 @@ test('changing reduced motion at runtime keeps scenery, rain and the explicit pa
   await expectMotionState(page, 'paused');
 });
 
-test('active local rain audio follows the selected world without starting itself', async ({ page }) => {
-  await page.addInitScript(() => {
-    const NativeAudioContext = window.AudioContext ?? window.webkitAudioContext;
-    const probe = { contexts: 0, gains: [] };
-    window.__journeyAudioProbe = probe;
-    window.AudioContext = class extends NativeAudioContext {
-      constructor(...args) {
-        super(...args);
-        probe.contexts += 1;
-      }
-
-      createGain() {
-        const node = super.createGain();
-        const targets = [];
-        const setTarget = node.gain.setTargetAtTime.bind(node.gain);
-        node.gain.setTargetAtTime = (value, ...args) => {
-          targets.push(value);
-          return setTarget(value, ...args);
-        };
-        probe.gains.push(targets);
-        return node;
-      }
-    };
-  });
-  const expectRainGain = async (value) => {
-    // AmbientAudio creates its rain-layer gain before the master gain.
-    await expect.poll(() => page.evaluate(() => window.__journeyAudioProbe.gains[0]?.at(-1))).toBe(value);
-    await expect(page.getByRole('button', { name: 'Desativar áudio', exact: true })).toHaveAttribute('aria-pressed', 'true');
-  };
-
+test('Journey layers follow scenery and weather using one user-activated offline engine', async ({ page }) => {
+  await installAudioProbe(page);
   await page.goto('/');
   await openJourney(page);
-  await page.getByRole('combobox', { name: 'Paisagem da viagem' }).selectOption('forest');
-  expect(await page.evaluate(() => window.__journeyAudioProbe.contexts)).toBe(0);
+  const selection = page.getByRole('combobox', { name: 'Paisagem da viagem' });
+  await selection.selectOption('forest');
+  expect((await audioSnapshot(page)).contexts).toBe(0);
   await page.getByRole('button', { name: 'Ativar áudio', exact: true }).click();
-  await expectRainGain(0);
-  await page.getByRole('combobox', { name: 'Paisagem da viagem' }).selectOption('sunset');
-  await expectRainGain(0);
-  await page.getByRole('combobox', { name: 'Paisagem da viagem' }).selectOption('rainy-night');
-  await expectRainGain(1);
+  const expectJourneyMix = async (rain) => {
+    await openMixer(page);
+    await expect(presetSelect(page)).toHaveValue('peaceful-journey');
+    for (const id of ['train-track', 'train-wheels', 'wind']) await expect(layerRow(page, id)).toHaveAttribute('data-status', 'playing');
+    await expect(layerRow(page, 'rain-window').getByRole('switch')).toHaveAttribute('aria-checked', String(rain));
+    if (rain) await expect(layerRow(page, 'rain-window')).toHaveAttribute('data-status', 'playing');
+    await closeMixer(page);
+  };
+  await expectJourneyMix(false);
+  const trainSources = (await audioSnapshot(page)).sources.filter(({ stopped }) => !stopped).map(({ id }) => id);
+  await selection.selectOption('sunset');
+  await expectJourneyMix(false);
+  await selection.selectOption('rainy-night');
+  await expectJourneyMix(true);
   await page.getByRole('button', { name: 'Parar chuva', exact: true }).click();
-  await expectRainGain(0);
+  await expectJourneyMix(false);
+  for (const id of trainSources) expect((await audioSnapshot(page)).sources.find((source) => source.id === id).stopped).toBe(false);
+
   await page.getByRole('button', { name: 'The Room', exact: true }).click();
-  await expectRainGain(1);
+  await openMixer(page);
+  await expect(presetSelect(page)).toHaveValue('rainy-evening');
+  await expect(layerRow(page, 'rain-soft')).toHaveAttribute('data-status', 'playing');
+  await expect(layerRow(page, 'fire')).toHaveAttribute('data-status', 'playing');
+  await closeMixer(page);
   await page.getByRole('button', { name: 'Let It Float', exact: true }).click();
-  await expectRainGain(1);
-  await page.getByRole('button', { name: 'The Garden — em planejamento', exact: true }).click();
-  await expectRainGain(0);
+  await openMixer(page);
+  await expect(presetSelect(page)).toHaveValue('rainy-evening');
+  await expect(layerRow(page, 'rain-soft')).toHaveAttribute('data-status', 'playing');
+  await closeMixer(page);
+  await page.getByRole('button', { name: 'The Garden', exact: true }).click();
+  await openMixer(page);
+  await expect(presetSelect(page)).toHaveValue('morning-garden');
+  await expect(layerRow(page, 'birds')).toHaveAttribute('data-status', 'playing');
+  await closeMixer(page);
   await openJourney(page);
-  await expectRainGain(0);
+  await expectJourneyMix(false);
   await page.getByRole('button', { name: 'Ativar chuva', exact: true }).click();
-  await expectRainGain(1);
+  await expectJourneyMix(true);
+  expect((await audioSnapshot(page)).contexts).toBe(1);
 
   await page.reload();
-  expect(await page.evaluate(() => window.__journeyAudioProbe.contexts)).toBe(0);
+  expect((await audioSnapshot(page)).contexts).toBe(0);
   await expect(page.getByRole('button', { name: 'Ativar áudio', exact: true })).toHaveAttribute('aria-pressed', 'false');
 });
 

@@ -1,4 +1,5 @@
 import { useEffect, useId, useState } from 'react';
+import Companion from '../../components/companion/Companion.jsx';
 import './Room.css';
 
 // Original artwork, drawn on a 480 × 270 grid. All scene details are local SVG.
@@ -351,16 +352,6 @@ function Bed() {
       <path d="M299 206h148v10H299zM303 216h9v10h-9zM434 216h9v10h-9z" fill="#4c4639" />
       <path d="M301 207h144v5H301zM305 216h4v8h-4zM436 216h4v8h-4z" fill="#907350" />
       <path d="M303 208h140v1H303z" fill="#b19063" />
-      <g className="room-sleeping-cat">
-        <path d="M360 182h3v-4h6v-3h16v2h8v-7h4v3h4v-3h3v15h-5v4h-29v-2h-8v-2h-2z" fill="#675745" />
-        <path d="M362 181h3v-3h5v-2h14v2h9v-4h3v3h5v-3h2v10h-6v3h-26v-2h-8z" fill="#c3a17a" />
-        <path
-          d="M367 179h7v2h-7zM375 177h3v5h-3zM382 179h3v4h-3zM392 181h3v1h-3zM399 181h3v1h-3z"
-          fill="#947658"
-        />
-        <path d="M396 183h2v1h-2zM369 185h9v1h-9z" fill="#e1bf95" />
-        <path d="M360 182h3v4h9v2h-10v-2h-2z" fill="#b5926d" />
-      </g>
     </g>
   );
 }
@@ -412,6 +403,7 @@ export default function Room({
   onToggleRain,
   onOpenNotebook,
   reducedMotion = false,
+  companion,
 }) {
   const uniqueId = useId().replaceAll(':', '');
   const windowId = `room-window-${uniqueId}`;
@@ -440,13 +432,13 @@ export default function Room({
         viewBox="0 0 480 270"
         xmlns="http://www.w3.org/2000/svg"
         shapeRendering="crispEdges"
-        role="img"
+        role="group"
         aria-labelledby={`room-title-${uniqueId} room-desc-${uniqueId}`}
       >
         <title id={`room-title-${uniqueId}`}>Seu pequeno refúgio em uma noite tranquila</title>
         <desc id={`room-desc-${uniqueId}`}>
           Um quarto em pixel art, com janela para a floresta, plantas, uma escrivaninha com chá e
-          caderno aberto, luminária dourada e um gato dormindo sobre a colcha.
+          caderno aberto e luminária dourada. Um pequeno companheiro pode descansar por aqui.
         </desc>
         <defs>
           <clipPath id={windowId}>
@@ -532,6 +524,8 @@ export default function Room({
           fill="#a8b589"
         />
         <path d="M0 264h480v6H0zM0 0h480v2H0z" fill="#152d30" />
+        {companion && <Companion world="room" settings={companion.settings} reducedMotion={reducedMotion}
+          paused={paused || companion.paused} context={{ rainOn, lampOn }} onInteract={companion.onInteract} />}
         <rect
           className="room-night-shade"
           width="480"

@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react';
+import { acquireFullscreenEscape } from '../../services/fullscreenEscape.js';
 import './JourneyKeepsake.css';
 
 const PAGES = [
@@ -56,15 +57,9 @@ export default function JourneyKeepsake({ kind, scenery, onClose }) {
     // The desktop embedder consumes Escape before DOM cancel/keydown events.
     // Only a contextual modal in its existing fullscreen may capture this key.
     const keyboard = window.haven && document.fullscreenElement?.contains(dialog) ? navigator.keyboard : null;
-    let disposed = false;
-    if (keyboard?.lock) {
-      void keyboard.lock(['Escape']).then(() => {
-        if (!disposed) setKeyboardLocked(true);
-      }).catch(() => {});
-    }
+    const releaseEscape = acquireFullscreenEscape(keyboard, setKeyboardLocked);
     return () => {
-      disposed = true;
-      keyboard?.unlock();
+      releaseEscape();
       dialog.close();
     };
   }, []);

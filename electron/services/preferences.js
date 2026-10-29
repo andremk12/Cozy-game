@@ -1,11 +1,15 @@
 import { mkdir, readFile, rename, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { DEFAULT_MIXER, normalizeMixer, validateMixer } from '../../shared/audio.js';
+import { DEFAULT_COMPANION, normalizeCompanion, validateCompanion } from '../../shared/companion.js';
 
 export const DEFAULT_PREFERENCES = Object.freeze({
   lampOn: true,
   rainOn: true,
   audioEnabled: false,
   volume: 0.25,
+  mixer: DEFAULT_MIXER,
+  companion: DEFAULT_COMPANION,
 });
 
 const booleanKeys = ['lampOn', 'rainOn', 'audioEnabled'];
@@ -23,6 +27,8 @@ export function normalizePreferences(value) {
   if (typeof value.volume === 'number' && Number.isFinite(value.volume)) {
     result.volume = Math.min(1, Math.max(0, value.volume));
   }
+  result.mixer = normalizeMixer(value.mixer);
+  result.companion = normalizeCompanion(value.companion);
   return result;
 }
 
@@ -38,11 +44,16 @@ export function validatePreferencePatch(patch) {
       if (typeof patch[key] !== 'number' || !Number.isFinite(patch[key]) || patch[key] < 0 || patch[key] > 1) {
         throw new TypeError('Volume must be between zero and one.');
       }
+    } else if (key === 'mixer') {
+      validateMixer(patch[key]);
+    } else if (key === 'companion') {
+      validateCompanion(patch[key]);
     } else if (typeof patch[key] !== 'boolean') {
       throw new TypeError('Preference switches must be booleans.');
     }
   }
-  return Object.fromEntries(patchKeys.map((key) => [key, patch[key]]));
+  return Object.fromEntries(patchKeys.map((key) => [key, key === 'mixer' ? validateMixer(patch[key])
+    : key === 'companion' ? validateCompanion(patch[key]) : patch[key]]));
 }
 
 export class PreferencesStore {
@@ -68,7 +79,7 @@ export class PreferencesStore {
   async get() {
     await this.#ready;
     await this.#pending;
-    return { ...this.#value };
+    return { ...this.#value, mixer: normalizeMixer(this.#value.mixer), companion: normalizeCompanion(this.#value.companion) };
   }
 
   save(patch) {
@@ -81,7 +92,7 @@ export class PreferencesStore {
       await writeFile(temporaryFile, `${JSON.stringify(next, null, 2)}\n`, { encoding: 'utf8', mode: 0o600 });
       await rename(temporaryFile, this.filePath);
       this.#value = next;
-      return { ...next };
+      return { ...next, mixer: normalizeMixer(next.mixer), companion: normalizeCompanion(next.companion) };
     });
     // A failed disk write must not poison subsequent requests.
     this.#pending = operation.catch(() => undefined);

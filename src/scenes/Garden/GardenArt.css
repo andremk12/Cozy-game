@@ -1,0 +1,74 @@
+.garden-art { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; image-rendering: pixelated; user-select: none; overflow: hidden; }
+.garden-object { cursor: pointer; outline: none; touch-action: manipulation; }
+.garden-object-hit { fill: transparent; stroke: transparent; stroke-width: 1; }
+.garden-object:hover > g > .garden-object-hit, .garden-object:hover > .garden-object-hit { fill: #f6e4b10c; stroke: #f0d79b85; }
+.garden-object:focus-visible > g > .garden-object-hit, .garden-object:focus-visible > .garden-object-hit, .garden-object.is-selected > g > .garden-object-hit { fill: #f4d6960a; stroke: #f6dfaa; stroke-width: 1.5; stroke-dasharray: 3 2; }
+.garden-object:focus-visible { outline: none; }
+.garden-empty-decoration { opacity: .28; }
+.garden-decoration-object:hover .garden-empty-decoration, .garden-decoration-object:focus-visible .garden-empty-decoration { opacity: 1; }
+.garden-empty-plant { opacity: .4; }
+.garden-plant-object:hover .garden-empty-plant, .garden-plant-object:focus-visible .garden-empty-plant { opacity: .9; }
+.garden-plant-response { transform-origin: 0 0; }
+.garden-arrangement-response { animation: garden-arrangement-move 650ms steps(6, end) both; }
+.garden-shrub-leaves { animation: garden-leaf-wind 16s steps(8, end) infinite; }
+.garden-tree-foliage { animation: garden-leaf-wind 23s steps(8, end) infinite; }
+.garden-plant-response--touch { animation: garden-plant-touch 1300ms steps(8, end) both; }
+.garden-plant-response--water { animation: garden-plant-touch 1600ms steps(8, end) both; }
+.garden-plant[data-stage='3'] .garden-plant-response--touch { animation-name: garden-adult-touch; }
+.garden-plant[data-stage='3'] .garden-plant-response--water { animation-name: garden-adult-touch; }
+.garden-watering { animation: garden-watering-presence 1700ms linear both; }
+.garden-watering-can { transform-origin: 10px -32px; animation: garden-tip-can 1600ms steps(8, end) both; }
+.garden-water-drops { animation: garden-water-fall 550ms steps(6, end) 3 both; }
+.garden-water-spark { animation: garden-water-spark 1600ms ease-out both; }
+.garden-butterfly { animation: garden-butterfly-float 12s steps(24, end) infinite; }
+.garden-butterfly--1 { animation-duration: 15s; animation-delay: -5s; }
+.garden-butterfly-wings { transform-origin: 0 0; animation: garden-butterfly-wings 900ms steps(3, end) infinite; }
+.garden-butterfly.is-reacting { animation: garden-butterfly-visit 2400ms steps(24, end) both; }
+.garden-fish { animation: garden-fish-swim 18s steps(36, end) infinite; }
+.garden-fish--1 { animation-duration: 22s; animation-delay: -9s; }
+.garden-fish--2 { animation-duration: 25s; animation-delay: -16s; }
+.garden-fish-group.is-feeding .garden-fish { animation: garden-fish-greet 2100ms steps(16, end) both; }
+.garden-pond-ring { transform-origin: 389px 201px; animation: garden-ripple 2000ms steps(12, end) both; }
+.garden-pond-ring--late { animation-delay: 250ms; }
+.garden-fish-food { animation: garden-food 1600ms ease-out both; }
+.garden-firefly { animation: garden-firefly-drift 14s steps(24, end) infinite, garden-firefly-light 5s ease-in-out infinite; }
+.garden-firefly--1 { animation-delay: -5s, -2s; }.garden-firefly--2 { animation-delay: -8s, -3s; }.garden-firefly--3 { animation-delay: -2s, -1s; }.garden-firefly--4 { animation-delay: -10s, -4s; }.garden-firefly--5 { animation-delay: -7s, -1.5s; }
+.garden-fireflies.is-reacting { animation: garden-firefly-response 1800ms ease-in-out both; }
+.garden-pond-shimmer { animation: garden-pond-shimmer 9s ease-in-out infinite; }
+.garden-lantern-glow { animation: garden-lantern-glow 10s ease-in-out infinite; }
+.garden-rainfall { animation: garden-rain-fall 2600ms linear infinite; }
+.garden-rain-ripples { animation: garden-rain-ripples 1900ms steps(4, end) infinite; }
+.garden-cat { transform: translateY(13px); transition: transform 700ms steps(7, end); }
+.garden-cat.is-visible { transform: translateY(0); }
+.garden-cat-tail { transform-origin: 8px -5px; animation: garden-cat-tail 9s steps(8, end) infinite; }
+.garden-cat-eyes { animation: garden-cat-blink 9s steps(1, end) infinite; }
+.garden-art.is-paused *, .garden-scene.is-paused .garden-art * { animation-play-state: paused !important; }
+.garden-art.is-paused .garden-cat { transition: none; }
+.garden-art.is-reduced-motion *, .garden-scene.is-reduced-motion .garden-art * { animation: none !important; transition: none !important; }
+.garden-art.is-reduced-motion .garden-watering, .garden-scene.is-reduced-motion .garden-watering { opacity: 1; }
+.garden-art.is-reduced-motion .garden-water-drops, .garden-scene.is-reduced-motion .garden-water-drops { opacity: .85; }
+@keyframes garden-plant-touch { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-1px); } 55% { transform: translateX(1px); } 80% { transform: translateX(-1px); } }
+@keyframes garden-arrangement-move { 0% { transform: translateY(-3px); } 55% { transform: translateY(-1px); } 100% { transform: translateY(0); } }
+@keyframes garden-leaf-wind { 0%,35%,100% { transform: translateX(0); } 60%,75% { transform: translateX(1px); } }
+@keyframes garden-adult-touch { 0%,100% { transform: translate(0,0); } 25% { transform: translate(-1px,-1px); } 50% { transform: translate(1px,0); } 75% { transform: translate(-1px,0); } }
+@keyframes garden-watering-presence { 0%,85% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes garden-tip-can { 0%,100% { transform: rotate(0); } 20%,75% { transform: rotate(-18deg); } }
+@keyframes garden-water-fall { from { transform: translate(1px,-4px); opacity: 0; } 30% { opacity: .9; } to { transform: translate(-2px,4px); opacity: 0; } }
+@keyframes garden-water-spark { 0%,25% { opacity: 0; } 50% { opacity: .8; } 100% { opacity: 0; } }
+@keyframes garden-butterfly-float { 0%,100% { transform: translate(0,0); } 25% { transform: translate(7px,-3px); } 60% { transform: translate(-4px,-5px); } 80% { transform: translate(-6px,1px); } }
+@keyframes garden-butterfly-wings { 0%,100% { transform: scaleX(1); } 50% { transform: scaleX(.5); } }
+@keyframes garden-butterfly-visit { 0%,100% { transform: translate(0,0); } 35% { transform: translate(15px,-13px); } 70% { transform: translate(-10px,-7px); } }
+@keyframes garden-fish-swim { 0%,100% { transform: translate(0,0); } 30% { transform: translate(8px,-3px); } 65% { transform: translate(-6px,3px); } }
+@keyframes garden-fish-greet { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-4px,-6px); } }
+@keyframes garden-ripple { from { transform: scale(.65); opacity: .8; } to { transform: scale(1.8); opacity: 0; } }
+@keyframes garden-food { from { opacity: 1; } to { opacity: 0; transform: translateY(3px); } }
+@keyframes garden-firefly-drift { 0%,100% { transform: translate(0,0); } 35% { transform: translate(5px,-4px); } 75% { transform: translate(-3px,2px); } }
+@keyframes garden-firefly-light { 0%,100% { opacity: .3; } 50% { opacity: 1; } }
+@keyframes garden-firefly-response { 0%,100% { opacity: 1; } 35% { opacity: .35; } 70% { opacity: 1; } }
+@keyframes garden-pond-shimmer { 0%,100% { opacity: .25; } 50% { opacity: .5; } }
+@keyframes garden-lantern-glow { 0%,100% { opacity: .8; } 50% { opacity: 1; } }
+@keyframes garden-rain-fall { to { transform: translateY(48px); } }
+@keyframes garden-rain-ripples { 0%,100% { opacity: .2; } 50% { opacity: .45; } }
+@keyframes garden-cat-tail { 0%,60%,100% { transform: translateX(0); } 70% { transform: translateX(2px); } 85% { transform: translateX(-1px); } }
+@keyframes garden-cat-blink { 0%,43%,47%,100% { opacity: 1; } 44%,46% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .garden-art *, .garden-art *::before, .garden-art *::after { animation: none !important; transition: none !important; } }

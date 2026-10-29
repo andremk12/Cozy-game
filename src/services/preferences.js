@@ -1,3 +1,6 @@
+import { DEFAULT_MIXER, normalizeMixer, validateMixer } from '../../shared/audio.js';
+import { DEFAULT_COMPANION, normalizeCompanion, validateCompanion } from '../../shared/companion.js';
+
 export const PREFERENCES_STORAGE_KEY = 'haven.preferences.v1';
 
 export const DEFAULT_PREFERENCES = Object.freeze({
@@ -5,12 +8,14 @@ export const DEFAULT_PREFERENCES = Object.freeze({
   rainOn: true,
   audioEnabled: false,
   volume: 0.25,
+  mixer: DEFAULT_MIXER,
+  companion: DEFAULT_COMPANION,
 });
 
 const BOOLEAN_KEYS = new Set(['lampOn', 'rainOn', 'audioEnabled']);
 const STORAGE_ERROR = 'Não foi possível salvar as preferências neste dispositivo.';
 
-/** Only these four settings can cross the persistence boundary. */
+/** Only the explicit settings schema can cross the persistence boundary. */
 export function normalizePreferences(input) {
   const source = input && typeof input === 'object' && !Array.isArray(input) ? input : {};
   const result = { ...DEFAULT_PREFERENCES };
@@ -21,6 +26,8 @@ export function normalizePreferences(input) {
   if (typeof source.volume === 'number' && Number.isFinite(source.volume)) {
     result.volume = Math.min(1, Math.max(0, source.volume));
   }
+  result.mixer = normalizeMixer(source.mixer);
+  result.companion = normalizeCompanion(source.companion);
   return result;
 }
 
@@ -128,7 +135,13 @@ export function createPreferenceStore({
         : valueOrUpdater;
     if (BOOLEAN_KEYS.has(key) && typeof value !== 'boolean') return false;
     if (key === 'volume' && (typeof value !== 'number' || !Number.isFinite(value))) return false;
-    const safeValue = key === 'volume' ? Math.min(1, Math.max(0, value)) : value;
+    let safeValue = key === 'volume' ? Math.min(1, Math.max(0, value)) : value;
+    if (key === 'mixer') {
+      try { safeValue = validateMixer(value); } catch { return false; }
+    }
+    if (key === 'companion') {
+      try { safeValue = validateCompanion(value); } catch { return false; }
+    }
     // Mark even unchanged defaults as intentional choices during restoration.
     if (!snapshot.ready) editedBeforeRestore.add(key);
     if (snapshot.preferences[key] === safeValue) return true;

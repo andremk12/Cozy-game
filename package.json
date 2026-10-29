@@ -45,6 +45,7 @@
     "files": [
       "dist/**/*",
       "electron/**/*",
+      "shared/**/*",
       "public/assets/icons/haven.png",
       "package.json"
     ],

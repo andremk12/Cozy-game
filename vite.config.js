@@ -1,10 +1,12 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { localAudioPlugin } from './scripts/local-audio-plugin.mjs';
 
 export default defineConfig({
   base: './',
   plugins: [
     react(),
+    localAudioPlugin(),
     {
       name: 'development-refresh-policy',
       apply: 'serve',

@@ -8,6 +8,7 @@ import { JourneyCurtains, JourneyObjectControls } from './JourneyObjects.jsx';
 import JourneyKeepsake from './JourneyKeepsake.jsx';
 import { useJourneyObjects } from './useJourneyObjects.js';
 import { SCENERIES } from './sceneries.js';
+import Companion from '../../components/companion/Companion.jsx';
 import './Journey.css';
 
 function MovementIcon({ paused }) {
@@ -27,6 +28,7 @@ export default function Journey({
   onTogglePaused,
   reducedMotion = false,
   onBack,
+  companion,
 }) {
   const uniqueId = useId().replaceAll(':', '');
   const windowId = `journey-window-${uniqueId}`;
@@ -86,6 +88,9 @@ export default function Journey({
         <JourneyCurtains open={objects.curtainsOpen} onToggle={objects.toggleCurtains} windowId={windowId} />
         <CarriageInterior lampOn={objects.lampOn} teaState={objects.teaState} teaServing={objects.teaServing} />
         <JourneyObjectControls objects={objects} />
+        {companion && <Companion world="journey" settings={companion.settings} reducedMotion={reducedMotion}
+          paused={paused || hidden || companion.paused || Boolean(objects.keepsake)}
+          context={{ scenery, rainOn: effectiveRain }} onInteract={companion.onInteract} />}
       </svg>
       {objects.keepsake && <JourneyKeepsake kind={objects.keepsake} scenery={selectedScenery} onClose={objects.closeKeepsake} />}
       <p className="sr-only" role="status">{objects.teaState === 'warm' ? 'Chá servido. O vapor sobe da xícara.' : objects.teaState === 'cooling' ? 'O chá esfria devagar.' : ''}</p>

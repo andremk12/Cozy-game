@@ -70,7 +70,7 @@ test('paper folds into a boat, sails and completes without persisting or sending
   await expect(page.getByRole('button', { name: 'Abrir caderno', exact: true })).toBeVisible();
 });
 
-test('reduced motion offers an immediate, static completion and planned worlds are honest', async ({
+test('reduced motion offers an immediate static completion and Garden stays usable', async ({
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
@@ -81,8 +81,8 @@ test('reduced motion offers an immediate, static completion and planned worlds a
   await page.getByRole('button', { name: 'Let it float', exact: true }).click();
   await expect(page.getByText('O rio segue. Você pode ficar.')).toBeVisible();
   await expect(page.locator('.sailing-boat')).toHaveCount(0);
-  await page.getByRole('button', { name: 'The Garden — em planejamento', exact: true }).click();
-  await expect(page.getByText('UM FUTURO CANTINHO · EM PLANEJAMENTO')).toBeVisible();
+  await page.getByRole('button', { name: 'The Garden', exact: true }).click();
+  await expect(page.locator('svg.garden-art')).toBeVisible();
   await page.getByRole('button', { name: 'The Journey', exact: true }).click();
   await expect(page.locator('.journey-scene')).toBeVisible();
   await expect(page.locator('.journey-scene')).toHaveClass(/is-reduced-motion/);

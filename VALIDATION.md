@@ -1,4 +1,115 @@
-# Validação atual — expansão interativa de The Journey
+# Validação atual — Áudio 2.0 e Cozy Sound Mixer
+
+Verificação de **29 de outubro de 2026**, em Windows x64, Node.js 22.18.0 e Microsoft Edge. As alterações locais anteriores de Garden e Journey foram preservadas; os registros abaixo permanecem como histórico e não substituem os testes desta mudança.
+
+| Verificação executada no código final | Resultado |
+| --- | --- |
+| `npm test` | **67 passaram**, nenhum falhou |
+| `npm run build` | Concluído; 78 módulos, sem novas dependências |
+| `npm run test:e2e` | **51 passaram** em aproximadamente 1,3 minuto; código de saída 0 |
+| `npx playwright test tests/e2e/haven.spec.js -g 'audio starts only' --repeat-each=3` | 3 repetições passaram após corrigir a restauração durante o carregamento |
+| `npm run test:desktop` no build final | Passou; todas as 12 camadas decodificadas/iniciadas, quatro presets, contexto único, CSP e imersão nativa |
+| `node scripts/prepare-audio.mjs` | Executado; oito WAVs preparados offline a partir dos originais licenciados |
+| Conferência independente dos recursos | Oito hashes SHA-256, cabeçalhos PCM e picos conferidos; passaram |
+| `git diff --check` | Sem erros de whitespace |
+| Inspeção visual | Capturas do mixer desktop, mobile e imersivo abertas e revisadas |
+
+## Comportamentos verificados
+
+- **Mixer funcional:** drawer com cabeçalho, Atmosphere, Your Sounds, categorias recolhíveis, 12 switches/sliders/percentuais, volume geral fixo, ativação explícita e mute que preserva a mistura. Abrir/fechar não cria contexto nem interrompe a reprodução. Indicadores refletem fontes iniciadas, habilitação, volume e mute; não são visualizadores simulados.
+- **Motor compartilhado:** um AudioContext criado somente pelo gesto de ativação, fontes independentes carregadas sob demanda, ganho por camada, master limitado a 0,25, fades finitos e overlap de até 750 ms nas bordas dos loops. Cada buffer fica limitado a pico absoluto de 0,24; mesmo 12 camadas no máximo têm teto somado de 0,72 após o master. Essa conta limita amplitude; não comprova equilíbrio perceptivo.
+- **Ganho e recursos:** sondagens da topologia Web Audio real confirmam múltiplas fontes, independência dos sliders, reuso das fontes em ajustes, master proporcional, mute chegando a zero real e distinção entre habilitado com volume zero e desativado. Fontes retiradas da mistura são paradas/desconectadas e seus buffers liberados após 850 ms. Unitários cobrem stop/dispose durante carregamento, mudanças rápidas, falha parcial de alocação, falha de decodificação e nova tentativa.
+- **Presets e navegação:** Rainy Evening, Morning Garden, Quiet Night e Peaceful Journey configuram camadas reais. Ajustes individuais selecionam Custom; trocar de preset preserva a última Custom para recuperar. Custom atravessa Room, Garden, Journey e Let It Float sem alterações. Fora de Custom, ambiente, clima e horário do jardim orientam a mistura, com fades; a configuração salva não é substituída ao iniciar o aplicativo.
+- **Inicialização e persistência:** recarregar restaura master, mute, preset, camadas e Custom sem criar AudioContext. Preferências antigas mantêm luz/chuva/volume/escolha de áudio e recebem o mixer padrão. Renderer, preload e main validam o schema aninhado, rejeitando campos extras e texto sintético antes do IPC. Salvamento ordenado, restauração tardia e cópias independentes continuam cobertos.
+- **Imersão e teclado:** M abre o mixer dentro da superfície fullscreen de Journey/Garden; Esc fecha primeiro o painel e preserva fullscreen, cenário, áudio e foco. O smoke nativo usa eventos reais, inclusive abrindo o mixer durante a ferramenta Mover do jardim e verificando que o Esc seguinte cancela a ferramenta antes de sair. A captura existente de Escape é compartilhada entre ferramentas e diálogos, sem novas permissões.
+- **Acessibilidade e layout:** foco inicial/retorno, ciclo Tab/Shift+Tab, setas nos sliders, foco visível, movimento reduzido e janelas de 800 × 650, 390 × 844 e 360 × 400. A rolagem é interna e o master permanece visível. Os demais testes cobrem arte fullscreen, DPR fracionário, ferramentas, objetos do trem e layouts anteriores.
+- **Regressões e segurança:** os 51 casos mantêm o ritual completo, confirmação de descarte, limpeza do texto antes da animação e ausência do texto sintético em armazenamento/requisições. Sandbox, isolamento, ausência de Node no renderer, quatro funções existentes da ponte, CSP e rejeição de recursos externos foram preservados. Nenhuma mudança na arte dos ambientes ou no ritual.
+
+Uma execução completa encontrou a preferência de áudio sendo salva somente após a decodificação das gravações: recarregar logo após o contexto iniciar podia perder a indicação **Retomar som**. O salvamento agora ocorre assim que a ativação explícita inicia o contexto. Três repetições focadas e a suíte completa posterior passaram. A revisão também identificou e corrigiu o compartilhamento da captura de Escape entre mixer e ferramenta ativa do jardim, coberto por seis unitários e pelo teste nativo.
+
+O smoke inicial dentro do sandbox foi impedido pela ACL do runtime Electron; os testes nativos finais foram executados fora dele, preservando `sandbox: true` no aplicativo. Uma rodada focada de interface aprovou os casos, mas ficou presa no encerramento do servidor dentro do sandbox; as execuções consolidadas fora dele encerraram normalmente. Os avisos de MockTimers, `NO_COLOR`/`FORCE_COLOR` e conversão de finais de linha não são falhas da aplicação.
+
+## Biblioteca, arquivos e limites
+
+Estão disponíveis três chuvas e vento procedurais, mais oito WAVs locais: folhas, pássaros, riacho, grilos, lareira, trilhos, rodas e interior do vagão. Os três perfis de trem derivam da mesma gravação real de **gryc**; o riacho é de **kurt**, ambos CC BY 3.0. As demais gravações são CC0. Folhas usa montagem de foley real de folhas secas de **qubodup**, não uma gravação de árvores ao vento. Origens, autores, adaptações, licenças e hashes constam em `public/assets/audio/README.md`, `manifest.json` e `public/licenses/Audio-*`.
+
+Arquivos principais desta alteração:
+
+- `src/services/audio/`: AudioEngine, preparo de camadas, biblioteca e presets; `ambientAudio.js` mantém apenas uma reexportação, sem um segundo motor.
+- `src/components/audio/`, `src/components/Icon.jsx` e `src/app/App.jsx`: painel, controles, ícones e coordenação de áudio/ambientes.
+- `shared/audio.js`, serviços de preferências do renderer/main e preload: schema limitado e migração, sem novos canais IPC.
+- `src/services/fullscreenEscape.js`, viewport/hook imersivos e efeitos de captura nos diálogos/ferramentas existentes: integração de M/Esc sem perder a captura da ferramenta ativa.
+- `scripts/local-audio-plugin.mjs`, `vite.config.js`, `scripts/prepare-audio.mjs` e smoke desktop: bytes locais sob demanda, preparo reproduzível e verificação nativa.
+- Testes de áudio, preferências e Escape; `tests/e2e/audio-mixer.spec.js`, helper de sondagem e atualização das verificações de áudio de Garden/Journey. README e roadmap atualizados pontualmente.
+
+Os WAVs somam **12.029.266 bytes**. Para manter `connect-src 'none'` no desktop, o build os entrega também como módulos JavaScript locais codificados em base64, importados somente ao ativar a camada. Há custo adicional de disco/memória e avisos do Vite por chunks acima de 500 kB; não foram ocultados. Otimizar essa duplicação é uma melhoria futura, sem necessidade de ampliar permissões ou acrescentar backend.
+
+Não foram realizadas escuta subjetiva em fones/caixas, avaliação de fadiga em sessões longas, medição de heap, ensaio de desempenho com todas as camadas no máximo, Narrador ou avaliação abrangente de monitores/GPU/DPI. O trecho de grilos tem 11 segundos; a percepção de repetição e as junções precisam de escuta manual. A verificação automatizada comprova fontes/buffers/ganhos reais, não a qualidade percebida do áudio. Próximas melhorias sugeridas: normalização perceptiva, trechos mais longos e gravações independentes das partes do trem.
+
+Capturas locais não versionadas: `outputs/Little-Haven-Mixer-desktop.png`, `outputs/Little-Haven-Mixer-mobile.png` e `outputs/Little-Haven-Mixer-immersive.png`. Não foi executado empacotamento nem atualizado o portátil. Não houve commit, push, merge ou release.
+
+Para conferir manualmente, execute `npm start` após o build. Abra **Mixer**, escolha **Rainy Evening** e clique em **Ativar áudio**. Ajuste chuva para 25%, lareira para 40% e vento; altere o master e teste mute/reativação. Feche, navegue entre os ambientes e confirme que Custom permanece. Em Journey/Garden, entre no Modo Imersivo, pressione M e depois Esc. Reabra o aplicativo: as escolhas devem voltar visualmente e o áudio deve aguardar um novo gesto. Faça a escuta com volume confortável, incluindo junções de loops e cada camada isolada.
+
+---
+
+# Validação anterior — The Garden
+
+Verificação de **28 de outubro de 2026**, em Windows x64, Node.js 22.18.0 e Microsoft Edge. Esta entrega implementa o jardim com hibisco rosa e gato laranja; os registros anteriores permanecem abaixo como histórico.
+
+| Verificação executada | Resultado |
+| --- | --- |
+| `npm test` | 51 passaram; nenhum falhou |
+| `npm run build` | Concluído; 61 módulos, sem novas dependências |
+| `npm run test:e2e` | 43 passaram em aproximadamente 1,1 minuto; código de saída 0 |
+| Rechecagens focadas de cultivo e imersão | Passaram; última rodada de imersão: 4/4, incluindo 320 × 240 e DPR 1,25/2 |
+| `npm run test:desktop` | Passou; ponte, arquivos locais, segurança, gato, contextos, Esc e fullscreen nativo/DOM |
+| `node scripts/garden-performance.mjs` | Ensaio de 60 segundos concluído; sem erros de renderer ou tarefas longas |
+| `git diff --check` | Sem erros de whitespace |
+
+## Funcionalidades verificadas
+
+- **Arte e cultivo:** SVG original de 480 × 270 com quatro canteiros, quatro vasos, árvore, cerca, caminho e lago. Margarida, lavanda, hibisco rosa, samambaia e suculenta têm desenhos próprios nos quatro estágios. Testes com relógio controlado verificam crescimento cumulativo aos 2/8/20 minutos, tempo entre visitas e restauração após reload. Não há morte, regressão, economia ou necessidade de visitas diárias.
+- **Cuidado e organização:** regador, gotas e reação das plantas; bônus de 20% da duração do estágio uma única vez por estágio não adulto. Rega adulta continua visual. Vasos trocam aparência e planta juntos, inclusive quando ocupados. Substituição confirmada ocorre numa única alteração. Banco, lanternas, pedras e cogumelos respeitam pontos compatíveis. Lanternas acesas e apagadas são distintas também de dia.
+- **Fauna:** duas borboletas, seis vagalumes noturnos, três peixes e um gato laranja com três esconderijos possíveis. Gato aparece e retorna, mantém alvo/foco de teclado e alterna poses imediatamente com movimento reduzido. Lago oferece reação e alimento simbólico sem inventário. Respostas dos animais também possuem aviso acessível discreto.
+- **Atmosfera e áudio:** dia, pôr do sol e noite combinados com clima limpo ou chuva. Vento/água, pássaros e insetos são sintetizados localmente. Testes verificam ausência de autoplay, contexto único, ganho limitado, mudanças de perfil e liberação de fontes, inclusive após falha parcial de alocação. Room e Journey mantêm a chuva anterior.
+- **Persistência:** `garden.json` desktop e `haven.garden.v1` web, separados das quatro preferências existentes. Validação compartilhada no main/renderer e validação restrita no preload; campos desconhecidos são rejeitados antes do IPC. Cobertura de posições duplicadas, incompatibilidade, arquivo ausente/inválido/grande, versões futuras, concorrência, ACK antigo, falha e nova tentativa. Versão futura permite sessão temporária sem sobrescrever o original ou oferecer tentativa de gravação inútil.
+- **Privacidade e segurança:** texto sintético de Let It Float permanece ausente do armazenamento do jardim; confirmação de descarte e texto efêmero continuam cobertos. O preload adiciona somente `getGarden` e `saveGarden`. Sandbox, isolamento, CSP, origem IPC e negação de recursos remotos foram preservados.
+- **Imersão e acesso:** mesmo SVG e estado ao entrar/sair, escala inteira física quando possível, cursor utilizável e ferramentas integradas no baú/placa. Esc fecha primeiro o contexto ou cancela a ferramenta. O teste nativo aguarda o Keyboard Lock existente, valida clique real no gato, foco e restauração, e repete as regressões de Journey. O botão de cancelamento devolve o foco ao baú; o aviso fica no topo para não cobrir vasos em áreas pequenas.
+
+Uma execução dentro do sandbox completou os casos, mas ficou presa ao encerrar o servidor de teste e foi interrompida. A repetição fora do sandbox encerrou normalmente; a suíte consolidada final de 43 casos terminou com código 0. Os avisos de `NO_COLOR`/`FORCE_COLOR` e do MockTimers experimental não indicaram falhas.
+
+## Inspeção visual e desempenho
+
+Foram abertas e revisadas capturas de dia/noite, jardim com oito plantas adultas, chuva, janela de 390 px e fullscreen desktop. Os testes também cobrem pôr do sol, 800 × 650, fullscreen 1920 × 1080, área reduzida de 320 × 240 e DPR 1,25/2. A escala padrão DPR 1 e o mecanismo compartilhado continuam cobertos; múltiplos monitores não receberam uma avaliação manual específica nesta entrega. O caso de DPR 2 foi acrescentado depois da suíte completa e passou na rodada focada de quatro testes de imersão.
+
+Ensaio local com **Intel Core i5-13450HX, 24 GiB de RAM, Windows 10.0.26200, Edge 156.0.4314.50 headless**, viewport 1440 × 960/DPR 1: oito plantas adultas, seis decorações, noite, chuva, peixes e vagalumes; áudio desligado.
+
+- Duração: 60.004 ms; 14.401 callbacks de `requestAnimationFrame`, cadência média de aproximadamente 240/s e intervalo p95 de **4,3 ms**.
+- Nenhum intervalo acima de 33,5 ms, nenhuma tarefa longa registrada e nenhuma mutação no SVG durante a observação sem interação.
+- 558 elementos no SVG noturno. Após mudar para dia e navegar vinte vezes, a contagem permaneceu em **537 antes e depois**; nenhum erro de renderer.
+
+A cadência de callbacks headless não comprova FPS apresentados por um monitor físico. Esta medição não substitui profiling de GPU/heap, desempenho com áudio ligado ou ensaios em outros computadores. As fontes de áudio e a ausência de duplicação são verificadas separadamente pelos testes de serviço e interface.
+
+Artefatos locais, sem versionamento: `outputs/garden-performance.json`, `outputs/Little-Haven-Garden-grown-day.png`, `outputs/Little-Haven-Garden-grown-night.png`, capturas de atmosfera/responsividade e `outputs/Little-Haven-Garden-immersive-desktop.png`.
+
+## Arquivos e limites
+
+- Cena e interações em `src/scenes/Garden/`; crescimento, catálogo e validação em `shared/garden.js`.
+- Estado em `src/hooks/useGarden.js` e `src/services/garden.js`; arquivo desktop em `electron/services/garden.js`, com integração mínima de main/preload.
+- Áudio, coordenação de App e componentes imersivos receberam alterações pontuais. Nenhuma arte ou fluxo de Room, Journey ou Let It Float foi reescrito.
+- Testes novos de modelo, store, arquivo/preload, fauna, cultivo, áudio e imersão; smoke desktop e documentação atualizados. `shared/**/*` foi incluído na distribuição, sem mudar dependências.
+
+Os canteiros são fixos; não há arrastar e soltar ou transplante entre canteiros e vasos. O gato escolhe um esconderijo por visita e não tem alimentação, miado ou deslocamento entre arbustos. Ferramentas, efeitos e animais não são persistidos.
+
+Não foram feitos testes manuais com Narrador, escuta subjetiva do áudio, medição de heap ou avaliação de todas as combinações de monitores/GPU/DPI. Também não foi gerado executável portátil nesta entrega. Não houve commit, push, merge ou release.
+
+Alterações confirmadas são preservadas; o encerramento normal aguarda gravações já aceitas pelo main. Não há promessa de recuperação de uma ação ainda não confirmada, encerramento forçado ou falha do sistema. Limpar o texto do ritual continua sem prometer eliminação forense de memória.
+
+Para testar manualmente, execute `npm start` após o build e abra **The Garden**. Plante um hibisco rosa, regue, reorganize vasos e decorações, procure o gato, toque no lago e alterne luz/clima. Ative som por clique, entre na imersão, abra ferramentas e confirme a prioridade de Esc. Reabra o aplicativo para conferir o jardim salvo. Repita usando Tab/Enter/Espaço e movimento reduzido.
+
+---
+
+# Validação anterior — expansão interativa de The Journey
 
 Verificação de 23 de outubro de 2026, em Windows x64 e Node.js 22.18.0. Os resultados históricos abaixo permanecem separados desta entrega.
 

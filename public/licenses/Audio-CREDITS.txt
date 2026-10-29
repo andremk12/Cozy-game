@@ -1,0 +1,49 @@
+﻿LITTLE HAVEN — AUDIO CREDITS
+
+Stream Sounds — kurt
+Original work: https://opengameart.org/content/stream-sounds
+License: Creative Commons Attribution 3.0 Unported
+https://creativecommons.org/licenses/by/3.0/
+Local file: assets/audio/stream.wav
+Adaptation: excerpt of stream1.ogg, seconds 1–31; mono, 32000 Hz,
+low-pass filter, DC removal and limited gain; loop seam overlap at playback.
+
+Background Rumble Noise — gryc
+Original work: https://opengameart.org/content/background-rumble-noise
+License: Creative Commons Attribution 3.0 Unported
+https://creativecommons.org/licenses/by/3.0/
+Local files: assets/audio/train-track.wav, train-wheels.wav, carriage.wav
+Adaptation: seconds 4–25 of the same real train-interior recording, converted
+into three frequency profiles (70–3000 Hz, 550–5000 Hz and low-pass 320 Hz),
+mono, 32000 Hz, DC removal and limited gain; loop seam overlap at playback.
+These are filtered perspectives of one recording, not isolated recordings.
+
+The original authors do not endorse Little Haven. Full license:
+Audio-CC-BY-3.0.txt in this directory. Preserve these credits and links.
+
+Additional public-domain-dedicated recordings under CC0 1.0 Universal:
+
+Ambient Bird Sounds — isaiah658
+https://opengameart.org/content/ambient-bird-sounds
+assets/audio/birds.wav; excerpt, mono/32000 Hz, filtering and gain.
+
+Fireplace Sound loop — PagDev
+https://opengameart.org/content/fireplace-sound-loop
+assets/audio/fire.wav; excerpt, mono/32000 Hz, filtering and gain.
+
+Crickets Ambient Noise - loopable — Wolfgang_ / Ted Kerr
+https://opengameart.org/content/crickets-ambient-noise-loopable
+assets/audio/crickets.wav; excerpt, mono/32000 Hz, filtering and gain.
+
+20 Rustles of dry leaves — qubodup
+https://opengameart.org/content/20-rustles-dry-leaves
+assets/audio/leaves.wav; montage of rustle02, rustle05, rustle09, rustle12;
+soft envelopes, filtering, mono/32000 Hz and limited gain. Kitchen foley of
+dry leaves, not an outdoor wind recording.
+
+CC0 license: https://creativecommons.org/publicdomain/zero/1.0/
+Full text: Audio-CC0-1.0.txt in this directory.
+
+Rain and wind synthesis is original Little Haven code. Source records,
+adaptations, SHA-256 hashes and processing metrics are supplied in
+assets/audio/README.md and assets/audio/manifest.json.

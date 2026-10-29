@@ -2,7 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 
 // Fullscreen is transient UI state. The same scene stays mounted; no preferences
 // or scene data pass through the desktop bridge.
-export function useImmersiveMode({ contextualOpen = false } = {}) {
+export function useImmersiveMode({ contextualOpen = false, onEscape } = {}) {
   const targetRef = useRef(null);
   const triggerRef = useRef(null);
   const entering = useRef(false);
@@ -83,20 +83,21 @@ export function useImmersiveMode({ contextualOpen = false } = {}) {
       if (event.key !== 'Escape') return;
       // A modal book or ticket owns the first Escape. Let its native cancel
       // event run without also asking the Fullscreen API to leave the carriage.
-      if (contextualOpen) return;
+      if (contextualOpen || targetRef.current?.querySelector('dialog[open]')) return;
       event.preventDefault();
+      if (onEscape?.()) return;
       void exit();
     };
     document.addEventListener('keydown', onKeyDown, true);
     return () => document.removeEventListener('keydown', onKeyDown, true);
-  }, [active, contextualOpen, exit]);
+  }, [active, contextualOpen, exit, onEscape]);
 
   const enter = useCallback(async () => {
     const target = targetRef.current;
     if (!target || entering.current || document.fullscreenElement === target) return;
     setError('');
     if (!document.fullscreenEnabled || !target.requestFullscreen) {
-      setError('A tela cheia não está disponível neste ambiente. Você pode continuar a viagem aqui.');
+      setError('A tela cheia não está disponível neste ambiente. Você pode continuar por aqui.');
       return;
     }
     entering.current = true;

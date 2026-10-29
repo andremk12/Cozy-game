@@ -1,0 +1,48 @@
+.companion { cursor: pointer; outline: none; touch-action: manipulation; }
+.companion-hit { fill: transparent; stroke: transparent; stroke-width: 1; }
+.companion:hover .companion-hit { stroke: #e4ce9b80; stroke-dasharray: 3 3; }
+.companion:focus-visible .companion-hit { stroke: #f1ddb0; stroke-width: 1.5; stroke-dasharray: 3 2; }
+.companion-hint text { font: 5px 'DM Sans', sans-serif; fill: #e7dfc4; }
+.companion-sprite { shape-rendering: crispEdges; pointer-events: none; }
+.companion-breathe { animation: companion-breathe 5.4s steps(1, end) infinite; }
+.companion-pose--sleeping .companion-breathe { animation-duration: 6.5s; }
+.companion-tail { animation: companion-tail 9s steps(1, end) infinite; transform-origin: 0 0; }
+.companion-pose--sleeping .companion-tail, .companion-pose--lying .companion-tail { animation-duration: 14s; }
+.companion-eyes:not(.is-closed) { animation: companion-blink 9s steps(1, end) infinite; }
+.companion-pose--looking .companion-looking-head { animation: companion-look 12s steps(1, end) infinite; }
+.companion-pose--walking .companion-breathe { animation: none; }
+.companion-pose--walking .companion-paws--front { animation: companion-paw 750ms steps(1, end) infinite; }
+.companion-pose--walking .companion-paws--back { animation: companion-paw 750ms steps(1, end) -375ms infinite; }
+.companion-pose--stretching .companion-breathe { animation: companion-stretch 3s steps(1, end) both; }
+.companion-pose--petting .companion-tail { animation: companion-pet-tail 1800ms steps(1, end) both; }
+.companion-pose--petting .companion-breathe { animation: companion-pet 1800ms steps(1, end) both; }
+.companion-affection { animation: companion-affection 1800ms steps(1, end) both; }
+.companion-travel { animation-fill-mode: both; }
+.companion.is-held .companion-paws { animation-play-state: paused; }
+.companion.is-paused *, .companion.is-paused *::before, .companion.is-paused *::after { animation-play-state: paused !important; }
+.companion-sprite.is-airborne .companion-shadow { opacity: .08; }
+.companion-sprite.is-airborne .companion-paws { animation: none; transform: translateY(-3px); }
+.companion-sprite.is-airborne .companion-breathe { animation: companion-hop-shape 1500ms steps(1, end) both; }
+@keyframes companion-travel { from { transform: translate(0, 0); } to { transform: translate(var(--companion-dx), var(--companion-dy)); } }
+@keyframes companion-hop-down {
+  0% { transform: translate(0, 0); animation-timing-function: steps(var(--companion-hop-rise), end); }
+  20% { transform: translate(0, var(--companion-hop-peak)); animation-timing-function: steps(var(--companion-hop-fall), end); }
+  100% { transform: translate(0, var(--companion-dy)); }
+}
+@keyframes companion-hop-up {
+  0% { transform: translate(0, 0); animation-timing-function: steps(var(--companion-hop-rise), end); }
+  80% { transform: translate(0, var(--companion-hop-peak)); animation-timing-function: steps(var(--companion-hop-fall), end); }
+  100% { transform: translate(0, var(--companion-dy)); }
+}
+@keyframes companion-breathe { 0%, 70%, 100% { transform: translateY(0); } 35% { transform: translateY(-1px); } }
+@keyframes companion-tail { 0%, 80%, 100% { transform: translateY(0); } 86%, 94% { transform: translateY(-1px); } }
+@keyframes companion-blink { 0%, 91%, 96%, 100% { opacity: 1; } 93%, 95% { opacity: 0; } }
+@keyframes companion-look { 0%, 35%, 100% { transform: translate(0, -1px); } 55%, 70% { transform: translate(1px, -2px); } }
+@keyframes companion-paw { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(1px, -1px); } }
+@keyframes companion-stretch { 0%, 100% { transform: translate(0, 0); } 25%, 75% { transform: translate(1px, -1px); } }
+@keyframes companion-pet-tail { 0%, 100% { transform: translateY(0); } 20%, 55% { transform: translateY(-2px); } 35%, 75% { transform: translateY(-1px); } }
+@keyframes companion-pet { 0%, 100% { transform: translateY(0); } 25%, 60% { transform: translateY(-1px); } }
+@keyframes companion-affection { 0%, 100% { opacity: 0; } 20%, 75% { opacity: .9; } }
+@keyframes companion-hop-shape { 0%, 90%, 100% { transform: translateY(1px); } 20%, 75% { transform: translateY(-1px); } }
+.companion.is-reduced-motion .companion-sprite * { animation: none !important; }
+@media (prefers-reduced-motion: reduce) { .companion-sprite * { animation: none !important; } }

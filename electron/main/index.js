@@ -2,6 +2,7 @@ import { app, BrowserWindow, dialog, ipcMain, session } from 'electron';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { PreferencesStore } from '../services/preferences.js';
+import { GardenStore } from '../services/garden.js';
 import {
   contentSecurityPolicy, getDevelopmentUrl, isAllowedFullscreenPermission, isAllowedKeyboardLockPermission, isAllowedResource,
 } from '../services/security.js';
@@ -13,6 +14,7 @@ const entryFile = path.join(distDirectory, 'index.html');
 const expectedPage = developmentUrl ? `${developmentUrl}/` : pathToFileURL(entryFile).href;
 let window;
 let preferences;
+let garden;
 let quitting = false;
 
 app.setName('Little Haven');
@@ -102,6 +104,7 @@ async function createWindow() {
 
 app.whenReady().then(async () => {
   preferences = new PreferencesStore(path.join(app.getPath('userData'), 'preferences.json'));
+  garden = new GardenStore(path.join(app.getPath('userData'), 'garden.json'));
   await preferences.get();
   protectSession();
   ipcMain.handle('haven:preferences:get', async (event) => {
@@ -111,6 +114,14 @@ app.whenReady().then(async () => {
   ipcMain.handle('haven:preferences:save', async (event, patch) => {
     verifySender(event);
     return preferences.save(patch);
+  });
+  ipcMain.handle('haven:garden:get', async (event) => {
+    verifySender(event);
+    return garden.get();
+  });
+  ipcMain.handle('haven:garden:save', async (event, value) => {
+    verifySender(event);
+    return garden.save(value);
   });
   await createWindow();
   app.on('activate', () => {
@@ -129,5 +140,5 @@ app.on('before-quit', (event) => {
   if (!preferences || quitting) return;
   event.preventDefault();
   quitting = true;
-  preferences.flush().catch(() => undefined).finally(() => app.quit());
+  Promise.allSettled([preferences.flush(), garden?.flush()]).finally(() => app.quit());
 });
