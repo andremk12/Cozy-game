@@ -1,3 +1,5 @@
+import { PETS, getPetDefinition } from './pets.js';
+
 // Only explicit companion preferences cross the local persistence boundary.
 export const COMPANION_APPEARANCES = Object.freeze([
   Object.freeze({ id: 'default', label: 'Creme e cinza' }),
@@ -5,11 +7,12 @@ export const COMPANION_APPEARANCES = Object.freeze([
   Object.freeze({ id: 'midnight', label: 'Noite' }),
 ]);
 export const DEFAULT_COMPANION = Object.freeze({
-  enabled: true, name: '', appearance: 'default', soundEnabled: false, introduced: false,
+  enabled: true, name: '', petId: 'cat', appearance: 'default', soundEnabled: false, introduced: false,
 });
 
 const KEYS = Object.keys(DEFAULT_COMPANION);
 const APPEARANCES = new Set(COMPANION_APPEARANCES.map(({ id }) => id));
+const PET_IDS = new Set(PETS.map(({ id }) => id));
 const isRecord = (value) => value !== null && typeof value === 'object' && !Array.isArray(value)
   && [Object.prototype, null].includes(Object.getPrototypeOf(value));
 const segmenter = typeof Intl.Segmenter === 'function' ? new Intl.Segmenter(undefined, { granularity: 'grapheme' }) : null;
@@ -19,7 +22,7 @@ const visibleCharacter = /[^\p{White_Space}\p{Default_Ignorable_Code_Point}]/u;
 
 /** Validate rather than truncate: combining accents and emoji count as perceived characters. */
 export function validateCompanionName(input) {
-  if (typeof input !== 'string') return { valid: false, name: '', error: 'Digite um nome para seu gatinho.', count: 0 };
+  if (typeof input !== 'string') return { valid: false, name: '', error: 'Digite um nome para seu companheiro.', count: 0 };
   const name = input.trim();
   // Bound pathological sequences of thousands of combining marks without
   // limiting ordinary Unicode names or splitting a grapheme cluster.
@@ -42,6 +45,7 @@ export function normalizeCompanion(input) {
   return {
     enabled: typeof source.enabled === 'boolean' ? source.enabled : DEFAULT_COMPANION.enabled,
     name: result.valid ? result.name : '',
+    petId: PET_IDS.has(source.petId) ? source.petId : DEFAULT_COMPANION.petId,
     appearance: APPEARANCES.has(source.appearance) ? source.appearance : DEFAULT_COMPANION.appearance,
     soundEnabled: false,
     introduced: typeof source.introduced === 'boolean' ? source.introduced : Boolean(result.valid),
@@ -53,7 +57,7 @@ export function validateCompanion(input) {
   const named = typeof input?.name === 'string' && input.name !== '' ? validateCompanionName(input.name) : null;
   if (!isRecord(input) || Object.keys(input).length !== KEYS.length || !KEYS.every((key) => Object.hasOwn(input, key))
     || typeof input.enabled !== 'boolean' || typeof input.introduced !== 'boolean'
-    || !APPEARANCES.has(input.appearance) || input.soundEnabled !== false
+    || !PET_IDS.has(input.petId) || !APPEARANCES.has(input.appearance) || input.soundEnabled !== false
     || typeof input.name !== 'string' || (input.name !== '' && (!named?.valid || named.name !== input.name))) {
     throw new TypeError('Invalid companion settings.');
   }
@@ -62,5 +66,5 @@ export function validateCompanion(input) {
 
 export function displayCompanionName(settings) {
   const result = validateCompanionName(settings?.name);
-  return result.valid ? result.name : 'Seu gatinho';
+  return result.valid ? result.name : getPetDefinition(settings?.petId).defaultName;
 }

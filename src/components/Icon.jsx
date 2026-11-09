@@ -1,5 +1,8 @@
 export default function Icon({ name, size = 20, ...props }) {
   const paths = {
+    music: <><path d="M9 17V5l12-2v12M9 9l12-2" /><ellipse cx="6" cy="18" rx="3" ry="2" /><ellipse cx="18" cy="16" rx="3" ry="2" /></>,
+    book: <><path d="M12 5C8 2 4 3 2 4v15c3-1 6-1 10 2 4-3 7-3 10-2V4c-2-1-6-2-10 1ZM12 5v16M5 7l4 1M5 11l4 1m6-4 4-1m-4 5 4-1" /></>,
+    kitchen: <><path d="M3 9h18v12H3zM3 9V4h18v5M6 6h.01M10 6h.01M15 6h.01M19 6h.01M6 12h12v6H6zM8 21v2m8-2v2" /></>,
     room: (
       <>
         <path d="m3 10 9-7 9 7v11H3Z" />

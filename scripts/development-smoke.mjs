@@ -70,7 +70,7 @@ async function instrumentDesktop() {
           if (!document.querySelector('#root')?.children.length) throw new Error('React did not mount.');
           if (!document.querySelector('.room-art')) throw new Error('The Room did not render.');
           if (typeof window.require !== 'undefined' || typeof window.process !== 'undefined') throw new Error('Node leaked to the renderer.');
-          if (Object.keys(window.haven).sort().join(',') !== 'getPreferences,savePreferences') throw new Error('Unexpected bridge API.');
+          if (Object.keys(window.haven).sort().join(',') !== 'commandKitchen,deleteBouquetDraft,getBouquetDraft,getGarden,getKitchen,getPreferences,memoryExport,memoryGet,memoryImport,memoryRestore,memorySave,onKitchenChanged,openBouquetEmail,openDeveloperContact,saveBouquetDraft,saveBouquetImage,saveGarden,savePreferences') throw new Error('Unexpected bridge API.');
           await window.haven.getPreferences();
           return { title: document.title, url: location.href, react: 'mounted', bridge: 'available' };
         })()`);

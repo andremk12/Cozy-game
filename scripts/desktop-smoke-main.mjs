@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import dalmatianManifest from '../public/assets/pets/dalmatian/animation-manifest.json' with { type: 'json' };
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const profile = path.join(root, 'work', 'desktop-smoke-profile');
@@ -68,6 +69,7 @@ async function verifyCompanion(window) {
   const evaluate = (source) => contents.executeJavaScript(source);
   await clickRendererButton(window, '[aria-label="Abrir My Companion"]');
   await waitFor(() => evaluate(`Boolean(document.querySelector('.companion-panel[open]'))`), 'Companion settings did not open.');
+  await clickRendererButton(window, '.companion-pet-options button', 'Gatinho');
   const welcome = await evaluate(`Boolean(document.querySelector('.companion-panel input[type="text"]'))`);
   if (!welcome) await clickRendererButton(window, '.companion-panel button', 'Renomear');
   await waitFor(() => evaluate(`Boolean(document.querySelector('.companion-panel input[type="text"]'))`), 'Companion naming input did not render.');
@@ -100,6 +102,25 @@ async function verifyCompanion(window) {
   await clickRendererButton(window, 'g.companion');
   await waitFor(() => evaluate(`document.querySelector('g.companion')?.dataset.pose === 'petting'`), 'Companion did not respond to a real petting click.');
   return 'native name/rename-cancel, local persistence, visibility, real petting and no companion sounds';
+}
+
+async function verifyDalmatian(window) {
+  const evaluate = (source) => window.webContents.executeJavaScript(source);
+  await clickRendererButton(window, '[aria-label="Abrir My Companion"]');
+  await waitFor(() => evaluate(`Boolean(document.querySelector('.companion-panel[open]'))`), 'Pet selector did not open.');
+  await clickRendererButton(window, '.companion-pet-options button', 'Dálmata');
+  await waitFor(() => evaluate(`window.haven.getPreferences().then(({ companion }) => companion.petId === 'dalmatian')`), 'Dalmatian selection did not persist through IPC.');
+  await clickRendererButton(window, '[aria-label="Fechar My Companion"]');
+  await waitFor(() => evaluate(`Boolean(document.querySelector('.companion[data-pet-id="dalmatian"] .companion-sheet image'))`), 'Dalmatian did not render.');
+  const assets = dalmatianManifest.animations.map(({ path, sheetWidth, sheetHeight }) => ({ path, sheetWidth, sheetHeight }));
+  const decoded = await evaluate(`Promise.all(${JSON.stringify(assets)}.map(async (asset) => {
+    const image = new Image();
+    image.src = new URL('assets/pets/dalmatian/' + asset.path, document.baseURI).href;
+    await image.decode();
+    return image.src.startsWith('file:') && image.naturalWidth === asset.sheetWidth && image.naturalHeight === asset.sheetHeight;
+  }))`);
+  assert.deepEqual(decoded, assets.map(() => true), 'Production file URLs must decode every approved sheet.');
+  return 'native selector, validated IPC persistence and seven sheets decoded from production file URLs';
 }
 
 async function verifyImmersiveMixer(window) {
@@ -155,15 +176,17 @@ async function verifySoundMixer(window) {
   await clickRendererButton(window, '.mixer-start');
   for (const [id, expected] of [
     ['rainy-evening', ['rain-soft', 'fire', 'wind']],
-    ['morning-garden', ['birds', 'stream', 'wind']],
+    ['morning-garden', ['leaves', 'birds', 'stream', 'wind']],
     ['quiet-night', ['crickets', 'stream', 'wind']],
-    ['peaceful-journey', ['train-track', 'train-wheels', 'wind']],
+    ['peaceful-journey', ['train-track', 'train-wheels', 'carriage', 'wind']],
   ]) {
     await choose(id);
     await waitFor(() => evaluate(`${JSON.stringify(expected)}.every((id) => document.querySelector('.mixer-layer[data-layer="' + id + '"]')?.dataset.status === 'playing')`), `Local audio did not decode/play for ${id}.`);
   }
   for (const id of ['rain-heavy', 'rain-window', 'leaves', 'carriage']) {
-    await clickRendererButton(window, `.mixer-layer[data-layer="${id}"] [role="switch"]`);
+    if (await evaluate(`document.querySelector('.mixer-layer[data-layer="${id}"] [role="switch"]')?.getAttribute('aria-checked') !== 'true'`)) {
+      await clickRendererButton(window, `.mixer-layer[data-layer="${id}"] [role="switch"]`);
+    }
     await waitFor(() => evaluate(`document.querySelector('.mixer-layer[data-layer="${id}"]')?.dataset.status === 'playing'`), `Local sound ${id} did not start.`);
   }
   assert.equal(await evaluate('window.__desktopMixerProbe.contexts.length'), 1, 'Mixer duplicated its AudioContext.');
@@ -174,7 +197,7 @@ async function verifySoundMixer(window) {
   await waitFor(() => evaluate(`document.querySelector('.mixer-mute')?.getAttribute('aria-pressed') === 'false'`), 'Unmute did not update after its native click.');
   await choose('rainy-evening');
   await clickRendererButton(window, '[aria-label="Fechar mixer"]');
-  return 'all 12 local layers decoded/started, four presets, mute, one context, no autoplay';
+  return '12 ambient layers decoded/started, four ambient presets, mute, one context, no autoplay; music has a separate smoke';
 }
 
 async function verifyGardenImmersive(window) {
@@ -430,7 +453,7 @@ app.on('browser-window-created', (_event, window) => {
       const result = await window.webContents.executeJavaScript(`(async () => {
         if (!document.querySelector('#root')?.children.length) throw new Error('React root is empty.');
         if (typeof window.require !== 'undefined' || typeof window.process !== 'undefined') throw new Error('Node leaked to the renderer.');
-        if (Object.keys(window.haven).sort().join(',') !== 'getGarden,getPreferences,memoryExport,memoryGet,memoryImport,memoryRestore,memorySave,openDeveloperContact,saveGarden,savePreferences') throw new Error('Unexpected bridge API.');
+        if (Object.keys(window.haven).sort().join(',') !== 'commandKitchen,deleteBouquetDraft,getBouquetDraft,getGarden,getKitchen,getPreferences,memoryExport,memoryGet,memoryImport,memoryRestore,memorySave,onKitchenChanged,openBouquetEmail,openDeveloperContact,saveBouquetDraft,saveBouquetImage,saveGarden,savePreferences') throw new Error('Unexpected bridge API.');
         const initial = await window.haven.getPreferences();
         await window.haven.savePreferences({ lampOn: !initial.lampOn, volume: 0.1 });
         const changed = await window.haven.getPreferences();
@@ -457,6 +480,7 @@ app.on('browser-window-created', (_event, window) => {
       result.audioMixer = await verifySoundMixer(window);
       result.gardenImmersive = await verifyGardenImmersive(window);
       result.immersive = await verifyJourneyImmersive(window);
+      result.dalmatian = await verifyDalmatian(window);
       assert.deepEqual(errors, [], `Renderer console errors: ${errors.join('; ')}`);
       const originalPrompt = dialog.showMessageBoxSync;
       let chosenButton = 0;
@@ -482,6 +506,7 @@ app.on('browser-window-created', (_event, window) => {
         window.webContents.reload();
         await reloaded;
         await waitFor(() => window.webContents.executeJavaScript(`document.querySelector('g.companion')?.getAttribute('aria-label') === 'Fazer carinho em Mochi Smoke'`), 'Companion name did not restore after reloading the desktop renderer.');
+        await waitFor(() => window.webContents.executeJavaScript(`Boolean(document.querySelector('.companion[data-pet-id="dalmatian"] .companion-sheet'))`), 'Dalmatian selection did not restore after reloading the desktop renderer.');
         assert.equal(prompts, 2);
         assert.equal(reloads, 1, 'Explicit discard must permit reloading.');
         result.unloadProtection = 'stay and explicit discard verified';

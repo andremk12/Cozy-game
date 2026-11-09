@@ -33,7 +33,44 @@ function Resting({ palette: p, sleeping }) {
   </>;
 }
 
-export default function CompanionSprite({ pose = 'idle', appearance = 'default', airborne = false, breathingClassName = '' }) {
+function ChefAccessories({ palette: p, pose, action, celebrate }) {
+  const resting = pose === 'sleeping' || pose === 'lying';
+  const head = resting ? 'translate(7 9)' : pose === 'walking' || pose === 'idle' ? 'translate(8 1)'
+    : pose === 'stretching' ? 'translate(10 11)' : pose === 'looking' ? 'translate(0 -1)' : undefined;
+  return <g className={`companion-chef${celebrate ? ' is-presenting' : ''}`}>
+    <path d={resting ? 'M-9-9H1v6H-9zM-8-11h2v3h-2z' : 'M-7-8H7v7H-7zM-5-10h2v3h-2zM3-10h2v3H3z'} fill="#e6deba" />
+    <path d={resting ? 'M-7-7h6v1h-6z' : 'M-6-5H6v1H-6zM-2-3h4v2h-4z'} fill="#a5b5a0" />
+    <g transform={head}>
+      <path d="M-8-26v-5h-2v-4h3v-3h5v2h5v-2h5v3h3v4H9v5z" fill="#686c59" />
+      <path d="M-7-27v-5h-2v-2h3v-3h3v3h7v-3h3v3h3v2H8v5z" fill="#f0e7c9" />
+      <path d="M-7-29H8v2H-7zM-5-34h2v3h-2zM4-34h2v3H4z" fill="#c7c8ab" />
+    </g>
+    {(action === 'mixing' || action === 'stirring') && <>
+      <path d="M9-7h17v3h-2v4H12v-3H9z" fill={action === 'mixing' ? '#a48268' : '#697d76'} />
+      <path d="M10-7h15v2H10zM13-4h10v2H13z" fill={action === 'mixing' ? '#e0c993' : '#b2b7a1'} />
+      <g key={action} className="companion-kitchen-work companion-chef-spoon">
+        <path d="M15-18h2v12h-2zM14-20h4v4h-4z" fill="#b6986a" />
+        <path d="M8-11h8v3H8z" fill={p.fur} /><path d="M13-11h3v3h-3z" fill={p.light} />
+      </g>
+    </>}
+    {action === 'icing' && <g key={action} className="companion-kitchen-work companion-chef-spatula">
+      <path d="M8-12h9v3H8z" fill={p.fur} /><path d="M15-18h2v12h-2z" fill="#b6986a" />
+      <path d="M13-21h6v6h-6z" fill="#b5b7a3" /><path d="M13-19h6v4h-6z" fill="#6b483a" />
+    </g>}
+    {action === 'reading' && <g className="companion-chef-book">
+      <path d="M6-8h9l3 2 3-2h9v9h-9l-3 2-3-2H6z" fill="#786650" />
+      <path d="M7-7h8l2 2v6l-2-1H7zM19-5l2-2h8v7h-8l-2 1z" fill="#e1d6ad" />
+      <path d="M9-5h5v1H9zM22-4h5v1h-5zM9-2h4v1H9z" fill="#a99b79" />
+    </g>}
+    {action === 'baking' && <path d="M7-9h6v3H7zM12-10h3v5h-3z" fill={p.light} />}
+    {action === 'presenting' && <g className="companion-chef-present">
+      <path d="M7-10h7v3h6v3h-9v-2H7z" fill={p.fur} /><path d="M16-7h4v3h-4z" fill={p.light} />
+    </g>}
+  </g>;
+}
+
+export default function CompanionSprite({ pose = 'idle', appearance = 'default', airborne = false, breathingClassName = '',
+  chef = false, kitchenAction, celebrate = false }) {
   const p = PALETTES[appearance] || PALETTES.default;
   const resting = pose === 'sleeping' || pose === 'lying';
   const stretching = pose === 'stretching';
@@ -66,6 +103,7 @@ export default function CompanionSprite({ pose = 'idle', appearance = 'default',
         <path d="M-9-9h2v3h-2zM6-10h2v3H6z" fill={p.stripe} />
         <g className="companion-looking-head" transform={pose === 'looking' ? 'translate(0 -1)' : undefined}><Face palette={p} closed={affectionate} looking={pose === 'looking'} /></g>
       </>}
+      {chef && <ChefAccessories palette={p} pose={pose} action={kitchenAction} celebrate={celebrate} />}
     </g>
     {affectionate && <g className="companion-affection" fill="#e8c59f"><path d="M-15-26h1v5h-1zM-17-24h5v1h-5zM14-28h1v5h-1zM12-26h5v1h-5z" /></g>}
   </g>;

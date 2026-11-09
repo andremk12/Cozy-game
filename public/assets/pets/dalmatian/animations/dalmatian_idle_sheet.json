@@ -1,0 +1,71 @@
+{ "frames": [
+   {
+    "filename": "dalmatian_idle_00",
+    "frame": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 1800
+   },
+   {
+    "filename": "dalmatian_idle_01",
+    "frame": { "x": 64, "y": 0, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 900
+   },
+   {
+    "filename": "dalmatian_idle_02",
+    "frame": { "x": 128, "y": 0, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 1800
+   },
+   {
+    "filename": "dalmatian_idle_03",
+    "frame": { "x": 192, "y": 0, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 900
+   }
+ ],
+ "meta": {
+  "app": "https://www.aseprite.org/",
+  "version": "1.3.18.6-x64",
+  "image": "dalmatian_idle_sheet.png",
+  "format": "RGBA8888",
+  "size": { "w": 256, "h": 64 },
+  "scale": "1",
+  "frameTags": [
+   { "name": "idle", "from": 0, "to": 3, "direction": "forward", "color": "#000000ff", "data": "Seated breathing; A-B-C-B; 5400ms; forward loop; feet anchored at (32,55)." }
+  ],
+  "layers": [
+   { "name": "DALMATA" },
+   { "name": "01_Cauda", "group": "DALMATA", "opacity": 255, "blendMode": "normal" },
+   { "name": "02_Patas_traseiras", "group": "DALMATA", "opacity": 255, "blendMode": "normal" },
+   { "name": "03_Tronco", "group": "DALMATA", "opacity": 255, "blendMode": "normal" },
+   { "name": "04_Pata_frente_E", "group": "DALMATA", "opacity": 255, "blendMode": "normal" },
+   { "name": "05_Pata_frente_D", "group": "DALMATA", "opacity": 255, "blendMode": "normal" },
+   { "name": "Cabeca_e_expressao", "group": "DALMATA" },
+   { "name": "06_Cabeca", "group": "Cabeca_e_expressao", "opacity": 255, "blendMode": "normal" },
+   { "name": "07_Orelha_E", "group": "Cabeca_e_expressao", "opacity": 255, "blendMode": "normal" },
+   { "name": "08_Orelha_D", "group": "Cabeca_e_expressao", "opacity": 255, "blendMode": "normal" },
+   { "name": "09_Expressao", "group": "Cabeca_e_expressao", "opacity": 255, "blendMode": "normal" },
+   { "name": "ACESSORIOS_COZINHA" },
+   { "name": "Avental", "group": "ACESSORIOS_COZINHA", "opacity": 255, "blendMode": "normal" },
+   { "name": "Chapeu", "group": "ACESSORIOS_COZINHA", "opacity": 255, "blendMode": "normal" },
+   { "name": "Utensilio", "group": "ACESSORIOS_COZINHA", "opacity": 255, "blendMode": "normal" },
+   { "name": "FX_OPCIONAL", "opacity": 255, "blendMode": "normal" }
+  ],
+  "slices": [
+   { "name": "pet_frame", "data": "Zero-based ground anchor. Do not trim or recenter frames.", "keys": [{ "frame": 0, "bounds": {"x": 0, "y": 0, "w": 64, "h": 64 }, "pivot": {"x": 32, "y": 55 } }] }
+  ]
+ }
+}

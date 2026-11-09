@@ -1,12 +1,15 @@
-// At full individual and master volume, twelve simultaneous sources still sum
-// below 0.72 peak. This is a conservative absolute ceiling, not loudness matching.
+// Thirteen layers at full volume sum to <= 0.78 after the 0.25 master;
+// all four finite kitchen effects add <= 0.16. No compressor is needed.
 export const SAMPLE_CEILING = 0.24;
 
 /** Overlap the tail into the head instead of tapering every loop to silence. */
-export function prepareLoop(context, original) {
-  const overlap = Math.min(Math.floor(original.sampleRate * 0.75), Math.floor(original.length / 4));
+export function prepareLoop(context, original, overlapSeconds = 0.75) {
+  const overlap = Math.min(Math.floor(original.sampleRate * overlapSeconds), Math.floor(original.length / 4));
   const length = original.length - overlap;
-  const result = context.createBuffer(Math.min(original.numberOfChannels, 2), length, original.sampleRate);
+  // Music already has a circular musical seam. Preserve the exact bar length
+  // and reuse its decoded buffer instead of allocating a second full track.
+  const result = overlap === 0 ? original
+    : context.createBuffer(Math.min(original.numberOfChannels, 2), length, original.sampleRate);
   let peak = 0;
   for (let channel = 0; channel < result.numberOfChannels; channel += 1) {
     const input = original.getChannelData(channel);

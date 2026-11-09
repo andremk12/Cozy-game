@@ -1,4 +1,292 @@
-# Validação atual — primeira Beta 0.2.0-beta.1
+# Little Bouquets — Flores para Você — 9 de novembro de 2026
+
+Implementação concluída sobre a árvore de trabalho existente, preservando as alterações anteriores. A oficina usa SVG/CSS e os componentes do jardim; não foram usados Aseprite, integrações de arte externas, novas dependências ou serviços remotos. Os registros históricos abaixo permanecem separados desta validação.
+
+## Resultados finais realmente executados
+
+| Comando / verificação | Resultado |
+| --- | --- |
+| `npm test` | **217 passaram**, zero falhas; exit 0 |
+| `npm run build` | Passou; exit 0. Permanece o aviso de chunks grandes da biblioteca de áudio existente |
+| `npx playwright test tests/e2e/bouquets.spec.js` | **11 passaram**, zero falhas; exit 0 |
+| `npm run test:e2e` | **126 passaram**, zero falhas; exit 0, 3,2 minutos |
+| `node scripts/bouquets-smoke.mjs` | Passou no Electron de produção com perfil isolado; exit 0 |
+| `npm run test:desktop` | Smoke geral passou; exit 0 |
+| `git diff --check` | Passou; aviso de conversão LF/CRLF no manifesto de áudio preexistente |
+| Inspeção visual | Capturas do jardim, oficina, espécies, revisão, cartão exportado e janela de 360 pixels abertas e revisadas |
+
+Logs locais ignorados pelo Git: `outputs/bouquets-unit-final.log`, `bouquets-build-final.log`, `bouquets-focused-complete.log`, `bouquets-e2e-complete.log`, `bouquets-native-final.log` e `bouquets-desktop-final.log`. Capturas e arquivos sintéticos exportados: `outputs/Little-Haven-Bouquets-*`.
+
+Rodadas anteriores detectaram seletores de teste que incluíam o conteúdo de campos e uma perda real de foco após excluir o rascunho enquanto o botão estava desabilitado pela operação. Os seletores passaram a usar os papéis acessíveis; o produto restaura o foco após a operação. Também foram corrigidos foco ao mover/remover flores, confirmação com diálogo nativo, carregamento da ilustração por `data:` compatível com a CSP e tamanho do embrulho conforme a quantidade de hastes. A evidência de aprovação é a rodada final acima; rodadas interrompidas ou sem confirmação de encerramento não foram contadas como aprovação.
+
+## Comportamentos verificados
+
+- **Jardim:** preservadas as cinco espécies anteriores; adicionados girassol, rosa vermelha, rosa cor-de-rosa, tulipa, hortênsia, peônia, dália, flores-do-campo e cosmos. Crescimento nos quatro estágios, rega, recuperação e persistência usam o modelo existente. Disponibilidade começa no estágio adulto; reutilizar flores não consome, remove ou regride as plantas.
+- **Oficina:** entrada pela mesa do jardim e botão equivalente, tela própria dentro da experiência, retorno com foco, até 12 hastes, mistura de espécies, remoção, reorganização, cinco papéis, cinco laços, folhas e etiqueta. Arte modular, animação breve sem repetição obrigatória e respeito a movimento reduzido.
+- **Carta e assunto:** edição Unicode, carta multilinha de até 1.000 caracteres, sugestões editáveis, papel próprio e pré-visualização. Assunto de até 120 caracteres, acentos/emojis, remoção dos espaços nas pontas e padrão quando vazio. Controles e quebras são rejeitados, inclusive em colagem; editar assunto conserva carta e arranjo. Revisão mostra Para quando informado, Assunto, Mensagem e Presente, com retorno à edição.
+- **Privacidade:** edição e destinatário permanecem na sessão; salvar rascunho exige ação explícita. Carta e assunto personalizado só são mantidos com a opção correspondente; destinatário nunca entra no documento. Retomada, recarga, exclusão e preservação de documentos inválidos/futuros foram verificadas. Não há integração automática com o mural ou com Let It Float.
+- **Exportação:** PNG do buquê de 1.200 × 1.000 pixels, cartão PNG de altura variável com texto nítido e cartão HTML independente, com imagem embutida, texto selecionável e escape de conteúdo. Cartas com muitas linhas recebem orientação para HTML antes de alocar um PNG excessivo. Alterar destinatário e assunto não muda os bytes do cartão. O teste nativo confirmou remoção de um chunk de metadados e payload extra sintéticos, além da exportação real SVG → canvas → IPC sob a CSP de produção.
+- **Compartilhamento:** assunto, destinatário e corpo são codificados separadamente; nada abre ou é enviado automaticamente. Links extensos são rejeitados antes do IPC/shell. Uma ação separada permite abrir o e-mail com assunto e destinatário, sem copiar a carta para o corpo, preservando a carta completa na oficina e no cartão. A interface informa que é necessário anexar o cartão manualmente e que o endereço pessoal do remetente poderá aparecer.
+- **Electron e regressões:** sandbox, isolamento, ausência de Node no renderer, schema e origem das chamadas preservados. Uma segunda janela com o mesmo preload foi recusada. Os erros de IPC esperados no log nativo são rejeições deliberadas desses testes, não falhas da interface. O smoke geral verificou jardim, áudio, companheiro, dálmata, imersão e proteção de saída do ritual; a suíte completa cobriu também cozinha, viagem e mural.
+
+## Arquivos desta funcionalidade
+
+- Modelo e serviços novos: `shared/bouquets.js`, `src/services/bouquets.js`, `electron/services/bouquets.js`.
+- Oficina nova: `src/scenes/Bouquets/BouquetWorkshop.jsx`, `BouquetWorkshop.css`, `BouquetCanvas.jsx`, `WorkshopArt.jsx`, `bouquetExport.js`.
+- Integração pontual: `shared/garden.js`, `src/scenes/Garden/GardenPlants.jsx`, `GardenScene.jsx`, `Garden.jsx`, `Garden.css`, `src/app/App.jsx`, `electron/main/index.js`, `electron/preload/index.cjs`.
+- Testes novos: `tests/bouquet-garden.test.js`, `tests/bouquets-model.test.js`, `tests/bouquets-platform.test.js`, `tests/e2e/bouquets.spec.js`, `scripts/bouquets-smoke.mjs` e `scripts/bouquets-smoke-main.mjs`. O teste do catálogo existente e as listas permitidas dos smoke tests desktop/desenvolvimento/pacote/portátil foram atualizados para acompanhar as novas espécies e os cinco métodos restritos da ponte.
+- Documentação: `README.md`, `ROADMAP.md`, este registro e `BOUQUETS_DELIVERY_PLAN.md`.
+
+## Limites e teste manual
+
+Os testes usaram apenas textos e endereços sintéticos. O teste nativo simulou o manipulador de e-mail e a escolha do caminho no diálogo, sem enviar e-mails reais. A abertura em clientes pessoais específicos, entrega real, leitores de tela, todas as escalas de DPI e avaliação humana prolongada continuam pendentes. A arte inicial distingue as espécies, mas ainda pode receber refinamento visual futuro; sua substituição está separada do modelo de composição.
+
+O envio intermediado permanece indisponível. A proposta em [BOUQUETS_DELIVERY_PLAN.md](BOUQUETS_DELIVERY_PLAN.md) aborda provedor, domínio autenticado, credenciais no servidor, autorização por envio, prevenção de abuso, denúncia/bloqueio, falhas e retenção mínima. Não há infraestrutura instalada nem promessa de anonimato perante operadores/provedor.
+
+Para testar manualmente, execute `npm run dev` ou `npm start` após o build. Entre em **The Garden**, cultive uma espécie floral e aguarde seu estágio adulto (ou use uma já adulta), abra a **mesa de florista**, combine flores e escolha papel/laço. Escreva carta e assunto, revise, volte para editar e exporte PNG/HTML. Teste salvar o rascunho com e sem carta, retomar e excluir. **Abrir meu e-mail** depende de um cliente configurado; confira o assunto e anexe manualmente o cartão antes de qualquer envio. Use Tab/Enter, movimento reduzido e o modo imersivo do jardim.
+
+Não houve commit, push, publicação ou empacotamento. O executável portátil anterior não foi regenerado; os comandos acima executam o código atualizado.
+
+---
+
+# Integração do dálmata — 7 de novembro de 2026
+
+Integração implementada na árvore de trabalho existente de `joguinho/Cozy-game`, preservando as alterações anteriores. O cadastro `cat`/`dalmatian`, a seleção no My Companion e a persistência compartilham o sistema atual. O dálmata aparece no quarto, jardim, trem e cozinha. Os sete PNGs aprovados, atlas e documentação original de transferência permanecem intactos; o PixelArtStudio não foi modificado. Detalhes de código, estados e cadastro do próximo pet: [DALMATIAN_INTEGRATION.md](DALMATIAN_INTEGRATION.md).
+
+## Resultado desta validação
+
+| Comando / verificação | Resultado |
+| --- | --- |
+| `npm test` | **190 passaram**, zero falhas |
+| `npm run build` | Passou; permanece o aviso de chunks maiores que 500 kB |
+| `npx playwright test tests/e2e/dalmatian.spec.js` | **7 passaram**, exit 0 |
+| `npm run test:e2e` — execução final | **114 passaram, 1 falhou**, exit 1; ressalva de áudio abaixo |
+| `npm run test:desktop` — execução final isolada | Passou; seleção nativa do dálmata, IPC validado, recarga persistente e sete PNGs decodificados via URLs `file:` |
+| Integridade dos assets | Hashes dos 14 PNGs/atlas conferem com o manifesto; os sete PNGs emitidos em `dist/` são byte a byte iguais aos de `public/` |
+| Inspeção visual | Capturas do seletor, Room, Garden, Journey, Kitchen, preparo da massa e conclusão inspecionadas |
+| `git diff --check` | Passou; aviso de LF/CRLF no manifesto de áudio preexistente |
+
+Os testes novos cobrem tempos variáveis e ordem de todos os frames, loops e término das transições, espera pelos pontos de ligação, caminhada após levantar, mudança de destino durante transição, carinho com retomada no mesmo pixel, seleção/migração/persistência e rejeição de IDs desconhecidos no IPC. Na interface, verificam também teclado, movimento reduzido, pausa, ocultação, quatro ambientes, cancelamento e conclusão real da receita, ausência de acessórios SVG duplicados, erros de console e requisições externas.
+
+Foram corrigidos durante esta integração: perda do contador de carinho ao concluir uma transição enfileirada; avanço indevido de frames ao trocar a etapa culinária durante o carinho; reinício da respiração ao ocultar/mostrar o companheiro; e uma regra CSS do retrato que também atingia o SVG interno da spritesheet. Os testes de regressão correspondentes passaram.
+
+### Ressalvas observadas
+
+O caso existente `tests/e2e/audio-mixer.spec.js:54`, na asserção de ganho real zero após silenciar, falhou na suíte completa e nas repetições focadas, inclusive com janela visível. O alvo de ganho é zero, mas o valor real fica em `0.001663411152549088`. Um diagnóstico isolado, **sem carregar o jogo ou o companheiro**, reproduziu exatamente esse valor: no Edge **156.0.4314.58**, `AudioContext.currentTime` permaneceu em **0.010666666666666666 s** em três amostras ao longo de 2,55 segundos, apesar de `state === 'running'`. A rampa existente não avança nesse ambiente. Isso fornece evidência de uma limitação do relógio de áudio no ambiente testado, sem determinar sua causa no navegador/dispositivo. O motor de áudio e o teste não foram modificados para ocultar a falha. **A suíte geral não está integralmente aprovada.**
+
+Uma execução do smoke desktop durante a suíte de navegador falhou ao abrir o mixer com M na imersão do jardim. A execução isolada final passou sem alterar o produto ou o teste desse atalho; a causa da ocorrência não foi confirmada. A primeira rodada focada em sandbox chegou a apresentar os cinco casos então existentes aprovados, mas não forneceu confirmação de encerramento do servidor; a evidência final é a execução posterior de sete casos com exit 0.
+
+Logs locais ignorados pelo Git: `outputs/dalmatian-unit-tests.log`, `dalmatian-build.log`, `dalmatian-focused-final.log`, `dalmatian-e2e-final.log`, `dalmatian-desktop-tests.log`, `dalmatian-desktop-concurrent.log` e `dalmatian-audio-diagnostic.log`. O diagnóstico isolado está em `work/dalmatian-audio-diagnostic.mjs`. Capturas: `outputs/Little-Haven-Dalmatian-*.png`.
+
+### Limites e teste manual
+
+A caminhada aprovada tem orientação à direita e não é espelhada; deslocamentos para a esquerda mantêm essa orientação. Não há arte específica para sentar após andar, carinho, salto, leitura, forno, decoração ou comemoração. Essas ações usam as poses disponíveis conforme documentado; `cook` é reservado a **mexer massa**, com chapéu, avental e utensílios já no PNG. A escala lógica é 1, com âncora fixa (32,55) e amostragem pixelada. Novas direções e ações exigem novas artes aprovadas.
+
+Para testar: execute `npm start` após o build atual; abra **Companion → Seu companheiro → Dálmata**, feche o painel e observe os ciclos tranquilos de descanso/caminhada. Faça carinho por clique ou Enter, oculte/mostre e reabra o aplicativo para verificar a seleção. Visite jardim e trem. Na cozinha, prepare uma receita com etapa de massa, pause/retome e observe o retorno ao repouso na mudança de etapa ou conclusão. Volte a **Gatinho** para conferir a pelagem preservada.
+
+Não houve instalação de dependências, commit, push, publicação ou novo empacotamento. Os caminhos de produção foram validados no Electron carregando `dist/`; o executável portátil anterior **não foi regenerado e não contém esta integração**. Não foi realizada uma sessão humana prolongada nem validação abrangente de GPUs/DPI/leitores de tela.
+
+---
+
+# Executável Windows atualizado — 31 de outubro de 2026
+
+Portátil gerado a partir da árvore de trabalho atual, incluindo os refinamentos da cozinha, companheiro, áudio ambiente e Café na Cozinha. A versão configurada foi mantida em **0.2.0-beta.1**. As alterações preexistentes foram preservadas; esta etapa não alterou código do aplicativo, dependências ou políticas do Electron.
+
+| Verificação desta geração | Resultado |
+| --- | --- |
+| `npm test` | Passou, exit 0 |
+| Build de produção (`test:e2e` e `package:win`) | Passou; permanece o aviso de chunks grandes da biblioteca local de áudio |
+| `npm run test:e2e` | **108 passaram**, exit 0, 2,7 min |
+| `npm run test:desktop` | Passou com perfil isolado |
+| `npm run package:win` | Passou; portátil Windows x64 gerado, sem publicação |
+| `node scripts/inspect-package.mjs` | Passou; 566 entradas, recursos e licenças presentes, sem candidatos proibidos detectados pela inspeção limitada |
+| `node scripts/package-smoke.mjs` | Passou; segurança, funcionamento offline, áudio, persistência, instância única e privacidade com dados sintéticos |
+| `node scripts/music-smoke.mjs --packaged "outputs/desktop/win-unpacked/Little Haven.exe"` | Passou na repetição isolada; música estéreo offline, consentimento, minimização, retorno e reabertura |
+| `node scripts/portable-smoke.mjs` | Passou; o `.exe` final extraiu, abriu o quarto empacotado e encerrou normalmente |
+| `npm run verify:win` | Passou; metadados conferidos e SHA-256 calculado; lançador e executável interno estão `NotSigned` |
+
+Arquivo: **`outputs/desktop/Little-Haven-0.2.0-beta.1-x64.exe`**, **135.142.833 bytes** (128,88 MiB).
+
+SHA-256: `5F3A6CAE7755559BDB3F57BE699F4AFF107753B2233A5E40EB7BCEE9E71EC52F`.
+
+A primeira tentativa de empacotamento encontrou bloqueio de rede `EACCES`; a repetição autorizada fora do isolamento concluiu o download e a geração. O primeiro smoke musical excedeu a espera de 5 s ao retornar à cozinha enquanto o empacotamento ainda estava em andamento; a repetição após o empacotamento passou com exit 0, sem alteração de código ou timeout. Isso registra uma falha intermitente de validação, cuja causa não foi confirmada. Logs locais em `outputs/executable-*.log`; o registro da repetição musical está em `outputs/executable-music-tests-retry.log`.
+
+Para testar manualmente, abra o portátil acima, entre em **The Cozy Kitchen**, abra o mixer, selecione **Cozy Kitchen** e ative o áudio por clique. Experimente receitas, troca de ambientes e reabertura. A avaliação auditiva humana continua pendente. O executável não tem assinatura digital; o Windows pode mostrar o aviso de SmartScreen já documentado. Não houve commit, push ou publicação.
+
+---
+
+# Revisão de áudio e Café na Cozinha — 31 de outubro de 2026
+
+Implementação e validação técnica no Windows x64, Node.js 22.18.0. Mudanças preexistentes da cozinha, companheiro, distribuição e demais módulos foram preservadas. Diagnóstico e inventário completos em [AUDIO_AUDIT.md](AUDIO_AUDIT.md); partitura, produção e direitos da música em [CAFE-NA-COZINHA.md](public/assets/audio/CAFE-NA-COZINHA.md).
+
+## Resultado implementado
+
+- Folhas: montagem dos 20 foleys CC0 locais, fragmentos sobrepostos, rajadas irregulares e filtragem suave. RMS efetivo 0,00661 → 0,02513 (+11,6 dB), com pico menor e menos lacunas; não houve aumento global de ganho.
+- Trem: pares suaves de juntas, pequena deriva de cadência, grave oscilante do vagão e perfis menos sobrepostos sobre a gravação licenciada existente. O objetivo foi articulação e identidade; o RMS das fontes não aumentou. Quatro WAVs ambientais revistos têm ciclos efetivos de 48 s e junções verificadas após o preparo real do motor.
+- Morning Garden inclui folhas a 42%, pássaros 38%, riacho 25%, vento 15%. Peaceful Journey usa trilhos 45%, rodas 22%, vagão 16%, vento 8%, com chuva na janela conforme o cenário. Demais fontes foram auditadas e preservadas quando não houve defeito técnico que justificasse substituição.
+- **Café na Cozinha existe como composição completa:** 64 compassos, 80 BPM, 192 s, estéreo, teclado elétrico/cordas/baixo/percussão sintetizados originalmente. Ogg Opus local, 2.977.767 bytes, pico decodificado 0,20385, RMS 0,03366. Não utiliza samples de terceiros. SHA-256 e partitura em `public/assets/audio/cafe-na-cozinha.json`.
+- Mixer com 13 fontes contínuas e um bus de efeitos contextuais. Música e efeitos têm switches e volumes independentes, master/mute compartilhados e preferências limitadas/validadas no renderer, preload e main. Cozy Kitchen usa música 30% e efeitos 65%, sem chuva; as opções de objetos/sino continuam desligadas inicialmente.
+- A camada musical é elegível somente na cozinha. Receita, pausa, conclusão, animações e imersão não reiniciam a fonte; saída faz fade e liberação em 850 ms. Retorno durante o fade reutiliza a fonte; depois da liberação, recomeça do início. Decodes pendentes são compartilhados durante navegação rápida. A música preserva exatamente 192 s, sem o overlap ambiental que cortaria um compasso e sem alocar outra cópia PCM.
+- Documentos v1 antigos mantêm os ajustes e recebem somente os novos controles. Custom continua preservada. Restauração e navegação não concedem autorização de áudio; cada abertura exige gesto explícito. Nenhum novo IPC, dependência ou permissão de rede foi adicionado. Let It Float e o motor do Pomodoro não foram modificados.
+
+## Verificações realmente executadas
+
+| Comando / verificação | Resultado atual |
+| --- | --- |
+| `npm test` | **171 passaram**, zero falhas; inclui regressões de preferências/IPC, privacidade, ciclo de vida, falhas, duplicação, ganho e assets |
+| `npm run build` | Passou; Ogg e todos os WAVs emitidos como chunks locais sob demanda |
+| `npm run test:e2e` | **108 passaram**, exit 0, 2,6 min; inclui três casos novos de música, mixer, cozinha, navegação, teclado, imersão e demais ambientes |
+| `npm run test:desktop` | Passou fora do isolamento da ferramenta; segurança, ponte, preferências, fontes ambientais, imersão e proteção do rascunho |
+| `node scripts/music-smoke.mjs` | Passou com perfil separado, build de produção offline, duas aberturas e conclusão de receita com janela minimizada |
+| `electron-builder --win --dir --x64 --publish never --config.directories.output=outputs/audio-review` | Passou; cópia de validação separada em `outputs/audio-review/win-unpacked/`, sem gerar/substituir o portátil de distribuição |
+| `node scripts/music-smoke.mjs --packaged "outputs/audio-review/win-unpacked/Little Haven.exe"` | Passou, duas aberturas; `app.isPackaged=true`, áudio dentro de `resources/app.asar`, duração estéreo 192 s, offline, consentimento, continuidade minimizada, fade/liberação, persistência e contexto único |
+| Composição/render/codificação/decodificação real no Edge | Executadas; duração, pico, RMS, canais e junção do Ogg final medidos |
+| `node scripts/refine-environment-audio.mjs` | Executado; quatro fontes finais e manifest regenerados a partir dos originais locais licenciados |
+| `node scripts/audit-audio.mjs` | Executado; camadas, quatro efeitos e somas de 120 s Room/Garden/Journey em master 25/50/100% medidas sem clipping |
+| `git diff --check` | Sem erros; somente aviso de conversão LF/CRLF no manifest |
+
+Os testes nativos foram repetidos fora do isolamento porque o Windows bloqueou o acesso sandboxed ao runtime com erro `install_dir_access`/AppContainer ACL; não se alterou ACL nem se desativou a segurança do aplicativo. Duas condições de corrida do novo harness foram corrigidas (aguardar criação e carregamento inicial da janela antes da recarga). Uma execução focada em sandbox emitiu 11 casos aprovados, mas ficou presa no teardown e foi encerrada; a evidência de sucesso global é a execução completa de 108 testes com exit 0 acima.
+
+Logs e relatórios locais, ignorados pelo Git: `outputs/audio-{unit-tests,e2e-tests,desktop-tests,music-desktop,music-packaged,package-tests}.log`, `audio-mix-audit.json`, `music-smoke.json` e `music-smoke-packaged.json`. A imagem do mixer desktop gerada pela suíte foi inspecionada; layout, foco e ajuste em janelas pequenas também passaram nas regressões existentes. Não houve commit, push, merge ou publicação.
+
+## Limitações e teste manual
+
+**Avaliação auditiva humana pendente.** Não houve escuta real em fones/caixas nem sessão subjetiva de 5–60 minutos. As medições não aprovam artisticamente os timbres, reconhecimento, conforto, repetitividade ou a junção percebida. O ciclo curto dos grilos foi preservado; as folhas continuam um arranjo de foley de folhas secas e o trem ainda compartilha uma gravação base. Os efeitos finitos existentes são interrompidos imediatamente ao silenciar/desativar; conferir possíveis artefatos de corte durante a escuta.
+
+Uma cópia PCM estéreo de 192 s a 48 kHz usa cerca de **70,3 MiB**, além do arquivo/módulo comprimido. O motor mantém uma fonte/buffer e libera a camada ao sair, mas não houve medição de heap/CPU durante uma sessão prolongada. O build continua avisando sobre os chunks grandes da biblioteca de áudio local; não é falha de build. Não foi gerado novo portátil de distribuição nem testada assinatura digital.
+
+Para experimentar, rode `npm start` após o build. Entre em **The Cozy Kitchen → Mixer → Cozy Kitchen → Ativar áudio**. Ajuste música para 30% e Sons da cozinha para 15%; ative objetos/sino separadamente em **Luz e sons**. Teste mute, volume zero, receita/pausa/conclusão, imersão, minimização, saída e retorno. Reabra: as escolhas devem voltar e o som aguardar novo gesto. No jardim e na viagem, compare os presets e as camadas isoladas, incluindo vento/chuva/riacho, cinco paisagens e duas junções de 48 s. A escuta em volume físico confortável e equipamentos diferentes é a próxima etapa de aprovação da experiência sonora.
+
+# Histórico — The Cozy Kitchen — refinamento integrado de 30 de outubro de 2026
+
+Correção localizada dos balões, movimento e livro, sobre a implementação anterior. Windows x64, Node.js 22.18.0 e npm 10.9.3. As alterações preexistentes foram preservadas. O motor temporal, catálogo, mensagens das sete receitas, preferências do companheiro, mixer, IPC e políticas do Electron não foram alterados nesta etapa.
+
+## Causas identificadas e correções
+
+| Problema | Causa confirmada | Correção |
+| --- | --- | --- |
+| Falas e conclusão fixas | O HTML era irmão do SVG, com `top/left/right` independentes da posição do gato. A fala ainda era escondida por CSS em janelas estreitas | Ambas usam `KitchenSpeech` no mesmo grupo móvel do personagem, fora da inversão horizontal e do botão de carinho. A ponta acompanha a cabeça; limites e tamanho do texto se adaptam à escala |
+| Movimento artificial | `useCompanion` sobrescrevia posição, pose e `travel:null` a cada etapa, ao mesmo tempo em que bloqueava o relógio visual da cozinha | Diretor pequeno com preparação, segmentos de caminhada, chegada e ação. O destino é a etapa real da receita; ações culinárias só começam após chegar |
+| Caminhos inadequados | O grafo antigo incluía deslocamento vertical do piso à bancada, atravessando o armário, e uma faixa que cruzava a mesa | Pontos centrais de piso e conexões ortogonais passam diante das pernas da mesa e pelo corredor direito, sem subir pela bancada |
+| Livro sem apoio coerente | A arte aberta e o alvo sobrepunham a pia | Livro fechado original, suporte e sombra em um mesmo grupo `translate(198 104)`, sobre trecho livre da bancada, com alvo alinhado |
+| Fechar desaparecia | Cabeçalho e botão rolavam junto com todo o conteúdo do diálogo | Cabeçalho fora do corpo rolável; páginas flexíveis, abertura breve, foco e Escape mantidos |
+
+O deslocamento compartilha um progresso CSS tipado com o balão. Coordenadas e recorte acompanham o mesmo pixel do movimento, sem atualização React ou leitura de layout a cada frame. `ResizeObserver` atua apenas sobre dimensões do cenário/controles e conteúdo, com limpeza ao ocultar/desmontar. A conversão inversa de escala preserva texto nativo legível. O conteúdo longo pode rolar internamente; fechar e ações continuam acessíveis. Não há sistema de pathfinding, engine ou dependência adicional.
+
+Pausar mantém o pixel atual; carinho e redirecionamento capturam a posição atual, sem reaplicar um destino direto. Ao retornar de ocultação ou remontar o ambiente, o chef sincroniza a etapa corrente e não reproduz uma fila antiga. A entrega da conclusão fica acima da cena até o balão aparecer na posição de apresentação; então são autorizados som opcional e gesto, uma vez. Companheiro oculto continua oculto, com mensagem sem personagem.
+
+## Validação desta etapa
+
+| Verificação | Resultado |
+| --- | --- |
+| `npm test` | **158 passaram**, zero falhas |
+| `npm run build` | Passou; 117 módulos; aviso anterior de chunks grandes de áudio |
+| Testes específicos de movimento/ancoragem/livro | Sete cenários incluídos na suíte completa; todos passaram |
+| Regressões específicas Kitchen/audio/imersão | **24 passaram** |
+| `npm run test:e2e` | **105 passaram** em 2,6 minutos |
+| `npm run test:desktop` | Passou na repetição isolada; ponte, segurança, preferências, companion, mixer, Garden/Journey imersivos e proteção do rascunho |
+| `node scripts/kitchen-smoke.mjs` | **Quatro fases passaram**, repetidas após ajustar a captura para aguardar a animação do livro |
+| `git diff --check` | Sem erros de whitespace |
+
+As provas de movimento usam tempo real e matrizes renderizadas (`getScreenCTM`), comparando cabeça, balão e patas. Relógios acelerados nas regressões aguardam os commits React entre segmentos; uma rodada inicial expôs um pressuposto incorreto do teste ao avançar toda a caminhada em uma única chamada. Outros ajustes de instrumentação removeram um hover involuntário, leram o relógio visível em vez do checkpoint persistente e corrigiram o nome esperado da ação de chocolate. Esses ajustes não alteraram o produto ou o temporizador.
+
+O primeiro smoke geral não entrou na imersão do Garden. A repetição isolada passou sem alteração de produto; a causa transitória não foi confirmada. A validação nativa específica da cozinha passou nas quatro fases, incluindo entrada/saída fullscreen, Escape contextual, movimento real e livro. O runtime foi executado fora do isolamento da ferramenta, mantendo sandbox do Electron e perfis sintéticos separados; não foram alteradas ACLs ou permissões do aplicativo.
+
+## Inspeção visual e arquivos
+
+Livro revisado no Edge em 360 × 640 e 800 × 480, antes/depois da rolagem: Fechar manteve os mesmos limites verticais (39–69 e 45–75 pixels), sem transbordamento horizontal. Em fullscreen 1440 × 960, o diálogo permaneceu centralizado e Escape fechou o livro antes de sair da imersão. Clique/teclado devolveram foco ao objeto. A arte sobre suporte e a pia livre foram examinadas em capturas.
+
+Falas e conclusão foram inspecionadas em desktop, janela estreita, imersão 1920 × 1080 e 320 × 240. Na composição mínima, a mensagem longa usa rolagem interna para manter texto, fechamento e ações disponíveis. A caminhada real, patas alternadas, pausa sem deriva, retomada e transição para a ação foram verificadas no Edge. No Electron, capturas de caminhada/fala, chegada, livro normal e livro imersivo foram abertas e revisadas; a captura aguarda a animação finita do diálogo para não registrar seu primeiro frame transparente. Três capturas consecutivas da caminhada no Edge confirmam o deslocamento conjunto do chef e do balão.
+
+Arquivos criados: `src/services/kitchenCompanionMotion.js`, `src/services/kitchenSpeech.js`, `src/scenes/Kitchen/KitchenSpeech.jsx`, `KitchenSpeech.css`, testes unitários de movimento/posição, `tests/e2e/kitchen-refinements.spec.js` e helper do relógio visual. Arquivos ajustados: `Companion.jsx`, `Companion.css`, `companionBehaviors.js`, `useCompanion.js`, componentes e estilos da cozinha, suítes específicas e scripts do smoke da cozinha. O sprite original, demais cenas e recursos sonoros foram preservados.
+
+Capturas em `outputs/Kitchen-refine-book-*.png` e `outputs/Little-Haven-Kitchen-*.png`, incluindo `walking-speech-1/2/3.png`, `walking-speech-desktop.png`, `arrived-desktop.png`, `book-normal-desktop.png` e `book-immersive-desktop.png`, sem versionamento. Não houve commit, push, merge, empacotamento ou novo portátil.
+
+## Limites e teste manual
+
+Não foram realizados ensaios prolongados de CPU/RAM, suspensão física do computador, múltiplos monitores/DPI/GPU ou avaliação manual com Narrador. A progressão do Pomodoro foi preservada e testada; estas correções não acrescentam garantias novas sobre falhas de energia ou mudanças do relógio local.
+
+Execute `npm start`, abra a cozinha e escolha uma receita pelo livro. Retire o cursor do trajeto para observar a sequência completa; passar o cursor ou focar o gato preserva a interação existente de segurar o personagem para carinho. Confira a fala junto à cabeça durante os passos, a chegada antes do preparo, pausa/retomada e o livro aberto enquanto o tempo continua. Redimensione, role o cardápio, feche por botão/Esc e repita na imersão e com movimento reduzido. Na conclusão, confira nome e mensagem, as três escolhas e a consulta posterior sem nova celebração.
+
+---
+
+# Histórico — primeira implementação da The Cozy Kitchen — 30 de outubro de 2026
+
+Implementação em Windows x64, Node.js 22.18.0 e npm 10.9.3. A árvore já continha alterações de distribuição/documentação e arquivos não rastreados de mídia; foram preservados. Não foram criados commits, pushes, releases ou executáveis portáteis nesta tarefa.
+
+## Verificações realmente executadas
+
+| Verificação | Resultado |
+| --- | --- |
+| `npm test`, repetido após os últimos ajustes | **149 passaram**, zero falhas |
+| `npm run build`, no código final | Passou; 113 módulos; cozinha carregada sob demanda |
+| `npm run test:e2e` no Microsoft Edge | **98 passaram** em 2,2 minutos |
+| `npx playwright test tests/e2e/kitchen.spec.js tests/e2e/kitchen-immersive.spec.js tests/e2e/kitchen-audio.spec.js`, após os últimos ajustes de avisos acessíveis e interação com a panela | **24 passaram** em 36,6 segundos |
+| `npm run test:desktop` | Passou; isolamento, ponte, preferências, jardim, companheiro, mixer, imersão e proteção do rascunho |
+| `node scripts/kitchen-smoke.mjs`, repetido no build final | **Três aberturas passaram**: pausa preservada ao fechar, conclusão minimizada e resultado dispensado sem repetição após reabrir |
+| `git diff --check` | Sem erros de whitespace |
+| Inspeção visual | Cozinha, livro, janela estreita, bolo no forno, conclusão, imersão 1920 × 1080 e imersão reduzida 320 × 240 inspecionados |
+
+A suíte completa de interface precedeu os dois últimos ajustes locais da cozinha; as três suítes específicas foram repetidas no build final. Uma execução específica inicial encontrou um seletor ambíguo do teste do livro imersivo; o seletor foi corrigido e as repetições passaram. Os testes da cozinha observam erros de renderer e requisições externas; nenhuma ocorrência foi encontrada nas execuções aprovadas.
+
+A primeira tentativa do smoke nativo da cozinha foi bloqueada pela ACL do runtime sob o isolamento da ferramenta. A repetição autorizada fora desse isolamento passou, sem alterar ACLs e mantendo `sandbox`, `contextIsolation` e ausência de Node no renderer. Os testes usam perfis locais separados e textos/estados sintéticos, sem acessar dados pessoais.
+
+## Comportamento verificado
+
+- Sete nomes e durações em português, catálogo ordenado e desbloqueado, descrições, pratos originais e as sete conclusões individuais. Bolo de 60 minutos com seis etapas automáticas e duração personalizada de 5 a 60 minutos inteiros.
+- Temporizador por tempo decorrido, com relógio monotônico durante execução, pausa/retomada, cancelamento sem celebração, reinício explícito e uma sessão por vez. Callbacks atrasados não contam segundos nem acumulam deriva.
+- Serviço temporal autoritativo no Electron; navegação e minimização não pausam. Fechar/reabrir recupera a mesma sessão ou conclusão, sem criar outra receita. Suspensão/retomada simulada coberta com relógios monotônicos que incluem ou excluem o período suspenso.
+- Reivindicação de conclusão serializada, entrega retida acima da cena quando a navegação ocorre durante o IPC, cartão não modal e nenhuma notificação do sistema. Consulta posterior pela mesa/relógio abre o resultado estático, sem novo sino ou celebração.
+- Mesmo Little Companion com nome Unicode, pelagem e visibilidade reais, roupa contextual e ações culinárias. Ocultar o personagem não impede o resultado textual. O personagem e o prato permanecem visíveis com o cartão de conclusão no desktop.
+- Luminárias, clima, geladeira, livro, bilhetes, relógio, chaleira, utensílios e panela funcionam sem sessão. Decoração e efeitos não alteram o tempo. Frases ocasionais são opcionais; mudanças de estado são anunciadas sem leitura dos segundos.
+- Sino, chaleira, utensílio e cozimento são síntese original local finita no motor compartilhado. Opções inicialmente desligadas; consentimento da abertura atual, master, volume zero, mute e desativação respeitados. Nenhum efeito fica guardado para reprodução tardia. O mixer Custom é preservado.
+- Documento versionado próprio, comandos/IPC limitados e gravação atômica. Corrupção, tamanho excessivo e versões futuras preservam os bytes originais e abrem sessão temporária com aviso. Falha de gravação mantém a sessão em memória e informa o erro.
+- Teclado, foco/retorno ao objeto, Escape contextual, M/C, modo imersivo, movimento reduzido e layouts de 360/390/800/1440 pixels. No livro estreito, Tab alcança o botão de iniciar e provoca rolagem nativa para mantê-lo visível.
+- Regressões de Room, Garden, Journey, Memory Corner e Let It Float passaram, incluindo proteção e privacidade dos rascunhos, sem enviá-los para a cozinha ou sua persistência.
+
+Os módulos principais são `shared/kitchen.js`, `shared/kitchenRecipes.js`, `electron/services/kitchen.js`, `src/services/kitchen.js`, `src/hooks/useKitchen.js` e `src/scenes/Kitchen/`. App, preload, main, companheiro e motor de áudio receberam extensões pontuais. Nenhuma dependência, engine gráfica ou conexão externa foi acrescentada. A arte e os estilos da cozinha formam chunks locais separados, carregados ao visitar o ambiente: aproximadamente 42,11 kB de JavaScript e 12,10 kB de CSS; o JavaScript inicial ficou em 472,54 kB. O build continua avisando sobre os chunks grandes de gravações de áudio já existentes; não houve falha.
+
+Capturas locais em `outputs/Little-Haven-Kitchen-{idle,book,mobile,mobile-book,cake-baking,cake-ready,immersive,immersive-small,desktop}.png`, sem versionamento. Os scripts de smoke de distribuição tiveram somente a expectativa da ponte atualizada; empacotamento, teste do portátil e publicação não foram executados.
+
+## Limites e teste manual
+
+Não foi suspenso fisicamente o computador nem acompanhada uma sessão real de 60 minutos nesta tarefa; as fronteiras temporais e etapas foram verificadas com relógios controlados. Permanecem pendentes ensaio prolongado de CPU/RAM, avaliação manual com Narrador, conforto sonoro em dispositivos distintos e múltiplas configurações de monitor/DPI/GPU.
+
+O tempo com o aplicativo fechado depende do relógio local. Retrocesso detectado recupera a sessão pausada; mudanças de horário enquanto fechado/suspenso não podem ser distinguidas perfeitamente de passagem real de tempo offline. Falha de disco ou encerramento abrupto pode perder a última gravação. Uma falha entre a reivindicação persistida e o desenho do cartão pode consumir sua apresentação automática; o prato e a mensagem continuam consultáveis manualmente. Não há garantia de exatamente uma apresentação diante de falhas de sistema.
+
+Para experimentar, execute `npm start` com o build atual e abra **The Cozy Kitchen**. Explore os objetos, escolha Chá Quentinho ou um tempo personalizado, pause, visite outro ambiente e retome. Minimize e confira o restante ao voltar. Feche/reabra durante preparo e pausa; ao concluir, confira mensagem, assinatura e as três ações. Ative áudio e, separadamente, os sons opcionais em **Luz e sons**; teste mute e volume zero. Repita com Tab/Enter/Espaço, movimento reduzido e modo imersivo. O portátil gerado anteriormente continua sendo a versão anterior.
+
+---
+
+# Validação de distribuição Windows — 30 de outubro de 2026
+
+Auditoria do build, assinatura, metadados e viabilidade MSIX/Store documentada em [WINDOWS_DISTRIBUTION.md](WINDOWS_DISTRIBUTION.md). Ambiente: Windows x64 10.0.26200, Node.js 22.18.0, npm 10.9.3, Electron 44.10.0, electron-builder 26.15.3. `media/` e `output/` já existiam como arquivos não rastreados e foram preservados. Sem mudanças no runtime, CSP, preload ou dados pessoais; sem commit ou publicação.
+
+| Verificação executada nesta auditoria | Resultado |
+| --- | --- |
+| `npm test` | **117 passaram**, zero falhas |
+| `npm run build` | Passou; 100 módulos. Aviso de chunks grandes de áudio, sem falha |
+| Schema do builder instalado, perfis padrão e assinatura obrigatória | Ambos aceitos por `validateConfiguration` de app-builder-lib |
+| `npm run verify:win` | Passou na inspeção; os dois executáveis atuais são **NotSigned**, sem timestamp. Isso não aprova distribuição pública assinada |
+| `npm run verify:win -- -RequireSignature` | **Rejeição esperada**, saída 1: faltam assinaturas e timestamps |
+| Verificador com `-ExpectedPublisher INVALID-PUBLISHER` | Rejeitou os dois executáveis, sem publicador assinado |
+| Builder com `--win dir --x64 --publish never --config.forceCodeSigning=true --config.directories.output=work/windows-signing-validation` | **Rejeição esperada**, saída 1, ao tentar assinar o PE sem credenciais: `App is not signed and "forceCodeSigning" is set to true` |
+| `npm run test:desktop` | Passou na repetição fora do isolamento da ferramenta: segurança/ponte, preferências, jardim, companion, mixer, imersão e proteção do rascunho |
+| `git diff --check` | Sem erros de whitespace |
+
+O primeiro smoke desktop foi bloqueado por ACL do runtime no isolamento da ferramenta. A repetição autorizada fora desse isolamento passou, mantendo sandbox do Electron e perfis de teste isolados; nenhuma ACL foi alterada. O builder também precisou de repetição autorizada com rede para baixar recursos, após `EACCES`; só depois chegou à rejeição esperada por falta de assinatura. Uma tentativa inicial com abreviação CLI `-c.*` foi interpretada como caminho de configuração; o comando novo usa `--config.*`, validado na execução real.
+
+O verificador foi corrigido durante a validação para conferir `FileVersion`, que mantém `0.2.0-beta.1` nos dois executáveis. O `ProductVersion` numérico `0.2.0.0` do PE interno é relatado, sem ser confundido com perda da identificação Beta. Ele também admite o sufixo numérico de build CI acrescentado pelo builder.
+
+**Portátil original preservado:** `outputs/desktop/Little-Haven-0.2.0-beta.1-x64.exe`, **119.674.290 bytes**, SHA-256 **`BAE3288EB7FBB8EAFDE727752109E5BBCC97421A9F050122F6D0BDCDC532EDDF`**, recalculado nesta auditoria e igual ao registro anterior. Não foi gerado outro portátil completo; a tentativa obrigatória deixou arquivos de preparação somente em `work/windows-signing-validation/`. Não foi gerado MSIX/AppX.
+
+**Limites:** assinatura pública bem-sucedida e timestamp real não puderam ser testados sem credenciais. Certificado/identidade, cadeia pública, SmartScreen após download em Windows limpo, Store/Partner Center, instalação/atualização/desinstalação MSIX, migração dos dados e Windows App Certification Kit permanecem sem validação. O script verifica o lançador e PE principal, sem atestar todas as DLLs ou comparar o conteúdo extraído do lançador. E2E não foi repetido: não houve alteração visual, de fluxo ou de código do aplicativo. Nenhum resultado histórico abaixo substitui estas verificações.
+
+Para repetir a inspeção manual, execute `npm run verify:win`; use `-RequireSignature` para exigir assinatura e `-ExpectedPublisher` com o Subject real validado. Após configurar credenciais legítimas, `npm run package:win:signed` gera em `outputs/desktop-signed/` e executa a exigência de assinatura/timestamp. Antes de compartilhar, confira o publicador e o hash final e teste em Windows limpo com proteções ativas.
+
+---
+
+# Primeira Beta 0.2.0-beta.1 — histórico de 29 de outubro de 2026
 
 Verificação de **29 de outubro de 2026**, branch `feature/little-heaven-improvements`, árvore inicialmente limpa. Ambiente validado: **Windows x64, build 10.0.26200**, Node.js de desenvolvimento **22.18.0**, npm **10.9.3**, Electron **44.10.0** (Node interno **24.22.1**) e Microsoft Edge. Nenhum commit, push, merge ou publicação foi realizado. Dados pessoais existentes não foram usados, apagados ou sobrescritos; testes desktop utilizaram perfis isolados e conteúdo sintético.
 

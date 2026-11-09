@@ -21,11 +21,16 @@
 .companion-panel h2 { margin: 7px 0 0; font: 27px/1 'Pixelify Sans', monospace; color: #efddae; }
 .companion-panel-close { display: grid; place-items: center; width: 34px; height: 34px; padding: 0; border: 1px solid #b8bea34d; border-radius: 4px; color: #d2d6bd; background: #283d34; cursor: pointer; }
 .companion-panel-content { overflow-y: auto; min-height: 0; padding: 20px 26px 24px; scrollbar-width: thin; scrollbar-color: #899575 #2b4039; }
-.companion-portrait { width: 190px; margin: 0 auto 10px; }
-.companion-portrait svg { display: block; width: 100%; image-rendering: pixelated; }
+.companion-portrait { width: 190px; max-width: 100%; margin: 0 auto 10px; }
+.companion-portrait > svg { display: block; width: 100%; image-rendering: pixelated; }
 .companion-panel h3 { margin: 0 0 12px; text-align: center; font: 23px/1.25 'Fraunces', Georgia, serif; color: #eee2c5; overflow-wrap: anywhere; }
 .companion-panel-intro { margin: 0 0 24px; text-align: center; font-size: 12px; line-height: 1.8; color: #b9c5b1; }
 .companion-field-label { display: block; font-size: 11px; color: #d0d6bf; margin-bottom: 9px; }
+.companion-pet-selection { margin: 0 0 22px; padding: 0; border: 0; min-width: 0; }
+.companion-pet-selection legend { padding: 0; margin-bottom: 9px; font-size: 11px; color: #d0d6bf; }
+.companion-pet-options { display: flex; gap: 8px; }
+.companion-pet-options button { flex: 1; min-width: 0; min-height: 42px; padding: 9px 12px; border: 1px solid #a5b09166; border-radius: 4px; background: #20372f; color: #d0d6bf; font-size: 12px; cursor: pointer; }
+.companion-pet-options button[aria-pressed='true'] { border-color: #d6c18b; background: #586b4c; color: #fff0ca; }
 .companion-panel input[type='text'], .companion-panel select { display: block; width: 100%; min-height: 42px; border: 1px solid #a5b09166; border-radius: 4px; background: #20372f; color: #eee4ce; padding: 10px 12px; font-size: 13px; }
 .companion-panel input[aria-invalid='true'] { border-color: #dbb58d; }
 .companion-name-hint { display: flex; justify-content: space-between; gap: 12px; margin-top: 8px; color: #a4b69f; font-size: 9px; }

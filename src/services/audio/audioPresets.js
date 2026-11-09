@@ -3,7 +3,7 @@ import { AUDIO_LAYERS } from './audioLibrary.js';
 
 const names = {
   'rainy-evening': 'Rainy Evening', 'morning-garden': 'Morning Garden',
-  'quiet-night': 'Quiet Night', 'peaceful-journey': 'Peaceful Journey', custom: 'Custom',
+  'quiet-night': 'Quiet Night', 'peaceful-journey': 'Peaceful Journey', 'cozy-kitchen': 'Cozy Kitchen', custom: 'Custom',
 };
 export const AUDIO_PRESETS = Object.freeze(Object.entries(names).map(([id, name]) => Object.freeze({
   id, name, layers: AUDIO_PRESET_LEVELS[id] ?? {},

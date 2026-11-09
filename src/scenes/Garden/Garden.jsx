@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import ImmersiveViewport from '../../components/ImmersiveViewport/ImmersiveViewport.jsx';
 import { useImmersiveMode } from '../../hooks/useImmersiveMode.js';
@@ -8,8 +8,12 @@ import GardenScene from './GardenScene.jsx';
 import GardenTools, { ToolButtons } from './GardenTools.jsx';
 import './Garden.css';
 
-export default function Garden({ gardenState, reducedMotion = false, onBack, companion }) {
+const BouquetWorkshop = lazy(() => import('../Bouquets/BouquetWorkshop.jsx'));
+
+export default function Garden({ gardenState, reducedMotion = false, onBack, companion, bouquetSessionRef }) {
   const { garden, ready, storageError, status, dispatch, retry } = gardenState;
+  const [workshopOpen, setWorkshopOpen] = useState(false);
+  const [workshopVisited, setWorkshopVisited] = useState(false);
   const [tool, setTool] = useState('observe');
   const [source, setSource] = useState(null);
   const [context, setContext] = useState(null);
@@ -64,6 +68,16 @@ export default function Garden({ gardenState, reducedMotion = false, onBack, com
       : value === 'water' ? 'Toque em uma planta para regar.'
         : value === 'plant' ? 'Escolha um canteiro ou vaso.'
           : value === 'decorate' ? 'Escolha uma lanterna, um ponto de decoração ou um vaso.' : 'Tudo pode esperar.');
+  }
+  function openWorkshop() {
+    setSource(null);
+    setTool('observe');
+    setWorkshopVisited(true);
+    setWorkshopOpen(true);
+  }
+  function closeWorkshop() {
+    setWorkshopOpen(false);
+    focusFrame.current = requestAnimationFrame(() => sceneRef.current?.querySelector('[aria-label="Abrir Little Bouquets"]')?.focus({ preventScroll: true }));
   }
   function open(kind, event, slotId) {
     opener.current = event?.currentTarget ?? document.activeElement;
@@ -140,16 +154,23 @@ export default function Garden({ gardenState, reducedMotion = false, onBack, com
   }
 
   if (!ready) return <div className="loading-room">Abrindo seu jardim…</div>;
-  return <section ref={sceneRef} className={`garden-scene${hidden ? ' is-paused' : ''}${reducedMotion ? ' is-reduced-motion' : ''}`}
+  return <section ref={sceneRef} className={`garden-scene${workshopOpen ? ' is-bouquets' : ''}${hidden ? ' is-paused' : ''}${reducedMotion ? ' is-reduced-motion' : ''}`}
     data-atmosphere={garden.atmosphere} data-weather={garden.weather} data-tool={tool} data-keyboard-lock={toolEscapeLocked} aria-label="The Garden: um pequeno lugar para crescer">
     <ImmersiveViewport targetRef={immersive.targetRef} active={immersive.active} onExit={immersive.exit} contextualOpen={Boolean(context)}>
-      <GardenScene garden={garden} reducedMotion={reducedMotion} paused={hidden} tool={tool} selectedSlot={source?.id}
+      {!workshopOpen && <GardenScene garden={garden} reducedMotion={reducedMotion} paused={hidden} tool={tool} selectedSlot={source?.id}
         companion={companion ? { ...companion, paused: companion.paused || Boolean(context) || tool !== 'observe' } : undefined}
         activePlantEffect={effect} onPlantSlot={plantSlot} onDecorationSlot={decorationSlot}
         onOpenTools={(event) => open('tools', event)} onOpenAtmosphere={(event) => open('atmosphere', event)}
+        onOpenBouquets={openWorkshop}
         onWildlife={(kind) => setNotice(kind === 'cat' ? 'O gato laranja espia entre as folhas.'
           : kind === 'pond' ? 'Os peixinhos se aproximam. Pequenas ondas atravessam o lago.'
-            : kind === 'butterfly' ? 'A borboleta muda suavemente de pouso.' : 'Os vagalumes respondem com um brilho suave.')} />
+            : kind === 'butterfly' ? 'A borboleta muda suavemente de pouso.' : 'Os vagalumes respondem com um brilho suave.')} />}
+      {workshopVisited && <div hidden={!workshopOpen} className="garden-workshop-container">
+        <Suspense fallback={<div className="loading-room">Abrindo o ateliê de flores…</div>}>
+          <BouquetWorkshop garden={garden} reducedMotion={reducedMotion} companion={companion}
+            active={workshopOpen && !hidden} sessionRef={bouquetSessionRef} onBack={closeWorkshop} />
+        </Suspense>
+      </div>}
       {context && <GardenTools key={context.slotId || context.kind} context={context} garden={garden} tool={tool}
         onTool={selectTool} onAction={action} onClose={close} />}
       <p className="sr-only" role="status">{notice}</p>
@@ -158,9 +179,10 @@ export default function Garden({ gardenState, reducedMotion = false, onBack, com
         <button type="button" onClick={cancelAction}>Cancelar ação</button>
       </div>}
     </ImmersiveViewport>
-    <div className="garden-controls">
+    <div className="garden-controls" hidden={workshopOpen}>
       <ToolButtons tool={tool} onTool={selectTool} />
       <div className="garden-extra-controls">
+        <button type="button" onClick={openWorkshop}><Icon name="garden" size={16} /> Oficina de buquês</button>
         <button type="button" onClick={(event) => open('atmosphere', event)}><Icon name={garden.atmosphere === 'night' ? 'moon' : 'sunset'} size={16} /> Luz e clima</button>
         <button type="button" ref={immersive.triggerRef} disabled={immersive.pending} aria-label="Modo Imersivo" title="Modo Imersivo" onClick={immersive.enter}><Icon name="expand" size={17} /></button>
         <button type="button" onClick={onBack}><Icon name="back" size={16} /> Voltar ao quarto</button>

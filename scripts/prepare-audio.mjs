@@ -105,3 +105,7 @@ try {
   }
   await writeFile(new URL('manifest.json', destination), `${JSON.stringify(manifest, null, 2)}\n`);
 } finally { await browser.close(); }
+
+// Finish with the current leaf montage and articulated railway profiles. The
+// original preparation above remains reproducible for the other recordings.
+await import('./refine-environment-audio.mjs');

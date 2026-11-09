@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useReducer, useRef, useState } from 'react';
 import Room from '../scenes/Room/Room.jsx';
 import LetItFloat from '../scenes/LetItFloat/LetItFloat.jsx';
 import Journey from '../scenes/Journey/Journey.jsx';
@@ -9,6 +9,7 @@ import { usePreferences } from '../hooks/usePreferences.js';
 import { useReducedMotion } from '../hooks/useReducedMotion.js';
 import { useGarden } from '../hooks/useGarden.js';
 import { useMemoryBoard } from '../hooks/useMemoryBoard.js';
+import { useKitchen } from '../hooks/useKitchen.js';
 import { AudioEngine } from '../services/audio/AudioEngine.js';
 import { AUDIO_PRESETS } from '../services/audio/audioPresets.js';
 import { cloneAudioLayers, createPresetMix } from '../../shared/audio.js';
@@ -19,6 +20,8 @@ import CompanionPanel from '../components/companion/CompanionPanel.jsx';
 import DeveloperLetter, { PixelStar } from '../components/developer/DeveloperLetter.jsx';
 import { version } from '../../package.json';
 import './App.css';
+
+const Kitchen = lazy(() => import('../scenes/Kitchen/Kitchen.jsx'));
 
 const worlds = [
   { id: 'room', name: 'The Room', sub: 'Seu pequeno refúgio', icon: 'room' },
@@ -36,14 +39,18 @@ const worlds = [
   },
   { id: 'float', name: 'Let It Float', sub: 'Um respiro, um recomeço', icon: 'boat' },
   { id: 'memory', name: 'The Memory Corner', sub: 'A Place for What Matters', icon: 'memory' },
+  { id: 'kitchen', name: 'The Cozy Kitchen', sub: 'Uma receita para focar no seu ritmo', icon: 'kitchen' },
 ];
 
 export default function App() {
   const { preferences, setPreference, ready, storageError } = usePreferences();
   const reducedMotion = useReducedMotion();
   const [world, setWorld] = useState('room');
+  // Personal letters and recipients stay in this session unless explicitly saved.
+  const bouquetSessionRef = useRef(null);
   const gardenState = useGarden({ active: world === 'garden' });
   const memory = useMemoryBoard({ active: world === 'memory' });
+  const kitchenState = useKitchen({ active: world === 'kitchen' });
   const [pendingWorld, setPendingWorld] = useState(null);
   const [ritual, dispatch] = useReducer(ritualReducer, initialRitual);
   const [audioActive, setAudioActive] = useState(false);
@@ -69,11 +76,12 @@ export default function App() {
   const selected = worlds.find((item) => item.id === world);
   const suggestedPreset = world === 'journey' ? 'peaceful-journey'
     : world === 'garden' ? gardenState.garden.atmosphere === 'night' ? 'quiet-night' : 'morning-garden'
+      : world === 'kitchen' ? 'cozy-kitchen'
       : 'rainy-evening';
-  const atmosphereKey = world === 'memory' ? 'memory' : world === 'garden' ? `garden:${gardenState.garden.atmosphere}:${gardenState.garden.weather}`
+  const atmosphereKey = world === 'kitchen' ? 'kitchen' : world === 'memory' ? 'memory' : world === 'garden' ? `garden:${gardenState.garden.atmosphere}:${gardenState.garden.weather}`
     : world === 'journey' ? `journey:${journeyScenery}:${journeyRainOn}` : `room:${preferences.rainOn}`;
   const weather =
-    world === 'memory' ? { icon: 'memory', label: 'Lembranças por perto' } : world === 'garden' ? {
+    world === 'kitchen' ? { icon: 'kitchen', label: 'Boas coisas levam tempo' } : world === 'memory' ? { icon: 'memory', label: 'Lembranças por perto' } : world === 'garden' ? {
       icon: gardenState.garden.weather === 'rain' ? 'rain' : gardenState.garden.atmosphere === 'night' ? 'moon' : 'sunset',
       label: `${gardenState.garden.atmosphere === 'night' ? 'Noite tranquila' : gardenState.garden.atmosphere === 'sunset' ? 'Pôr do sol' : 'Dia ensolarado'}${gardenState.garden.weather === 'rain' ? ' · Chuva suave' : ''}`,
     } : world === 'journey'
@@ -112,6 +120,9 @@ export default function App() {
     };
   }, []);
   useEffect(() => {
+    audio.current?.setScene(world);
+  }, [world]);
+  useEffect(() => {
     audio.current?.setVolume(preferences.volume);
     audio.current?.setMix(preferences.mixer);
   }, [preferences.volume, preferences.mixer]);
@@ -128,7 +139,7 @@ export default function App() {
       const next = createPresetMix(suggestedPreset, current);
       if (world === 'garden') next.layers['rain-soft'].enabled = gardenState.garden.weather === 'rain';
       else if (world === 'journey') next.layers['rain-window'].enabled = journeyScenery === 'rainy-night' && journeyRainOn;
-      else next.layers['rain-soft'].enabled = preferences.rainOn;
+      else if (world !== 'kitchen') next.layers['rain-soft'].enabled = preferences.rainOn;
       return next;
     });
   }, [ready, atmosphereKey, suggestedPreset, world, gardenState.garden.weather, journeyScenery, journeyRainOn, preferences.rainOn, setPreference]);
@@ -378,6 +389,12 @@ export default function App() {
               />
             ) : world === 'memory' ? (
               <MemoryCorner memory={memory} reducedMotion={reducedMotion} onBack={() => moveTo('room')} />
+            ) : world === 'kitchen' ? (
+              <Suspense fallback={<div className="loading-room">Abrindo sua cozinha…</div>}>
+                <Kitchen kitchenState={kitchenState} companion={companion} reducedMotion={reducedMotion}
+                  onBack={() => moveTo('room')} onSoundEffect={(kind) => audio.current?.playKitchenEffect(kind)}
+                  onCompletionSound={() => audio.current?.playKitchenEffect('completion')} />
+              </Suspense>
             ) : world === 'float' ? (
               <LetItFloat
                 ritual={ritual}
@@ -386,7 +403,7 @@ export default function App() {
                 onBack={() => moveTo('room')}
               />
             ) : (
-              <Garden gardenState={gardenState} reducedMotion={reducedMotion} onBack={() => moveTo('room')} companion={companion} />
+              <Garden gardenState={gardenState} reducedMotion={reducedMotion} onBack={() => moveTo('room')} companion={companion} bouquetSessionRef={bouquetSessionRef} />
             )}
           </div>
           <div className="scene-bottom">
@@ -402,6 +419,8 @@ export default function App() {
                 </>
               ) : world === 'memory' ? (
                 <><Icon name="memory" size={13} /> Algumas lembranças merecem um lugar por perto. Fotografias e bilhetes ficam neste dispositivo.</>
+              ) : world === 'kitchen' ? (
+                <><Icon name="kitchen" size={13} /> Escolha uma receita ou apenas fique por aqui. Os tempos são simbólicos para foco.</>
               ) : world === 'float' ? (
                 <>
                   <Icon name="lock" size={13} /> Seu texto fica apenas nesta sessão e é descartado
@@ -449,6 +468,8 @@ export default function App() {
                 <span>
                   {item.name}
                   {item.planned && <small>em breve</small>}
+                  {item.id === 'kitchen' && world !== 'kitchen' && kitchenState.kitchen?.session?.status === 'completed'
+                    && kitchenState.kitchen.session.presentation === 'pending' && <small className="kitchen-ready-note">Receita pronta</small>}
                 </span>
                 {world === item.id && <span className="selected-dot" />}
               </button>
@@ -476,7 +497,7 @@ export default function App() {
         onChange={(value) => setPreference('companion', value)} onClose={closeCompanion} />}
       {mixerOpen && <SoundMixer mix={preferences.mixer} volume={preferences.volume} active={audioActive}
         status={audioStatus} notice={audioNotice || audioStatus.error} suggestion={suggestedPreset}
-        target={fullscreenTarget || document.body} onClose={closeMixer} onStart={toggleAudio}
+        target={fullscreenTarget || document.body} scene={world} onClose={closeMixer} onStart={toggleAudio}
         onPreset={selectPreset} onLayer={changeLayer} onVolume={(value) => setPreference('volume', value)}
         onMute={() => setPreference('mixer', (current) => ({ ...current, muted: !current.muted }))} />}
       {pendingWorld && (

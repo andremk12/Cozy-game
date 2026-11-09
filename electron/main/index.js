@@ -1,8 +1,10 @@
-import { app, BrowserWindow, dialog, ipcMain, session, shell } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, nativeImage, powerMonitor, session, shell } from 'electron';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { PreferencesStore } from '../services/preferences.js';
 import { GardenStore } from '../services/garden.js';
+import { BouquetStore, registerBouquets } from '../services/bouquets.js';
+import { KitchenStore } from '../services/kitchen.js';
 import { MemoryCornerStore } from '../services/memoryCorner.js';
 import { registerDeveloperContacts } from '../services/developerContacts.js';
 import { lockDesktopInstance } from '../services/singleInstance.js';
@@ -19,6 +21,8 @@ const expectedPage = developmentUrl ? `${developmentUrl}/` : pathToFileURL(entry
 let window;
 let preferences;
 let garden;
+let bouquets;
+let kitchen;
 let memory;
 let quitting = false;
 
@@ -110,6 +114,8 @@ async function createWindow() {
   window.on('page-title-updated', (event) => event.preventDefault());
   window.once('ready-to-show', () => window?.show());
   window.on('closed', () => { window = undefined; });
+  window.on('restore', () => { void kitchen?.get().catch(() => {}); });
+  window.on('focus', () => { void kitchen?.get().catch(() => {}); });
   if (developmentUrl) await window.loadURL(expectedPage);
   else await window.loadFile(entryFile);
 }
@@ -117,12 +123,16 @@ async function createWindow() {
 if (primaryInstance) app.whenReady().then(async () => {
   preferences = new PreferencesStore(path.join(app.getPath('userData'), 'preferences.json'));
   garden = new GardenStore(path.join(app.getPath('userData'), 'garden.json'));
+  bouquets = new BouquetStore(path.join(app.getPath('userData'), 'bouquet-draft.json'));
+  kitchen = new KitchenStore(path.join(app.getPath('userData'), 'kitchen.json'));
   memory = new MemoryCornerStore(path.join(app.getPath('userData'), 'memory-corner'), { decodeImage: decodeMemoryImage });
   await preferences.get();
   protectSession();
   registerMemoryCorner({ ipcMain, session: session.defaultSession, dialog, store: memory,
     verifySender, getWindow: () => window });
   registerDeveloperContacts({ ipcMain, verifySender, openExternal: (destination) => shell.openExternal(destination) });
+  registerBouquets({ ipcMain, verifySender, store: bouquets, dialog, getWindow: () => window,
+    openExternal: (destination) => shell.openExternal(destination), decodeImage: (bytes) => nativeImage.createFromBuffer(bytes) });
   ipcMain.handle('haven:preferences:get', async (event) => {
     verifySender(event);
     return preferences.get();
@@ -139,6 +149,24 @@ if (primaryInstance) app.whenReady().then(async () => {
     verifySender(event);
     return garden.save(value);
   });
+  ipcMain.handle('haven:kitchen:get', async (event, ...args) => {
+    verifySender(event);
+    if (args.length) throw new TypeError('Unexpected kitchen arguments.');
+    return kitchen.get();
+  });
+  ipcMain.handle('haven:kitchen:command', async (event, ...args) => {
+    verifySender(event);
+    if (args.length !== 1) throw new TypeError('Invalid kitchen command.');
+    return kitchen.command(args[0]);
+  });
+  kitchen.subscribe((snapshot) => {
+    const contents = window?.webContents;
+    if (contents && !contents.isDestroyed() && contents.mainFrame.url === expectedPage) {
+      contents.send('haven:kitchen:changed', snapshot);
+    }
+  });
+  powerMonitor.on('suspend', () => { void kitchen.suspend().catch(() => {}); });
+  powerMonitor.on('resume', () => { void kitchen.resume().catch(() => {}); });
   await createWindow();
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow().catch(showStartupError);
@@ -156,6 +184,6 @@ app.on('before-quit', (event) => {
   if (!preferences || quitting) return;
   event.preventDefault();
   quitting = true;
-  Promise.allSettled([preferences.flush(), garden?.flush(), memory?.flush()])
-    .then(() => memory?.cleanup?.()).catch(() => {}).finally(() => app.quit());
+  Promise.allSettled([preferences.flush(), garden?.flush(), bouquets?.flush(), memory?.flush(), kitchen?.flush()])
+    .then(() => { kitchen?.dispose(); return memory?.cleanup?.(); }).catch(() => {}).finally(() => app.quit());
 });

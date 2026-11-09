@@ -20,7 +20,9 @@
     "test:e2e": "npm run build && playwright test",
     "test:desktop": "node scripts/desktop-smoke.mjs",
     "test:memory": "node scripts/memory-smoke.mjs",
-    "package:win": "npm run build && electron-builder --win portable --x64"
+    "package:win": "npm run build && electron-builder --win portable --x64 --publish never",
+    "package:win:signed": "npm run build && electron-builder --win portable --x64 --publish never --config.forceCodeSigning=true --config.directories.output=outputs/desktop-signed && npm run verify:win -- -OutputDirectory outputs/desktop-signed -RequireSignature",
+    "verify:win": "powershell -NoProfile -File scripts/verify-windows-artifacts.ps1"
   },
   "dependencies": {
     "@fontsource/dm-sans": "5.3.0",
@@ -52,7 +54,14 @@
     ],
     "win": {
       "icon": "public/assets/icons/haven.ico",
-      "target": "portable"
+      "target": "portable",
+      "requestedExecutionLevel": "asInvoker",
+      "signtoolOptions": {
+        "signingHashAlgorithms": ["sha256"]
+      }
+    },
+    "portable": {
+      "requestExecutionLevel": "user"
     },
     "artifactName": "Little-Haven-${version}-${arch}.${ext}"
   }

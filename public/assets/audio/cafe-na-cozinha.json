@@ -1,0 +1,1391 @@
+{
+  "id": "cafe-na-cozinha",
+  "title": "Café na Cozinha",
+  "file": "cafe-na-cozinha.ogg",
+  "bytes": 2977767,
+  "sha256": "eaf9871f5d9501df3062b433bf191b16739680364c6989b34aed06d2c03474d7",
+  "format": "Ogg Opus",
+  "targetBitrate": 112000,
+  "sourceSampleRate": 24000,
+  "bpm": 80,
+  "timeSignature": "4/4",
+  "bars": 64,
+  "source": "Original score and original additive/physical-style instrument synthesis; no third-party samples.",
+  "license": "Project original material; same distribution terms as Little Haven. No third-party audio license.",
+  "loop": "Exact 64-bar circular render; source/reverb tails wrap; Opus pre-skip and end granule respected. Do not shorten with prepareLoop().",
+  "measurements": {
+    "duration": 192,
+    "sampleRate": 48000,
+    "channels": 2,
+    "peak": 0.2038513869047165,
+    "rms": 0.03365814250486967,
+    "stereoDifferenceRms": 0.006886878113663098,
+    "seamSampleDelta": [
+      0.00044786278158426285,
+      0.0012559620663523674
+    ],
+    "barRmsMin": 0.023765769147969556,
+    "barRmsMax": 0.041115675524700884
+  },
+  "score": [
+    {
+      "bar": 1,
+      "section": "Janela da manhã",
+      "chord": "Fmaj9",
+      "melody": [
+        {
+          "beat": 1,
+          "midi": 69,
+          "beats": 1
+        },
+        {
+          "beat": 2.5,
+          "midi": 67,
+          "beats": 0.5
+        }
+      ]
+    },
+    {
+      "bar": 2,
+      "section": "Janela da manhã",
+      "chord": "Dm9",
+      "melody": [
+        {
+          "beat": 0.5,
+          "midi": 65,
+          "beats": 1
+        },
+        {
+          "beat": 2.5,
+          "midi": 64,
+          "beats": 0.75
+        }
+      ]
+    },
+    {
+      "bar": 3,
+      "section": "Janela da manhã",
+      "chord": "Gm9",
+      "melody": [
+        {
+          "beat": 1,
+          "midi": 65,
+          "beats": 0.5
+        },
+        {
+          "beat": 2,
+          "midi": 69,
+          "beats": 1
+        }
+      ]
+    },
+    {
+      "bar": 4,
+      "section": "Janela da manhã",
+      "chord": "C13",
+      "melody": [
+        {
+          "beat": 1.5,
+          "midi": 67,
+          "beats": 1
+        },
+        {
+          "beat": 3,
+          "midi": 64,
+          "beats": 0.5
+        }
+      ]
+    },
+    {
+      "bar": 5,
+      "section": "Janela da manhã",
+      "chord": "Am9",
+      "melody": [
+        {
+          "beat": 0.5,
+          "midi": 67,
+          "beats": 1
+        },
+        {
+          "beat": 2,
+          "midi": 64,
+          "beats": 0.75
+        }
+      ]
+    },
+    {
+      "bar": 6,
+      "section": "Janela da manhã",
+      "chord": "D13",
+      "melody": [
+        {
+          "beat": 1,
+          "midi": 66,
+          "beats": 1
+        },
+        {
+          "beat": 3,
+          "midi": 64,
+          "beats": 0.5
+        }
+      ]
+    },
+    {
+      "bar": 7,
+      "section": "Janela da manhã",
+      "chord": "Gm9",
+      "melody": [
+        {
+          "beat": 1,
+          "midi": 62,
+          "beats": 0.75
+        },
+        {
+          "beat": 2.5,
+          "midi": 65,
+          "beats": 1
+        }
+      ]
+    },
+    {
+      "bar": 8,
+      "section": "Janela da manhã",
+      "chord": "C13",
+      "melody": [
+        {
+          "beat": 1.5,
+          "midi": 64,
+          "beats": 1
+        },
+        {
+          "beat": 3,
+          "midi": 67,
+          "beats": 0.5
+        }
+      ]
+    },
+    {
+      "bar": 9,
+      "section": "Café na mesa",
+      "chord": "Fmaj9",
+      "melody": [
+        {
+          "beat": 0.5,
+          "midi": 69,
+          "beats": 0.75
+        },
+        {
+          "beat": 1.5,
+          "midi": 72,
+          "beats": 0.5
+        },
+        {
+          "beat": 2.5,
+          "midi": 71,
+          "beats": 0.5
+        },
+        {
+          "beat": 3.25,
+          "midi": 69,
+          "beats": 0.5
+        }
+      ]
+    },
+    {
+      "bar": 10,
+      "section": "Café na mesa",
+      "chord": "Dm9",
+      "melody": [
+        {
+          "beat": 0.5,
+          "midi": 69,
+          "beats": 0.5
+        },
+        {
+          "beat": 1.5,
+          "midi": 65,
+          "beats": 0.75
+        },
+        {
+          "beat": 2.75,
+          "midi": 64,
+          "beats": 0.75
+        }
+      ]
+    },
+    {
+      "bar": 11,
+      "section": "Café na mesa",
+      "chord": "Gm9",
+      "melody": [
+        {
+          "beat": 0,
+          "midi": 65,
+          "beats": 0.75
+        },
+        {
+          "beat": 1.25,
+          "midi": 69,
+          "beats": 0.5
+        },
+        {
+          "beat": 2,
+          "midi": 70,
+          "beats": 0.75
+        },
+        {
+          "beat": 3.25,
+          "midi": 69,
+          "beats": 0.5
+        }
+      ]
+    },
+    {
+      "bar": 12,
+      "section": "Café na mesa",
+      "chord": "C13",
+      "melody": [
+        {
+          "beat": 0.5,
+          "midi": 67,
+          "beats": 1
+        },
+        {
+          "beat": 2,
+          "midi": 64,
+          "beats": 0.75
+        },
+        {
+          "beat": 3.25,
+          "midi": 62,
+          "beats": 0.5
+        }
+      ]
+    },
+    {
+      "bar": 13,
+      "section": "Café na mesa",
+      "chord": "Am9",
+      "melody": [
+        {
+          "beat": 0.5,
+          "midi": 64,
+          "beats": 0.5
+        },
+        {
+          "beat": 1.5,
+          "midi": 67,
+          "beats": 0.5
+        },
+        {
+          "beat": 2.25,
+          "midi": 71,
+          "beats": 1
+        }
+      ]
+    },
+    {
+      "bar": 14,
+      "section": "Café na mesa",
+      "chord": "D13",
+      "melody": [
+        {
+          "beat": 0.5,
+          "midi": 69,
+          "beats": 0.5
+        },
+        {
+          "beat": 1.25,
+          "midi": 66,
+          "beats": 0.75
+        },
+        {
+          "beat": 2.5,
+          "midi": 64,
+          "beats": 0.75
+        }
+      ]
+    },
+    {
+      "bar": 15,
+      "section": "Café na mesa",
+      "chord": "Gm9",
+      "melody": [
+        {
+          "beat": 0,
+          "midi": 65,
+          "beats": 0.75
+        },
+        {
+          "beat": 1.5,
+          "midi": 62,
+          "beats": 0.75
+        },
+        {
+          "beat": 2.75,
+          "midi": 69,
+          "beats": 0.75
+        }
+      ]
+    },
+    {
+      "bar": 16,
+      "section": "Café na mesa",
+      "chord": "C13",
+      "melody": [
+        {
+          "beat": 0.5,
+          "midi": 67,
+          "beats": 0.75
+        },
+        {
+          "beat": 1.75,
+          "midi": 64,
+          "beats": 0.5
+        },
+        {
+          "beat": 3,
+          "midi": 67,
+          "beats": 0.5
+        }
+      ]
+    },
+    {
+      "bar": 17,
+      "section": "Uma conversa sem palavras",
+      "chord": "Fmaj9",
+      "melody": [
+        {
+          "beat": 0.75,
+          "midi": 72,
+          "beats": 1
+        },
+        {
+          "beat": 2.25,
+          "midi": 69,
+          "beats": 0.5
+        },
+        {
+          "beat": 3,
+          "midi": 67,
+          "beats": 0.5
+        }
+      ]
+    },
+    {
+      "bar": 18,
+      "section": "Uma conversa sem palavras",
+      "chord": "Dm9",
+      "melody": [
+        {
+          "beat": 0.5,
+          "midi": 69,
+          "beats": 0.75
+        },
+        {
+          "beat": 1.75,
+          "midi": 72,
+          "beats": 0.5
+        },
+        {
+          "beat": 2.75,
+          "midi": 76,
+          "beats": 0.75
+        }
+      ]
+    },
+    {
+      "bar": 19,
+      "section": "Uma conversa sem palavras",
+      "chord": "Gm9",
+      "melody": [
+        {
+          "beat": 0.75,
+          "midi": 74,
+          "beats": 0.5
+        },
+        {
+          "beat": 1.75,
+          "midi": 70,
+          "beats": 0.75
+        },
+        {
+          "beat": 3,
+          "midi": 69,
+          "beats": 0.5
+        }
+      ]
+    },
+    {
+      "bar": 20,
+      "section": "Uma conversa sem palavras",
+      "chord": "C13",
+      "melody": [
+        {
+          "beat": 0,
+          "midi": 72,
+          "beats": 0.5
+        },
+        {
+          "beat": 1,
+          "midi": 69,
+          "beats": 1
+        },
+        {
+          "beat": 2.5,
+          "midi": 67,
+          "beats": 0.75
+        }
+      ]
+    },
+    {
+      "bar": 21,
+      "section": "Uma conversa sem palavras",
+      "chord": "Am9",
+      "melody": [
+        {
+          "beat": 0.5,
+          "midi": 71,
+          "beats": 0.75
+        },
+        {
+          "beat": 1.75,
+          "midi": 72,
+          "beats": 0.5
+        },
+        {
+          "beat": 2.75,
+          "midi": 76,
+          "beats": 0.75
+        }
+      ]
+    },
+    {
+      "bar": 22,
+      "section": "Uma conversa sem palavras",
+      "chord": "D13",
+      "melody": [
+        {
+          "beat": 0.25,
+          "midi": 74,
+          "beats": 1
+        },
+        {
+          "beat": 1.75,
+          "midi": 71,
+          "beats": 0.75
+        },
+        {
+          "beat": 3,
+          "midi": 69,
+          "beats": 0.5
+        }
+      ]
+    },
+    {
+      "bar": 23,
+      "section": "Uma conversa sem palavras",
+      "chord": "Gm9",
+      "melody": [
+        {
+          "beat": 0.75,
+          "midi": 69,
+          "beats": 0.5
+        },
+        {
+          "beat": 1.5,
+          "midi": 65,
+          "beats": 0.75
+        },
+        {
+          "beat": 2.75,
+          "midi": 62,
+          "beats": 0.75
+        }
+      ]
+    },
+    {
+      "bar": 24,
+      "section": "Uma conversa sem palavras",
+      "chord": "C13",
+      "melody": [
+        {
+          "beat": 0.5,
+          "midi": 64,
+          "beats": 1
+        },
+        {
+          "beat": 2.25,
+          "midi": 67,
+          "beats": 0.5
+        },
+        {
+          "beat": 3.25,
+          "midi": 69,
+          "beats": 0.5
+        }
+      ]
+    },
+    {
+      "bar": 25,
+      "section": "Luz na bancada",
+      "chord": "Bbmaj9",
+      "melody": [
+        {
+          "beat": 0.5,
+          "midi": 74,
+          "beats": 0.75
+        },
+        {
+          "beat": 1.75,
+          "midi": 72,
+          "beats": 0.5
+        },
+        {
+          "beat": 3,
+          "midi": 69,
+          "beats": 0.75
+        }
+      ]
+    },
+    {
+      "bar": 26,
+      "section": "Luz na bancada",
+      "chord": "Bdim7",
+      "melody": [
+        {
+          "beat": 0.75,
+          "midi": 71,
+          "beats": 0.75
+        },
+        {
+          "beat": 2,
+          "midi": 68,
+          "beats": 0.5
+        },
+        {
+          "beat": 3,
+          "midi": 65,
+          "beats": 0.5
+        }
+      ]
+    },
+    {
+      "bar": 27,
+      "section": "Luz na bancada",
+      "chord": "Am9",
+      "melody": [
+        {
+          "beat": 0.5,
+          "midi": 67,
+          "beats": 0.5
+        },
+        {
+          "beat": 1.5,
+          "midi": 71,
+          "beats": 0.75
+        },
+        {
+          "beat": 2.75,
+          "midi": 72,
+          "beats": 0.75
+        }
+      ]
+    },
+    {
+      "bar": 28,
+      "section": "Luz na bancada",
+      "chord": "D13",
+      "melody": [
+        {
+          "beat": 0.5,
+          "midi": 74,
+          "beats": 1
+        },
+        {
+          "beat": 2,
+          "midi": 71,
+          "beats": 0.5
+        },
+        {
+          "beat": 3,
+          "midi": 66,
+          "beats": 0.5
+        }
+      ]
+    },
+    {
+      "bar": 29,
+      "section": "Luz na bancada",
+      "chord": "Gm9",
+      "melody": [
+        {
+          "beat": 0.75,
+          "midi": 70,
+          "beats": 0.75
+        },
+        {
+          "beat": 2,
+          "midi": 69,
+          "beats": 0.5
+        },
+        {
+          "beat": 3,
+          "midi": 65,
+          "beats": 0.5
+        }
+      ]
+    },
+    {
+      "bar": 30,
+      "section": "Luz na bancada",
+      "chord": "C13",
+      "melody": [
+        {
+          "beat": 0.5,
+          "midi": 64,
+          "beats": 0.75
+        },
+        {
+          "beat": 1.75,
+          "midi": 67,
+          "beats": 0.75
+        },
+        {
+          "beat": 3,
+          "midi": 69,
+          "beats": 0.5
+        }
+      ]
+    },
+    {
+      "bar": 31,
+      "section": "Luz na bancada",
+      "chord": "Fmaj9",
+      "melody": [
+        {
+          "beat": 0.5,
+          "midi": 72,
+          "beats": 1
+        },
+        {
+          "beat": 2,
+          "midi": 69,
+          "beats": 0.75
+        },
+        {
+          "beat": 3.25,
+          "midi": 67,
+          "beats": 0.5
+        }
+      ]
+    },
+    {
+      "bar": 32,
+      "section": "Luz na bancada",
+      "chord": "C13",
+      "melody": [
+        {
+          "beat": 0.75,
+          "midi": 64,
+          "beats": 0.75
+        },
+        {
+          "beat": 2,
+          "midi": 62,
+          "beats": 0.5
+        },
+        {
+          "beat": 3,
+          "midi": 67,
+          "beats": 0.5
+        }
+      ]
+    },
+    {
+      "bar": 33,
+      "section": "O perfume do café",
+      "chord": "Bbmaj9",
+      "melody": [
+        {
+          "beat": 0.5,
+          "midi": 69,
+          "beats": 0.5
+        },
+        {
+          "beat": 1.25,
+          "midi": 72,
+          "beats": 0.75
+        },
+        {
+          "beat": 2.5,
+          "midi": 74,
+          "beats": 0.5
+        },
+        {
+          "beat": 3.25,
+          "midi": 72,
+          "beats": 0.5
+        }
+      ]
+    },
+    {
+      "bar": 34,
+      "section": "O perfume do café",
+      "chord": "Bdim7",
+      "melody": [
+        {
+          "beat": 0.5,
+          "midi": 71,
+          "beats": 0.75
+        },
+        {
+          "beat": 1.75,
+          "midi": 68,
+          "beats": 0.5
+        },
+        {
+          "beat": 2.75,
+          "midi": 65,
+          "beats": 0.75
+        }
+      ]
+    },
+    {
+      "bar": 35,
+      "section": "O perfume do café",
+      "chord": "Am9",
+      "melody": [
+        {
+          "beat": 0.5,
+          "midi": 64,
+          "beats": 0.75
+        },
+        {
+          "beat": 1.75,
+          "midi": 67,
+          "beats": 0.5
+        },
+        {
+          "beat": 2.75,
+          "midi": 71,
+          "beats": 0.75
+        }
+      ]
+    },
+    {
+      "bar": 36,
+      "section": "O perfume do café",
+      "chord": "D13",
+      "melody": [
+        {
+          "beat": 0.5,
+          "midi": 69,
+          "beats": 1
+        },
+        {
+          "beat": 2,
+          "midi": 66,
+          "beats": 0.5
+        },
+        {
+          "beat": 3.25,
+          "midi": 64,
+          "beats": 0.5
+        }
+      ]
+    },
+    {
+      "bar": 37,
+      "section": "O perfume do café",
+      "chord": "Gm9",
+      "melody": [
+        {
+          "beat": 0.75,
+          "midi": 65,
+          "beats": 0.5
+        },
+        {
+          "beat": 1.5,
+          "midi": 69,
+          "beats": 0.75
+        },
+        {
+          "beat": 2.75,
+          "midi": 70,
+          "beats": 0.5
+        }
+      ]
+    },
+    {
+      "bar": 38,
+      "section": "O perfume do café",
+      "chord": "C13",
+      "melody": [
+        {
+          "beat": 0.5,
+          "midi": 69,
+          "beats": 0.5
+        },
+        {
+          "beat": 1.5,
+          "midi": 67,
+          "beats": 0.75
+        },
+        {
+          "beat": 2.75,
+          "midi": 64,
+          "beats": 0.75
+        }
+      ]
+    },
+    {
+      "bar": 39,
+      "section": "O perfume do café",
+      "chord": "Fmaj9",
+      "melody": [
+        {
+          "beat": 0.5,
+          "midi": 67,
+          "beats": 0.75
+        },
+        {
+          "beat": 1.75,
+          "midi": 69,
+          "beats": 1
+        }
+      ]
+    },
+    {
+      "bar": 40,
+      "section": "O perfume do café",
+      "chord": "C13",
+      "melody": [
+        {
+          "beat": 0.75,
+          "midi": 67,
+          "beats": 0.75
+        },
+        {
+          "beat": 2.25,
+          "midi": 64,
+          "beats": 0.5
+        },
+        {
+          "beat": 3.25,
+          "midi": 67,
+          "beats": 0.5
+        }
+      ]
+    },
+    {
+      "bar": 41,
+      "section": "De volta à mesa",
+      "chord": "Fmaj9",
+      "melody": [
+        {
+          "beat": 0.5,
+          "midi": 69,
+          "beats": 0.75
+        },
+        {
+          "beat": 1.5,
+          "midi": 72,
+          "beats": 0.5
+        },
+        {
+          "beat": 2.5,
+          "midi": 67,
+          "beats": 0.5
+        },
+        {
+          "beat": 3.25,
+          "midi": 69,
+          "beats": 0.5
+        }
+      ]
+    },
+    {
+      "bar": 42,
+      "section": "De volta à mesa",
+      "chord": "Dm9",
+      "melody": [
+        {
+          "beat": 0.5,
+          "midi": 69,
+          "beats": 0.5
+        },
+        {
+          "beat": 1.5,
+          "midi": 65,
+          "beats": 0.75
+        },
+        {
+          "beat": 2.75,
+          "midi": 64,
+          "beats": 0.75
+        }
+      ]
+    },
+    {
+      "bar": 43,
+      "section": "De volta à mesa",
+      "chord": "Gm9",
+      "melody": [
+        {
+          "beat": 0,
+          "midi": 65,
+          "beats": 0.75
+        },
+        {
+          "beat": 1.25,
+          "midi": 69,
+          "beats": 0.5
+        },
+        {
+          "beat": 2,
+          "midi": 70,
+          "beats": 0.75
+        },
+        {
+          "beat": 3.25,
+          "midi": 69,
+          "beats": 0.5
+        }
+      ]
+    },
+    {
+      "bar": 44,
+      "section": "De volta à mesa",
+      "chord": "C13",
+      "melody": [
+        {
+          "beat": 0.5,
+          "midi": 67,
+          "beats": 1
+        },
+        {
+          "beat": 2,
+          "midi": 64,
+          "beats": 0.75
+        },
+        {
+          "beat": 3.25,
+          "midi": 62,
+          "beats": 0.5
+        }
+      ]
+    },
+    {
+      "bar": 45,
+      "section": "De volta à mesa",
+      "chord": "Am9",
+      "melody": [
+        {
+          "beat": 0.5,
+          "midi": 64,
+          "beats": 0.5
+        },
+        {
+          "beat": 1.5,
+          "midi": 67,
+          "beats": 0.5
+        },
+        {
+          "beat": 2.25,
+          "midi": 71,
+          "beats": 1
+        }
+      ]
+    },
+    {
+      "bar": 46,
+      "section": "De volta à mesa",
+      "chord": "D13",
+      "melody": [
+        {
+          "beat": 0.5,
+          "midi": 69,
+          "beats": 0.5
+        },
+        {
+          "beat": 1.25,
+          "midi": 66,
+          "beats": 0.75
+        },
+        {
+          "beat": 2.5,
+          "midi": 64,
+          "beats": 0.75
+        }
+      ]
+    },
+    {
+      "bar": 47,
+      "section": "De volta à mesa",
+      "chord": "Gm9",
+      "melody": [
+        {
+          "beat": 0,
+          "midi": 65,
+          "beats": 0.75
+        },
+        {
+          "beat": 1.5,
+          "midi": 62,
+          "beats": 0.75
+        },
+        {
+          "beat": 2.75,
+          "midi": 69,
+          "beats": 0.75
+        }
+      ]
+    },
+    {
+      "bar": 48,
+      "section": "De volta à mesa",
+      "chord": "C13",
+      "melody": [
+        {
+          "beat": 0.5,
+          "midi": 67,
+          "beats": 0.75
+        },
+        {
+          "beat": 1.75,
+          "midi": 64,
+          "beats": 0.5
+        },
+        {
+          "beat": 3,
+          "midi": 67,
+          "beats": 0.5
+        }
+      ]
+    },
+    {
+      "bar": 49,
+      "section": "Um pouco de silêncio",
+      "chord": "Bbmaj9",
+      "melody": [
+        {
+          "beat": 0.75,
+          "midi": 72,
+          "beats": 1
+        },
+        {
+          "beat": 3,
+          "midi": 77,
+          "beats": 0.5
+        }
+      ]
+    },
+    {
+      "bar": 50,
+      "section": "Um pouco de silêncio",
+      "chord": "Bdim7",
+      "melody": [
+        {
+          "beat": 0.5,
+          "midi": 71,
+          "beats": 0.75
+        },
+        {
+          "beat": 2.75,
+          "midi": 77,
+          "beats": 0.75
+        }
+      ]
+    },
+    {
+      "bar": 51,
+      "section": "Um pouco de silêncio",
+      "chord": "Am9",
+      "melody": [
+        {
+          "beat": 0.75,
+          "midi": 71,
+          "beats": 0.5
+        },
+        {
+          "beat": 3,
+          "midi": 76,
+          "beats": 0.5
+        }
+      ]
+    },
+    {
+      "bar": 52,
+      "section": "Um pouco de silêncio",
+      "chord": "D13",
+      "melody": [
+        {
+          "beat": 0,
+          "midi": 72,
+          "beats": 0.5
+        },
+        {
+          "beat": 2.5,
+          "midi": 83,
+          "beats": 0.75
+        }
+      ]
+    },
+    {
+      "bar": 53,
+      "section": "Um pouco de silêncio",
+      "chord": "Gm9",
+      "melody": [
+        {
+          "beat": 0.5,
+          "midi": 74,
+          "beats": 0.75
+        },
+        {
+          "beat": 2.75,
+          "midi": 81,
+          "beats": 0.75
+        }
+      ]
+    },
+    {
+      "bar": 54,
+      "section": "Um pouco de silêncio",
+      "chord": "C13",
+      "melody": [
+        {
+          "beat": 0.25,
+          "midi": 74,
+          "beats": 1
+        },
+        {
+          "beat": 3,
+          "midi": 81,
+          "beats": 0.5
+        }
+      ]
+    },
+    {
+      "bar": 55,
+      "section": "Um pouco de silêncio",
+      "chord": "Fmaj9",
+      "melody": [
+        {
+          "beat": 0.75,
+          "midi": 72,
+          "beats": 0.5
+        },
+        {
+          "beat": 2.75,
+          "midi": 79,
+          "beats": 0.75
+        }
+      ]
+    },
+    {
+      "bar": 56,
+      "section": "Um pouco de silêncio",
+      "chord": "C13",
+      "melody": [
+        {
+          "beat": 0.5,
+          "midi": 74,
+          "beats": 1
+        },
+        {
+          "beat": 3.25,
+          "midi": 81,
+          "beats": 0.5
+        }
+      ]
+    },
+    {
+      "bar": 57,
+      "section": "A manhã continua",
+      "chord": "Fmaj9",
+      "melody": [
+        {
+          "beat": 0.5,
+          "midi": 69,
+          "beats": 0.75
+        },
+        {
+          "beat": 1.5,
+          "midi": 72,
+          "beats": 0.5
+        },
+        {
+          "beat": 2.5,
+          "midi": 71,
+          "beats": 0.5
+        },
+        {
+          "beat": 3.25,
+          "midi": 69,
+          "beats": 0.5
+        }
+      ]
+    },
+    {
+      "bar": 58,
+      "section": "A manhã continua",
+      "chord": "Dm9",
+      "melody": [
+        {
+          "beat": 0.5,
+          "midi": 69,
+          "beats": 0.5
+        },
+        {
+          "beat": 1.5,
+          "midi": 65,
+          "beats": 0.75
+        },
+        {
+          "beat": 2.75,
+          "midi": 64,
+          "beats": 0.75
+        }
+      ]
+    },
+    {
+      "bar": 59,
+      "section": "A manhã continua",
+      "chord": "Gm9",
+      "melody": [
+        {
+          "beat": 0,
+          "midi": 65,
+          "beats": 0.75
+        },
+        {
+          "beat": 1.25,
+          "midi": 69,
+          "beats": 0.5
+        },
+        {
+          "beat": 2,
+          "midi": 70,
+          "beats": 0.75
+        },
+        {
+          "beat": 3.25,
+          "midi": 69,
+          "beats": 0.5
+        }
+      ]
+    },
+    {
+      "bar": 60,
+      "section": "A manhã continua",
+      "chord": "C13",
+      "melody": [
+        {
+          "beat": 0.5,
+          "midi": 67,
+          "beats": 1
+        },
+        {
+          "beat": 2,
+          "midi": 64,
+          "beats": 0.75
+        },
+        {
+          "beat": 3.25,
+          "midi": 62,
+          "beats": 0.5
+        }
+      ]
+    },
+    {
+      "bar": 61,
+      "section": "A manhã continua",
+      "chord": "Am9",
+      "melody": [
+        {
+          "beat": 0.5,
+          "midi": 64,
+          "beats": 0.5
+        },
+        {
+          "beat": 1.5,
+          "midi": 67,
+          "beats": 0.5
+        },
+        {
+          "beat": 2.25,
+          "midi": 71,
+          "beats": 1
+        }
+      ]
+    },
+    {
+      "bar": 62,
+      "section": "A manhã continua",
+      "chord": "D13",
+      "melody": [
+        {
+          "beat": 0.5,
+          "midi": 69,
+          "beats": 0.5
+        },
+        {
+          "beat": 1.25,
+          "midi": 66,
+          "beats": 0.75
+        },
+        {
+          "beat": 2.5,
+          "midi": 64,
+          "beats": 0.75
+        }
+      ]
+    },
+    {
+      "bar": 63,
+      "section": "A manhã continua",
+      "chord": "Gm9",
+      "melody": [
+        {
+          "beat": 0,
+          "midi": 69,
+          "beats": 0.75
+        },
+        {
+          "beat": 1.5,
+          "midi": 67,
+          "beats": 0.75
+        },
+        {
+          "beat": 2.75,
+          "midi": 65,
+          "beats": 0.75
+        }
+      ]
+    },
+    {
+      "bar": 64,
+      "section": "A manhã continua",
+      "chord": "C13",
+      "melody": [
+        {
+          "beat": 0.5,
+          "midi": 67,
+          "beats": 0.75
+        },
+        {
+          "beat": 1.75,
+          "midi": 64,
+          "beats": 0.5
+        },
+        {
+          "beat": 3,
+          "midi": 67,
+          "beats": 0.5
+        }
+      ]
+    }
+  ],
+  "auditoryReview": "Pending human listening; these measurements do not certify timbre, comfort or naturalness."
+}

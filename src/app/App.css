@@ -463,6 +463,8 @@
   }
   .world-tabs {
     width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     justify-content: space-between;
     gap: 0;
   }
@@ -477,9 +479,15 @@
   .world-tab > span:not(.selected-dot) {
     text-align: center;
     line-height: 1.5;
+    flex-wrap: wrap;
+    justify-content: center;
   }
   .world-tab small {
     display: none;
+  }
+  .world-tab small.kitchen-ready-note {
+    display: inline;
+    font-size: 8px;
   }
   .selected-dot {
     display: none !important;

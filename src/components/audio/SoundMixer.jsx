@@ -10,11 +10,12 @@ import './SoundMixer.css';
 const GROUPS = [
   { id: 'weather', name: 'Weather', hint: 'Chuva & brisa', ids: ['rain-soft', 'rain-heavy', 'rain-window', 'wind'] },
   { id: 'nature', name: 'Nature', hint: 'Um pouco de ar livre', ids: ['leaves', 'birds', 'stream', 'crickets'] },
-  { id: 'cozy', name: 'Cozy', hint: 'Calor por perto', ids: ['fire'] },
+  { id: 'cozy', name: 'Cozy', hint: 'Calor por perto', ids: ['fire', 'kitchen-effects'] },
   { id: 'journey', name: 'Journey', hint: 'O caminho também é casa', ids: ['train-track', 'train-wheels', 'carriage'] },
+  { id: 'music', name: 'Música', hint: 'Café na Cozinha · instrumental original', ids: ['kitchen-music'] },
 ];
 
-export default function SoundMixer({ mix, volume, active, status, notice, suggestion, target,
+export default function SoundMixer({ mix, volume, active, status, notice, suggestion, target, scene,
   onClose, onStart, onPreset, onLayer, onVolume, onMute }) {
   const dialogRef = useRef(null);
   const [keyboardLocked, setKeyboardLocked] = useState(false);
@@ -105,7 +106,8 @@ export default function SoundMixer({ mix, volume, active, status, notice, sugges
               {group.ids.map((id) => {
                 const layer = AUDIO_LAYERS.find((item) => item.id === id);
                 return layer && <SoundLayerControl key={id} layer={layer} value={mix.layers[id]}
-                  status={status.layers?.[id]} audible={audible} onChange={(value) => onLayer(id, value)} />;
+                  status={status.layers?.[id]} audible={audible} inScene={!layer.scene || layer.scene === scene}
+                  onChange={(value) => onLayer(id, value)} />;
               })}
             </details>
           ))}

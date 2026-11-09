@@ -39,7 +39,7 @@ try {
   assert.ok(page, 'Portable app did not load its packaged renderer.');
   await page.waitForSelector('.room-art');
   assert.equal(await page.getByRole('button', { name: 'Abrir caderno', exact: true }).count(), 1);
-  assert.deepEqual(await page.evaluate(() => Object.keys(window.haven).sort()), ['getGarden', 'getPreferences', 'memoryExport', 'memoryGet', 'memoryImport', 'memoryRestore', 'memorySave', 'openDeveloperContact', 'saveGarden', 'savePreferences']);
+  assert.deepEqual(await page.evaluate(() => Object.keys(window.haven).sort()), ['commandKitchen', 'deleteBouquetDraft', 'getBouquetDraft', 'getGarden', 'getKitchen', 'getPreferences', 'memoryExport', 'memoryGet', 'memoryImport', 'memoryRestore', 'memorySave', 'onKitchenChanged', 'openBouquetEmail', 'openDeveloperContact', 'saveBouquetDraft', 'saveBouquetImage', 'saveGarden', 'savePreferences']);
   assert.ok(page.url().includes('app.asar'));
   await page.getByRole('button', { name: 'Uma pequena surpresa', exact: true }).click();
   await page.getByRole('dialog').waitFor({ state: 'visible' });

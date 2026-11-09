@@ -9,7 +9,18 @@ export const SPECIES = Object.freeze([
   { id: 'hibiscus', label: 'Hibisco rosa' },
   { id: 'fern', label: 'Samambaia' },
   { id: 'succulent', label: 'Suculenta' },
+  { id: 'sunflower', label: 'Girassol' },
+  { id: 'rose-red', label: 'Rosa vermelha' },
+  { id: 'rose-pink', label: 'Rosa cor-de-rosa' },
+  { id: 'tulip', label: 'Tulipa' },
+  { id: 'hydrangea', label: 'Hortênsia' },
+  { id: 'peony', label: 'Peônia' },
+  { id: 'dahlia', label: 'Dália' },
+  { id: 'wildflower', label: 'Flores-do-campo' },
+  { id: 'cosmos', label: 'Cosmos' },
 ]);
+// Arrangement availability is a view of the garden, never a consumable inventory.
+export const BOUQUET_SPECIES = Object.freeze(SPECIES.filter(({ id }) => !['fern', 'succulent'].includes(id)));
 export const PLANT_SLOTS = Object.freeze([
   { id: 'bed-1', label: 'Canteiro 1', kind: 'bed', x: 83, y: 181 },
   { id: 'bed-2', label: 'Canteiro 2', kind: 'bed', x: 150, y: 174 },
@@ -74,6 +85,11 @@ function elapsedAt(plant, now) {
 export function getPlantStage(plant, now = Date.now()) {
   const elapsed = elapsedAt(plant, now);
   return GROWTH_THRESHOLDS.filter((threshold) => elapsed >= threshold).length;
+}
+
+export function getAvailableBouquetSpecies(garden, now = Date.now()) {
+  const grown = new Set(garden.plants.filter((plant) => getPlantStage(plant, now) === 3).map(({ species }) => species));
+  return BOUQUET_SPECIES.filter(({ id }) => grown.has(id));
 }
 
 export function reconcileGarden(garden, now = Date.now()) {

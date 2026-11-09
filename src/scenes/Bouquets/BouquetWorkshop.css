@@ -1,0 +1,80 @@
+.bouquet-workshop { background: #ece1c6; color: #483f32; padding: 24px; }
+.bouquet-workshop button, .bouquet-workshop select, .bouquet-workshop input, .bouquet-workshop textarea { font: inherit; }
+.bouquet-workshop button { padding: 10px 13px; border: 1px solid #9a8a6b; border-radius: 4px; background: #f6edd7; color: #443e31; cursor: pointer; line-height: 1.35; }
+.bouquet-workshop button:hover:not(:disabled) { background: #fff8e7; border-color: #727f59; }
+.bouquet-workshop button:disabled { opacity: .48; cursor: default; }
+.bouquet-workshop button:focus-visible, .bouquet-workshop select:focus-visible, .bouquet-workshop input:focus-visible, .bouquet-workshop textarea:focus-visible, .bouquet-workshop summary:focus-visible { outline: 3px solid #52745a; outline-offset: 3px; }
+.bouquet-workshop h2, .bouquet-workshop h3 { font-family: 'Fraunces', Georgia, serif; font-weight: 500; }
+.bouquet-workshop h3 { margin: 0 0 10px; font-size: 21px; }
+.bouquet-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.bouquet-heading h2 { margin: 6px 0 3px; font-size: clamp(27px, 4vw, 37px); }
+.bouquet-heading h2:focus { outline: none; }
+.bouquet-heading p { margin: 0; font-size: 17px; color: #66704f; }
+.bouquet-eyebrow { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: #637050; }
+.bouquet-steps { display: flex; flex-wrap: wrap; gap: 9px 22px; list-style: none; padding: 18px 0 14px; margin: 0; font-size: 12px; color: #766b56; }
+.bouquet-steps li { padding-bottom: 6px; border-bottom: 2px solid transparent; }
+.bouquet-steps [aria-current] { color: #405a3d; border-color: #798d66; font-weight: 700; }
+.bouquet-studio { background: #cdb994; border: 3px solid #9d835d; box-shadow: 0 3px 0 #b6a17b; margin-bottom: 25px; }
+.bouquet-workshop-art { display: block; width: 100%; height: auto; max-height: 460px; background: #7b7056; image-rendering: pixelated; }
+.bouquet-studio > p { margin: 0; padding: 10px 14px; text-align: center; font-size: 12px; color: #524332; }
+.bouquet-workspace { display: grid; grid-template-columns: minmax(250px, .85fr) minmax(320px, 1.15fr); align-items: start; gap: 28px; }
+.bouquet-preview { padding: 22px 18px; background: var(--letter-color, #fff3d9); border: 1px solid #c1ad85; box-shadow: 4px 4px 0 #c7b38b50; min-width: 0; }
+.bouquet-canvas { display: block; width: 100%; height: auto; max-height: 380px; image-rendering: pixelated; }
+.bouquet-preview-note, .bouquet-empty { margin: 0; text-align: center; color: #6d6e53; font-size: 12px; line-height: 1.6; }
+.bouquet-letter-preview { border-top: 1px solid #b6a78355; padding: 20px 8px 2px; }
+.bouquet-letter-preview h3 { font-size: 22px; color: #5e664a; }
+.bouquet-letter-preview p { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 15px; line-height: 1.8; max-height: 580px; overflow-y: auto; }
+.bouquet-letter-preview small { display: block; margin-top: 26px; color: #7a735d; font-size: 11px; }
+.bouquet-editor { min-width: 0; }
+.bouquet-help, .bouquet-counter { font-size: 12px; color: #6e644e; line-height: 1.65; margin: 5px 0 14px; }
+.bouquet-counter { margin-top: -4px; font-size: 11px; }
+.bouquet-flower-choices { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 23px; }
+.bouquet-flower-choices button { display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; gap: 5px; padding: 10px 5px; min-width: 0; font-size: 12px; }
+.bouquet-flower-choices svg { width: 44px; height: 48px; image-rendering: pixelated; }
+.bouquet-add { position: absolute; top: 5px; right: 8px; color: #5a714a; font-size: 18px; }
+.bouquet-empty-garden { padding: 16px; border: 1px dashed #a69872; margin: 12px 0 22px; line-height: 1.7; font-size: 13px; }
+.bouquet-arrangement-controls { margin-bottom: 22px; }
+.bouquet-subheading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.bouquet-subheading h3 { font-size: 18px; margin: 0; }
+.bouquet-subheading button { font-size: 11px; }
+.bouquet-stem-list { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 5px; max-height: 245px; overflow-y: auto; }
+.bouquet-stem-list li { display: flex; justify-content: space-between; align-items: center; gap: 8px; border-bottom: 1px solid #b9aa854f; padding: 5px 1px; font-size: 12px; }
+.bouquet-stem-list li > div { display: flex; gap: 4px; }
+.bouquet-stem-list button { padding: 5px 8px; min-height: 30px; font-size: 11px; }
+.bouquet-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.bouquet-field { display: grid; gap: 8px; margin: 0 0 14px; font-size: 13px; font-weight: 600; }
+.bouquet-field input, .bouquet-field select, .bouquet-field textarea { color-scheme: light; width: 100%; min-width: 0; border: 1px solid #a69674; background: #fff9e9; color: #453f33; border-radius: 3px; padding: 11px; font-weight: 400; }
+.bouquet-field textarea { resize: vertical; min-height: 155px; line-height: 1.7; }
+.bouquet-details { display: flex; gap: 12px 20px; flex-wrap: wrap; margin: 7px 0 23px; font-size: 12px; }
+.bouquet-workshop input[type='checkbox'] { accent-color: #627f57; width: 15px; height: 15px; vertical-align: middle; margin-right: 5px; }
+.bouquet-workshop .bouquet-primary { background: #5c7250; border-color: #4d6244; color: #fff4da; }
+.bouquet-workshop .bouquet-primary:hover:not(:disabled) { background: #4d6544; color: #fff8e7; }
+.bouquet-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 15px 0; }
+.bouquet-suggestions { margin: 20px 0; border-top: 1px solid #b7aa86; border-bottom: 1px solid #b7aa86; padding: 13px 0; font-size: 12px; }
+.bouquet-suggestions summary { cursor: pointer; font-weight: 600; }
+.bouquet-suggestions button { font-size: 11px; margin: 3px 5px 3px 0; }
+.bouquet-review-meta { margin: 16px 0; display: grid; grid-template-columns: 75px minmax(0, 1fr); gap: 14px 8px; font-size: 13px; line-height: 1.7; }
+.bouquet-review-meta dt { font-weight: 700; color: #566348; }
+.bouquet-review-meta dd { margin: 0; overflow-wrap: anywhere; }
+.bouquet-review-message { white-space: pre-wrap; max-height: 420px; overflow-y: auto; }
+.bouquet-sharing { padding-top: 20px; margin-top: 22px; border-top: 1px solid #b9a77e; }
+.bouquet-future { padding: 12px; background: #d9ddc7; font-size: 12px; line-height: 1.7; border-left: 3px solid #82946b; }
+.bouquet-error, .bouquet-notice { padding: 13px 16px; border: 1px solid #ae7261; background: #f6ded0; color: #693e32; font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; }
+.bouquet-notice { border-color: #9aab7a; background: #e4e8ce; color: #485b38; }
+.bouquet-drafts { margin-top: 32px; border-top: 1px solid #b3a17b; padding-top: 22px; font-size: 13px; }
+.bouquet-drafts > p { line-height: 1.7; max-width: 750px; }
+.bouquet-drafts .bouquet-actions button { font-size: 12px; }
+.bouquet-confirm { width: min(440px, calc(100vw - 28px)); max-height: calc(100dvh - 28px); overflow: auto; padding: 22px; border: 2px solid #ad9269; border-radius: 5px; background: #f4e8ce; color: #483f32; line-height: 1.6; }
+.bouquet-confirm::backdrop { background: #142a2270; }
+.bouquet-stem-list li:focus { outline: 2px solid #52745a; outline-offset: -2px; }
+.bouquet-email-alternative { margin: 14px 0; padding: 12px; border: 1px solid #b9aa85; }
+.bouquet-workshop.is-wrapping .bouquet-flower-layer { animation: bouquet-settle 420ms steps(4, end); transform-origin: center; }
+.bouquet-workshop.is-wrapping .bouquet-paper-front { animation: bouquet-fold 600ms steps(5, end); transform-origin: center; }
+.bouquet-workshop.is-wrapping .bouquet-ribbon { animation: bouquet-tie 1100ms steps(5, end); }
+@keyframes bouquet-settle { from { transform: translateY(-5px); } to { transform: translateY(0); } }
+@keyframes bouquet-fold { from { transform: scaleX(.75); opacity: .25; } to { transform: scaleX(1); opacity: 1; } }
+@keyframes bouquet-tie { 0%, 55% { opacity: 0; } 100% { opacity: 1; } }
+.bouquet-workshop.is-reduced-motion *, .bouquet-workshop.is-reduced-motion *::before { animation: none !important; transition: none !important; }
+@media (max-width: 760px) { .bouquet-workshop { padding: 17px; } .bouquet-workspace { grid-template-columns: 1fr; gap: 24px; } .bouquet-preview { max-width: 520px; width: 100%; margin-inline: auto; } .bouquet-canvas { max-height: 280px; } .bouquet-heading { align-items: flex-start; } .bouquet-heading > button { max-width: 125px; font-size: 12px; } .bouquet-studio > p { font-size: 11px; } }
+@media (max-width: 420px) { .bouquet-workshop { padding: 13px; } .bouquet-heading h2 { font-size: 25px; } .bouquet-heading > button { max-width: 95px; padding: 9px; } .bouquet-eyebrow { font-size: 9px; } .bouquet-steps { gap: 9px; font-size: 10px; } .bouquet-flower-choices { grid-template-columns: repeat(3, minmax(0, 1fr)); } .bouquet-choices { grid-template-columns: 1fr; gap: 0; } .bouquet-subheading { flex-wrap: wrap; } .bouquet-review-meta { grid-template-columns: 65px minmax(0, 1fr); } }
+@media (prefers-reduced-motion: reduce) { .bouquet-workshop *, .bouquet-workshop *::before { animation: none !important; transition: none !important; } }

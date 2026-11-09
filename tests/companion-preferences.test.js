@@ -10,6 +10,7 @@ import {
 import { DEFAULT_PREFERENCES, createPreferenceStore, normalizePreferences } from '../src/services/preferences.js';
 import { PreferencesStore, normalizePreferences as normalizeDesktopPreferences, validatePreferencePatch } from '../electron/services/preferences.js';
 import { createPresetMix } from '../shared/audio.js';
+import { PETS, getPetDefinition } from '../shared/pets.js';
 
 const testRoot = path.resolve('work');
 const syntheticText = 'SYNTHETIC_PRIVATE_COMPANION_DRAFT';
@@ -19,6 +20,9 @@ function invalidCompanions() {
   return [
     null, {}, [], settings({ enabled: 'yes' }), settings({ introduced: 1 }), settings({ soundEnabled: true }),
     settings({ appearance: 'remote-sprite' }), settings({ name: '  Mochi ' }), settings({ name: '   ' }),
+    settings({ petId: 'remote-pet' }), settings({ petId: 'https://example.invalid/pet.png' }),
+    settings({ petId: '../dalmatian' }), settings({ petId: null }),
+    Object.fromEntries(Object.entries(settings()).filter(([key]) => key !== 'petId')),
     settings({ name: 42 }), settings({ name: 'a'.repeat(25) }), settings({ name: 'Mochi\n' }),
     settings({ name: '\u202eMochi' }), settings({ name: '\u200d\u200b' }),
     settings({ name: 'Mochi', thought: syntheticText }), { ...settings(), nested: { thought: syntheticText } },
@@ -58,6 +62,11 @@ test('companion schema has no imposed name or unavailable sound and recovers onl
   assert.equal(DEFAULT_COMPANION.name, '');
   assert.equal(displayCompanionName(DEFAULT_COMPANION), 'Seu gatinho');
   assert.equal(displayCompanionName(settings({ name: 'Mochi' })), 'Mochi');
+  assert.equal(DEFAULT_COMPANION.petId, 'cat');
+  assert.equal(displayCompanionName(settings({ petId: 'dalmatian' })), 'Seu dálmata');
+  assert.equal(displayCompanionName(settings({ petId: 'dalmatian', name: 'Pingo' })), 'Pingo');
+  assert.deepEqual(PETS.map(({ id }) => id), ['cat', 'dalmatian']);
+  assert.equal(getPetDefinition('unknown').id, 'cat');
   assert.deepEqual(COMPANION_APPEARANCES.map(({ id }) => id), ['default', 'ginger', 'midnight']);
   for (const companion of invalidCompanions()) assert.throws(() => validateCompanion(companion), TypeError);
   const recovered = normalizeCompanion(settings({ name: '  Mochi  ', enabled: false, soundEnabled: true,
@@ -65,6 +74,7 @@ test('companion schema has no imposed name or unavailable sound and recovers onl
   assert.deepEqual(recovered, settings({ name: 'Mochi', enabled: false }));
   assert.equal(JSON.stringify(recovered).includes(syntheticText), false);
   assert.equal(normalizeCompanion(settings({ name: 'x'.repeat(25) })).name, '');
+  assert.equal(normalizeCompanion(settings({ petId: 'remote-pet' })).petId, 'cat');
   const copy = validateCompanion(settings({ name: 'Mochi', introduced: true }));
   copy.name = 'Luna';
   assert.equal(DEFAULT_COMPANION.name, '');
@@ -80,6 +90,12 @@ test('legacy preference recovery adds companion without changing room or mixer s
   assert.deepEqual(normalizeDesktopPreferences(legacy), expected);
   const priorCompanion = { ...legacy, companion: { enabled: false, name: 'Neko', appearance: 'ginger', soundEnabled: false } };
   assert.deepEqual(normalizePreferences(priorCompanion).companion, settings({ enabled: false, name: 'Neko', appearance: 'ginger', introduced: true }));
+  const priorSpecies = { enabled: false, name: 'Neko', appearance: 'midnight', soundEnabled: false, introduced: true };
+  for (const normalize of [normalizePreferences, normalizeDesktopPreferences]) {
+    assert.deepEqual(normalize({ ...legacy, companion: priorSpecies }), {
+      ...legacy, companion: settings(priorSpecies),
+    });
+  }
 });
 
 test('renderer and preload reject unknown companion data before any persistence or IPC', async () => {
@@ -110,7 +126,30 @@ test('renderer and preload reject unknown companion data before any persistence 
   assert.deepEqual(JSON.parse(JSON.stringify(messages[0].value)), { companion });
   companion.name = 'Changed after IPC';
   assert.notEqual(messages[0].value.companion.name, companion.name);
+  const dalmatian = settings({ petId: 'dalmatian', appearance: 'ginger', name: 'Pingo', introduced: true });
+  await bridge.savePreferences({ companion: dalmatian });
+  assert.deepEqual(JSON.parse(JSON.stringify(messages[1].value)), { companion: dalmatian });
+  assert.deepEqual(validatePreferencePatch({ companion: dalmatian }), { companion: dalmatian });
   assert.equal(JSON.stringify(messages).includes(syntheticText), false);
+});
+
+test('switching species persists locally and preserves the cat coat, name and room preferences', async () => {
+  let saved;
+  const storage = { getItem: () => saved ?? null, setItem: (_key, value) => { saved = value; } };
+  const store = createPreferenceStore({ bridge: null, storage });
+  await store.initialize();
+  store.setPreference('rainOn', false);
+  store.setPreference('companion', settings({ name: 'Pingo', appearance: 'ginger', introduced: true }));
+  assert.equal(store.setPreference('companion', (current) => ({ ...current, petId: 'dalmatian' })), true);
+  await store.flush();
+  const reopened = createPreferenceStore({ bridge: null, storage });
+  await reopened.initialize();
+  assert.deepEqual(reopened.getSnapshot().preferences.companion,
+    settings({ petId: 'dalmatian', name: 'Pingo', appearance: 'ginger', introduced: true }));
+  assert.equal(reopened.getSnapshot().preferences.rainOn, false);
+  reopened.setPreference('companion', (current) => ({ ...current, petId: 'cat' }));
+  await reopened.flush();
+  assert.deepEqual(JSON.parse(saved).companion, settings({ name: 'Pingo', appearance: 'ginger', introduced: true }));
 });
 
 test('naming, choosing later and renaming survive reload while unrelated preferences stay unchanged', async () => {
@@ -154,11 +193,11 @@ test('desktop companion changes are atomic, cloned and restored through the exis
     const snapshot = await store.get();
     assert.equal(snapshot.companion.name, 'Luna 2');
     snapshot.companion.name = 'Another mutation';
-    await store.save({ companion: settings({ name: 'Mochi', enabled: false, appearance: 'ginger', introduced: true }) });
+    await store.save({ companion: settings({ petId: 'dalmatian', name: 'Mochi', enabled: false, appearance: 'ginger', introduced: true }) });
     await store.flush();
     const reopened = await new PreferencesStore(file).get();
     assert.deepEqual(reopened, { ...DEFAULT_PREFERENCES, volume: 0.17,
-      companion: settings({ name: 'Mochi', enabled: false, appearance: 'ginger', introduced: true }) });
+      companion: settings({ petId: 'dalmatian', name: 'Mochi', enabled: false, appearance: 'ginger', introduced: true }) });
     assert.equal((await readFile(file, 'utf8')).includes(syntheticText), false);
     assert.equal((await store.get()).companion.name, 'Mochi');
   } finally {

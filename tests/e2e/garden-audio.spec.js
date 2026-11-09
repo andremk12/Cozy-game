@@ -56,7 +56,7 @@ test('Garden weather and wildlife presets stay silent until a gesture, share one
   const insectGain = firstNight.gains.find(({ master, target }) => !master && target === 0.4).id;
 
   await atmosphere(page, 'day', 'clear');
-  await playingLayers(page, ['birds', 'stream', 'wind'], 'morning-garden', [0.25, 0.35, 0.5]);
+  await playingLayers(page, ['leaves', 'birds', 'stream', 'wind'], 'morning-garden', [0.15, 0.25, 0.38, 0.42]);
   await expect.poll(async () => (await audioSnapshot(page)).sources.filter(({ gainId }) => [rainGain, insectGain].includes(gainId))
     .every(({ stopped, disconnected, hasBuffer }) => stopped && disconnected && !hasBuffer)).toBe(true);
   await atmosphere(page, 'night', 'rain');

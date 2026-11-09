@@ -100,8 +100,7 @@ test('decode failure leaves other layers playing and a later toggle can retry', 
   audio.setMix(mix);
   mix.layers.fire.enabled = true;
   audio.setMix(mix);
-  await Promise.resolve();
-  await Promise.resolve();
+  await new Promise((resolve) => setImmediate(resolve));
   assert.equal(last.layers.fire, 'playing');
   assert.equal(last.error, '');
   await audio.dispose();

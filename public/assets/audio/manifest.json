@@ -110,23 +110,21 @@
   {
     "id": "train-track",
     "file": "train-track.wav",
-    "bytes": 1344044,
-    "sha256": "cd9cd586cb4aa63790ed794c5a293e1ad078fa56e5b192bbbb19e3db14a00f44",
-    "duration": 21,
-    "peak": 0.6,
-    "rms": 0.11141135816737391,
+    "bytes": 3120044,
+    "sha256": "f0cb4fb8d3b97c5cb3661198c000ec532b626565e023a35ca732b69ac0ac238a",
+    "duration": 48.75,
+    "peak": 0.2349853515625,
+    "rms": 0.03539394463182289,
     "rate": 32000,
-    "originalDurations": [
-      25.5471875
-    ],
     "processing": {
-      "id": "train-track",
-      "source": "train.ogg",
-      "start": 4,
-      "duration": 21,
-      "highpass": 70,
-      "lowpass": 3000,
-      "rms": 0.13
+      "script": "scripts/refine-environment-audio.mjs",
+      "seed": 724893,
+      "duration": 48.75,
+      "loopDuration": 48,
+      "headAppendSeconds": 0.75,
+      "peakCeiling": 0.235,
+      "targetRms": 0.06,
+      "description": "CC BY train interior; 100–1400 Hz, soft paired rail-joint body articulation; slow movement; no compressor"
     },
     "sources": [
       {
@@ -138,23 +136,21 @@
   {
     "id": "train-wheels",
     "file": "train-wheels.wav",
-    "bytes": 1344044,
-    "sha256": "0b02674ca529fd10d6146dc61a30f8095673adfbb04a4a4f535d920578590a3b",
-    "duration": 21,
-    "peak": 0.5364294492046858,
-    "rms": 0.09,
+    "bytes": 3120044,
+    "sha256": "04d0648c888c83382e36f5811ad681b4179e46ba03f278ea9fbd25d441fc2ad3",
+    "duration": 48.75,
+    "peak": 0.2349853515625,
+    "rms": 0.03539524375372319,
     "rate": 32000,
-    "originalDurations": [
-      25.5471875
-    ],
     "processing": {
-      "id": "train-wheels",
-      "source": "train.ogg",
-      "start": 4,
-      "duration": 21,
-      "highpass": 550,
-      "lowpass": 5000,
-      "rms": 0.09
+      "script": "scripts/refine-environment-audio.mjs",
+      "seed": 724893,
+      "duration": 48.75,
+      "loopDuration": 48,
+      "headAppendSeconds": 0.75,
+      "peakCeiling": 0.235,
+      "targetRms": 0.038,
+      "description": "CC BY train interior; 380–2100 Hz, soft paired wheel articulation; slow movement; no compressor"
     },
     "sources": [
       {
@@ -166,22 +162,21 @@
   {
     "id": "carriage",
     "file": "carriage.wav",
-    "bytes": 1344044,
-    "sha256": "f18bf79e32edf34ffb5892a207d48da184d60111756c6907173abe63739a99cf",
-    "duration": 21,
-    "peak": 0.4699790552179205,
-    "rms": 0.1,
+    "bytes": 3120044,
+    "sha256": "eda0f9ba9c75732c86a129875684658b7049992fd5f5724ac2532bd38aa4d062",
+    "duration": 48.75,
+    "peak": 0.2349853515625,
+    "rms": 0.04776689182230373,
     "rate": 32000,
-    "originalDurations": [
-      25.5471875
-    ],
     "processing": {
-      "id": "carriage",
-      "source": "train.ogg",
-      "start": 4,
-      "duration": 21,
-      "lowpass": 320,
-      "rms": 0.1
+      "script": "scripts/refine-environment-audio.mjs",
+      "seed": 724893,
+      "duration": 48.75,
+      "loopDuration": 48,
+      "headAppendSeconds": 0.75,
+      "peakCeiling": 0.235,
+      "targetRms": 0.055,
+      "description": "CC BY train interior; 45–260 Hz; slow movement; no compressor"
     },
     "sources": [
       {
@@ -193,46 +188,102 @@
   {
     "id": "leaves",
     "file": "leaves.wav",
-    "bytes": 1792044,
-    "sha256": "b7c30dfd70b097018ecf041ee2570080957ac59989c511e59d2187f73e9a8427",
-    "duration": 28,
-    "peak": 0.6,
-    "rms": 0.016389005206301127,
+    "bytes": 3120044,
+    "sha256": "5127acedf13b576ff119cd8656ca1d2c3a31dc157a3f4ee7ef68a7720fc0e576",
+    "duration": 48.75,
+    "peak": 0.2349853515625,
+    "rms": 0.025477540777519556,
     "rate": 32000,
-    "originalDurations": [
-      0.85240625,
-      0.9939375,
-      0.6346875,
-      0.77275
-    ],
     "processing": {
-      "id": "leaves",
-      "sources": [
-        "rustle/rustle02.flac",
-        "rustle/rustle05.flac",
-        "rustle/rustle09.flac",
-        "rustle/rustle12.flac"
-      ],
-      "duration": 28,
-      "lowpass": 6000,
-      "rms": 0.08
+      "script": "scripts/refine-environment-audio.mjs",
+      "seed": 381739,
+      "duration": 48.75,
+      "loopDuration": 48,
+      "headAppendSeconds": 0.75,
+      "peakCeiling": 0.235,
+      "targetRms": 0.046,
+      "description": "20 CC0 leaf foleys; irregular overlapping grains, two gentle filter stages (220–4200 and 90–3200 Hz), 3 slow gust envelopes"
     },
     "sources": [
       {
+        "file": "rustle/rustle01.flac",
+        "sha256": "9c5da19eb8d37b59890c0be1171c40fe4dd16177e7a97558a156c1036b7bed05"
+      },
+      {
         "file": "rustle/rustle02.flac",
         "sha256": "1e01e752b2165d78482bd91ef8b859541601ae4de6b7cf6178e935cce0036c69"
+      },
+      {
+        "file": "rustle/rustle03.flac",
+        "sha256": "517bbf429a21d3a0cd39f6f7bf9be1894615091fa07c4926f8cf69bbbfa05366"
+      },
+      {
+        "file": "rustle/rustle04.flac",
+        "sha256": "ef00c41e4c72f0ae5a96e1c90f9b3b3f53b5612adf60fdf9be367194d6780afa"
       },
       {
         "file": "rustle/rustle05.flac",
         "sha256": "b7e85badf26220810e38eb9ae37eedaaeb9d743e1251a757c8faedb2a2d80a30"
       },
       {
+        "file": "rustle/rustle06.flac",
+        "sha256": "46c0feab3ea03f2be11596a1f3badf5113eb126989e9da50f8a687c6f38e807d"
+      },
+      {
+        "file": "rustle/rustle07.flac",
+        "sha256": "1abaaabe7c2be91e6b111c5fafd1666d7c7f2b4869e03c3779d9c9616a08cbf8"
+      },
+      {
+        "file": "rustle/rustle08.flac",
+        "sha256": "c9130555f50f85c36c0eb1604bc9a95afde7e8e0853a321737904a048d8e97b7"
+      },
+      {
         "file": "rustle/rustle09.flac",
         "sha256": "efa9b55ed26bc570da99c4348f2f6fbdf4b8be098029581bef27db8a1d0065e3"
       },
       {
+        "file": "rustle/rustle10.flac",
+        "sha256": "7a6d0b9d170e59e571ac7560133a8c860527ab0f045c08b375591b81bcb59b1f"
+      },
+      {
+        "file": "rustle/rustle11.flac",
+        "sha256": "f742bf8a42804cfcce4a552e501c2479795c808394b0c25cf758aac303969111"
+      },
+      {
         "file": "rustle/rustle12.flac",
         "sha256": "cddcf2912ee7fc6a9bcac783e24e3576c7c2f1fb2d5abe1fc3eb22fd036ddd6b"
+      },
+      {
+        "file": "rustle/rustle13.flac",
+        "sha256": "c1e4339b2a0b8776c8396d5193fd813ee67badcc51222ffe5064bfa4d1fa3a31"
+      },
+      {
+        "file": "rustle/rustle14.flac",
+        "sha256": "b1765f73c57a48ef9b127c6771fdac5ec8c539855f6519d8c67a27efd157501f"
+      },
+      {
+        "file": "rustle/rustle15.flac",
+        "sha256": "95c58bceeb7b6710d4bec45b41972c7a0350c4283f78794d28208b4ca6ca86bd"
+      },
+      {
+        "file": "rustle/rustle16.flac",
+        "sha256": "1b2eda4fab3ecf3c909abb3f69aaf1f83e667bbff6b26b602ece431092b4008a"
+      },
+      {
+        "file": "rustle/rustle17.flac",
+        "sha256": "ccb7094917e95098c12965c9a73384ccd3bbf7add2cb949237c8adff80367ad1"
+      },
+      {
+        "file": "rustle/rustle18.flac",
+        "sha256": "75c7cec7e75c9a413a5f8afddca0fde4f405d3be0d1e900bec6f09d04c5ea664"
+      },
+      {
+        "file": "rustle/rustle19.flac",
+        "sha256": "4be030530fa15129ce4bfa5f3010dc29289c95bf62a8455c9f7c4b710a864bb3"
+      },
+      {
+        "file": "rustle/rustle20.flac",
+        "sha256": "3c141f622a6a2595d507b00af2cd932afa5b33139b256ddfd1ed7fc86eb9d64c"
       }
     ]
   }

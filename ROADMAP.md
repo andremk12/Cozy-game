@@ -40,14 +40,15 @@ Entregue nesta versão:
 Limites e evoluções planejadas:
 
 - As cinco paisagens se repetem em loop; refinar transições e detalhes da ambientação.
-- Ampliar as gravações de trem; as três camadas atuais são tratamentos da mesma gravação licenciada.
+- Ampliar as gravações de trem; a revisão atual combina a gravação licenciada com articulação original das juntas e perfis complementares em ciclos de 48 segundos. Avaliação auditiva humana pendente.
 - Revisar a experiência em diferentes resoluções, escalas e computadores, preservando teclado e movimento reduzido.
 - Manter o ritmo livre, sem obrigações ou punições pela ausência.
 
 ## Fase 4 — Personalização, ambientação expandida e melhorias visuais — parcial
 
 - Decoração, vasos e iluminação entregues no jardim; ampliar escolhas para outros ambientes.
-- **Áudio 2.0 e Cozy Sound Mixer implementados:** 12 camadas locais/procedurais, volumes independentes, master, mute, quatro presets completos e Custom persistente; navegação com fades e controle por M na imersão.
+- **Cozy Sound Mixer:** 13 fontes contínuas locais/procedurais, controle separado dos efeitos contextuais da cozinha, volumes independentes, master, mute, cinco presets e Custom persistente; navegação com fades e controle por M na imersão.
+- Revisão sonora: folhas com montagem granular irregular de foley CC0; trem com articulação própria, texturas e grave complementares; presets Garden/Journey reequilibrados. Inventário e medições em `AUDIO_AUDIT.md`; escuta em dispositivos reais ainda necessária.
 - Motor Web Audio único, gravações licenciadas carregadas sob demanda e preferências validadas sem ampliar permissões do Electron. Áudio sempre depende de gesto a cada abertura.
 - **Little Companion implementado:** gatinho SVG original em Room/Garden/Journey, oito poses/comportamentos, carinho sem contadores, nome Unicode escolhido pelo usuário, renomeação, visibilidade e três pelagens locais. My Companion acessível por C na imersão; o ritual permanece sem o personagem.
 - Companheiro sem fome, tarefas, recompensas ou penalidades. Percursos limitados às áreas seguras dos cenários; próxima evolução: mais trajetos/interações e sons opcionais licenciados pelo motor existente.
@@ -64,6 +65,29 @@ Limites e evoluções planejadas:
 - Ampliar testes de regressão e validar resolução e escala do Windows.
 - Consolidar empacotamento, integridade, assinatura e distribuição desktop.
 - Manter todos os ambientes utilizáveis sem conexão com a internet.
+
+## The Cozy Kitchen — A Recipe for Focus — implementado
+
+- Cozinha original SVG de 480 × 270 com fogão/forno, geladeira, bancada, livro, chaleira, relógio, plantas, iluminação e janela interativos.
+- Sete receitas em português, de Chá Quentinho (5 minutos) a Bolo de Cenoura com Chocolate (60 minutos), e duração personalizada de 5 a 60 minutos. Os tempos representam foco, não instruções culinárias.
+- Uma sessão por vez, pausa, retomada, encerramento antecipado e reinício explícito. Motor por tempo decorrido no processo principal, independente da cena, com reconciliação de suspensão e recuperação ao reabrir.
+- Pratos e mensagens próprios para cada conclusão, apresentação única por sessão e resultado pendente quando a cozinha não está visível. Sem notificações, sequência automática, pontuação ou penalidades.
+- Mesmo Little Companion com identidade/visibilidade preservadas, roupa de chef e ações culinárias. Bolo com seis etapas proporcionais ao progresso.
+- Som de conclusão e efeitos procedurais originais opcionais pelo motor compartilhado, desligados inicialmente, respeitando gesto, master e mute, com controle de volume independente no mixer.
+- **Café na Cozinha:** composição instrumental original estéreo de 3min12s/80 BPM em Ogg Opus local, teclado/cordas/baixo/percussão sintetizados, sem samples de terceiros. Camada própria e preset Cozy Kitchen sem chuva; mesma autorização de áudio, continuidade durante a receita/minimização e fade ao sair. Custom preservada; avaliação auditiva humana pendente.
+- Documento local versionado separado, comandos IPC limitados, modo imersivo, teclado e movimento reduzido; texto de Let It Float continua privado e efêmero.
+- Refinamento integrado: deslocamento por trajetos de piso com preparação/chegada antes das ações, falas e conclusão ancoradas à cabeça com escala de texto independente, livro fechado apoiado fora da pia e cardápio com fechamento sempre visível durante rolagem.
+
+Limites e próximos refinamentos: escuta em diferentes dispositivos, revisão com leitores de tela e ensaios prolongados em GPUs/DPI distintos. Alterações do relógio enquanto o aplicativo está fechado e falhas abruptas de disco/sistema têm limites de recuperação documentados no README. Resultados realmente executados em `VALIDATION.md`.
+
+## Little Bouquets — Flores para Você — implementado
+
+- Expansão do catálogo do jardim com nove opções florais, mantendo plantas, quatro estágios e rega existentes. Disponibilidade vinculada às flores adultas, sem consumir recursos ou plantas.
+- Ateliê acessível pela mesa do jardim, composição visual de até 12 hastes, remoção/reorganização por controles, cinco papéis, cinco laços e detalhes opcionais.
+- Carta Unicode de até 1.000 caracteres, sugestões editáveis, papel próprio e assunto personalizável de até 120 caracteres com proteção contra injeção de cabeçalhos.
+- Revisão antes de compartilhar, exportação PNG/HTML local, rascunho salvo somente por escolha explícita e destinatário nunca persistido. `mailto:` abre o cliente pessoal; o usuário anexa o arquivo e confirma o envio nele.
+- SVG/CSS modulares, sem Aseprite nesta versão, aproveitando jardim, companheiro, áudio e imersão existentes. Sem integração automática com o mural ou com Let It Float.
+- Próximos refinamentos: arte original mais elaborada, avaliação em diferentes DPI/leitores de tela e integração opcional ao mural. Envio intermediado depende de autorização e infraestrutura real conforme [BOUQUETS_DELIVERY_PLAN.md](BOUQUETS_DELIVERY_PLAN.md); permanece indisponível.
 
 ## The Memory Corner — A Place for What Matters — implementado
 

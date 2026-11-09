@@ -1,6 +1,7 @@
 import { DEFAULT_MIXER, normalizeMixer } from '../../../shared/audio.js';
 import { AUDIO_LAYERS, loadRecording } from './audioLibrary.js';
 import { createProceduralBuffer, fadeGain, prepareLoop } from './AudioLayer.js';
+import { createKitchenEffect, KITCHEN_EFFECT_SECONDS } from './kitchenEffects.js';
 
 export const MAX_MASTER_GAIN = 0.25;
 const RELEASE_MS = 850;
@@ -23,6 +24,11 @@ export class AudioEngine {
     this._mix = normalizeMixer(DEFAULT_MIXER);
     this._volume = 0.25;
     this._layers = new Map();
+    this._pendingRecordings = new Map();
+    this._scene = 'room';
+    this._effects = new Set();
+    this._effectsGain = null;
+    this._effectsTarget = null;
     this._playing = false;
     this._disposed = false;
     this._operation = 0;
@@ -35,8 +41,10 @@ export class AudioEngine {
     if (this._disposed) return;
     const layers = Object.fromEntries(AUDIO_LAYERS.map(({ id }) => {
       const layer = this._layers.get(id);
-      return [id, this._errors.has(id) ? 'error' : layer?.pending ? 'loading'
-        : this._playing && layer?.source && this._mix.layers[id].enabled && this._mix.layers[id].volume > 0 ? 'playing' : 'idle'];
+      const eligible = this._isEligible(id);
+      const playing = eligible && (layer?.source || (id === 'kitchen-effects' && this._effects.size));
+      return [id, this._errors.has(id) ? 'error' : eligible && layer?.pending ? 'loading'
+        : playing ? 'playing' : 'idle'];
     }));
     this._onStateChange({ playing: this._playing, layers, error: this._errors.size
       ? 'Alguns sons não puderam carregar. Desative e ative a camada para tentar novamente.' : '' });
@@ -70,9 +78,103 @@ export class AudioEngine {
     layer.buffer = null;
   }
 
-  _isWanted(id) {
+  _isEligible(id) {
     const value = this._mix.layers[id];
-    return this._playing && value.enabled && value.volume > 0;
+    const definition = AUDIO_LAYERS.find((item) => item.id === id);
+    return this._playing && value.enabled && value.volume > 0
+      && (!definition.scene || definition.scene === this._scene);
+  }
+
+  _isWanted(id) {
+    return this._isEligible(id) && id !== 'kitchen-effects';
+  }
+
+  // Navigation changes eligibility, never consent or the persisted mix. Pending
+  // decodes are shared even if a fading layer is released before they finish.
+  setScene(scene) {
+    if (this._disposed || this._scene === scene) return;
+    this._scene = scene;
+    if (scene !== 'kitchen') this._clearEffects();
+    for (const id of this._errors) if (!this._isWanted(id)) this._errors.delete(id);
+    this._syncLayers();
+  }
+
+  _loadRecording(context, definition) {
+    const { id } = definition;
+    let pending = this._pendingRecordings.get(id);
+    if (!pending) {
+      pending = Promise.resolve().then(() => this._recordingLoader(context, id)).then((decoded) => {
+        if (this._disposed || this._context !== context) return null;
+        return prepareLoop(context, decoded, definition.loopOverlap);
+      }).finally(() => {
+        if (this._pendingRecordings.get(id) === pending) this._pendingRecordings.delete(id);
+      });
+      this._pendingRecordings.set(id, pending);
+    }
+    return pending;
+  }
+
+  _releaseEffect(effect, ended = false) {
+    if (!this._effects.delete(effect)) return;
+    effect.source.onended = null;
+    if (!ended) {
+      try { effect.source.stop(); } catch { /* A finite effect may already have ended. */ }
+    }
+    effect.source.disconnect();
+    effect.source.buffer = null;
+    this._emit();
+  }
+
+  _clearEffects() {
+    for (const effect of this._effects) this._releaseEffect(effect);
+  }
+
+  _setEffectsGain() {
+    const value = this._mix.layers['kitchen-effects'];
+    const target = value.enabled ? value.volume : 0;
+    if (this._effectsGain && this._effectsTarget !== target) {
+      this._effectsTarget = target;
+      fadeGain(this._context, this._effectsGain.gain, target, 0.08);
+    }
+  }
+
+  /** Optional one-shots share the already authorized context and master gain. */
+  playKitchenEffect(kind) {
+    if (this._disposed || !this._playing || this._mix.muted || this._volume <= 0
+      || !this._isEligible('kitchen-effects')
+      || this._context?.state !== 'running' || !this._master
+      || !Object.hasOwn(KITCHEN_EFFECT_SECONDS, kind)
+      || [...this._effects].some((effect) => effect.kind === kind)) return false;
+    let effect;
+    try {
+      if (!this._effectsGain) {
+        const gain = this._context.createGain();
+        try {
+          gain.gain.value = 0;
+          gain.connect(this._master);
+          this._effectsGain = gain;
+          this._setEffectsGain();
+        } catch (error) {
+          gain.disconnect();
+          this._effectsGain = null;
+          this._effectsTarget = null;
+          throw error;
+        }
+      }
+      const source = this._context.createBufferSource();
+      effect = { kind, source };
+      this._effects.add(effect);
+      source.buffer = createKitchenEffect(this._context, kind);
+      source.loop = false;
+      source.connect(this._effectsGain);
+      source.onended = () => this._releaseEffect(effect, true);
+      source.start();
+      this._emit();
+      return true;
+    } catch {
+      if (effect) this._releaseEffect(effect);
+      return false;
+    }
   }
 
   _ensureLayer(definition) {
@@ -100,9 +202,7 @@ export class AudioEngine {
         let buffer;
         if (definition.source === 'procedural') buffer = createProceduralBuffer(context, id, this._random);
         else {
-          const decoded = await this._recordingLoader(context, id);
-          if (this._disposed || this._context !== context || this._layers.get(id) !== layer || !this._isWanted(id)) return;
-          buffer = prepareLoop(context, decoded);
+          buffer = await this._loadRecording(context, definition);
         }
         if (this._disposed || this._context !== context || this._layers.get(id) !== layer || !this._isWanted(id)) return;
         const source = context.createBufferSource();
@@ -163,6 +263,9 @@ export class AudioEngine {
     if (this._disposed) return;
     const muted = this._mix.muted;
     this._mix = normalizeMixer(mix);
+    if (this._mix.muted || !this._mix.layers['kitchen-effects'].enabled
+      || this._mix.layers['kitchen-effects'].volume === 0) this._clearEffects();
+    this._setEffectsGain();
     for (const id of this._errors) if (!this._mix.layers[id].enabled) this._errors.delete(id);
     this._setMaster(this._mix.muted && !muted ? 0.025 : 0.4);
     this._syncLayers();
@@ -171,6 +274,7 @@ export class AudioEngine {
 
   setVolume(value) {
     this._volume = clampVolume(value);
+    if (this._volume === 0) this._clearEffects();
     this._setMaster(0.08);
   }
 
@@ -212,6 +316,7 @@ export class AudioEngine {
 
   stop() {
     this._playing = false;
+    this._clearEffects();
     this._operation += 1;
     clearTimeout(this._suspendTimer);
     this._setMaster(0.08);
@@ -228,10 +333,14 @@ export class AudioEngine {
     if (this._disposed) return;
     this._disposed = true;
     this._playing = false;
+    this._clearEffects();
     this._operation += 1;
     clearTimeout(this._suspendTimer);
     this._suspendTimer = null;
     for (const [id, layer] of this._layers) this._release(id, layer);
+    this._pendingRecordings.clear();
+    this._effectsGain?.disconnect();
+    this._effectsGain = null;
     this._master?.disconnect();
     this._master = null;
     const context = this._context;

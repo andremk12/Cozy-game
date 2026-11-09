@@ -65,7 +65,7 @@ function GardenBackground({ atmosphere }) {
 
 const DECOR_LABELS = { bench: 'banco de madeira', lantern: 'lanterna', stone: 'pedras decorativas', mushroom: 'cogumelos' };
 
-export default function GardenScene({ garden, reducedMotion = false, paused = false, tool = 'observe', selectedSlot, onPlantSlot, onDecorationSlot, onWildlife, onOpenTools, onOpenAtmosphere, activePlantEffect, companion }) {
+export default function GardenScene({ garden, reducedMotion = false, paused = false, tool = 'observe', selectedSlot, onPlantSlot, onDecorationSlot, onWildlife, onOpenTools, onOpenAtmosphere, onOpenBouquets, activePlantEffect, companion }) {
   const uniqueId = useId().replaceAll(':', '');
   const rainId = `garden-rain-${uniqueId}`;
   return <svg className={`garden-art${paused ? ' is-paused' : ''}${reducedMotion ? ' is-reduced-motion' : ''}`} viewBox="0 0 480 270" xmlns="http://www.w3.org/2000/svg" shapeRendering="crispEdges" role="group" aria-labelledby={`garden-title-${uniqueId} garden-description-${uniqueId}`} data-atmosphere={garden.atmosphere} data-weather={garden.weather}>
@@ -80,6 +80,20 @@ export default function GardenScene({ garden, reducedMotion = false, paused = fa
       const top = type === 'bench' ? -34 : type === 'lantern' ? -40 : -22;
       return <GardenObject key={slot.id} label={`${slot.label}: ${decoration ? DECOR_LABELS[decoration.kind] : 'espaço livre'}`} description="Escolher, mover ou guardar uma decoração deste ponto." onActivate={(event) => onDecorationSlot?.(slot.id, event)} data-slot-id={slot.id} aria-pressed={selectedSlot === slot.id} className={`garden-decoration-object${selectedSlot === slot.id ? ' is-selected' : ''}`}><g transform={`translate(${slot.x} ${slot.y})`}><GardenDecoration decoration={decoration} atmosphere={garden.atmosphere} /><rect className="garden-object-hit" x={-width/2} y={top} width={width} height={-top+5} /></g></GardenObject>;
     })}
+    <GardenObject label="Abrir Little Bouquets" description="Uma pequena mesa de florista. Montar um buquê com as flores do jardim." onActivate={onOpenBouquets} className="garden-bouquets-object">
+      <g transform="translate(188 115)">
+        <path d="M-27-22h54v5h-54zM-23-17h5V2h-5zM18-17h5V2h-5z" fill="#80634d" />
+        <path d="M-28-25h56v5h-56zM-22-18h44v3h-44z" fill="#c49d6b" />
+        <path d="M-25-24h49v1h-49zM-21-16h2V0h-2z" fill="#e1bc83" />
+        <g transform="translate(-16 -29) scale(.58)"><GardenPlant species="daisy" stage={3} /></g>
+        <g transform="translate(-5 -29) scale(.58)"><GardenPlant species="lavender" stage={3} /></g>
+        <path d="M-23-31h26v4H1v6h-22v-6h-2z" fill="#9b956d" />
+        <path d="M-21-30H1v2h-22zM-18-26h2v4h-2z" fill="#ccc397" />
+        <path d="M7-29h13l5 5H11z" fill="#ead8ac" />
+        <path d="M10-29h3l5 5h-3z" fill="#ba7d83" />
+        <rect className="garden-object-hit" x="-29" y="-53" width="58" height="56" />
+      </g>
+    </GardenObject>
     {PLANT_SLOTS.map((slot) => {
       const plant = garden.plants.find((item) => item.slotId === slot.id);
       const species = SPECIES.find((item) => item.id === plant?.species);

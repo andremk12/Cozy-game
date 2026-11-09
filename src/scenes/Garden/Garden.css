@@ -1,4 +1,6 @@
 .garden-scene { position: relative; background: #344d3a; }
+.garden-controls[hidden], .garden-workshop-container[hidden] { display: none; }
+.garden-scene.is-bouquets .immersive-viewport:fullscreen > .immersive-art { width: 100% !important; height: 100% !important; left: 0 !important; top: 0 !important; overflow-y: auto; image-rendering: auto; }
 .garden-scene .immersive-art { position: relative; }
 .garden-scene .immersive-viewport:fullscreen { cursor: default; }
 .garden-controls { padding: 15px 22px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; background: #213c33; border-top: 1px solid #77967533; }

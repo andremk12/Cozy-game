@@ -6,3 +6,10 @@ test-results/
 playwright-report/
 *.log
 .DS_Store
+# Signing credentials belong outside the repository.
+.env
+.env.*
+!.env.example
+*.pfx
+*.p12
+*.key

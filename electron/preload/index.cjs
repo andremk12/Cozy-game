@@ -3,11 +3,12 @@ const { contextBridge, ipcRenderer } = require('electron');
 // This sandboxed CommonJS boundary cannot import shared/companion.js. Keep its
 // small schema and Unicode validation equivalent; main validates again.
 function safeCompanion(companion) {
-  const keys = ['enabled', 'name', 'appearance', 'soundEnabled', 'introduced'];
+  const keys = ['enabled', 'name', 'appearance', 'soundEnabled', 'introduced', 'petId'];
   if (!companion || typeof companion !== 'object' || Array.isArray(companion)
     || Object.keys(companion).length !== keys.length || !keys.every((key) => Object.hasOwn(companion, key))
     || typeof companion.enabled !== 'boolean' || typeof companion.introduced !== 'boolean'
     || !['default', 'ginger', 'midnight'].includes(companion.appearance) || companion.soundEnabled !== false
+    || !['cat', 'dalmatian'].includes(companion.petId)
     || typeof companion.name !== 'string' || companion.name.length > 2048) {
     throw new TypeError('Invalid companion settings.');
   }
@@ -27,8 +28,8 @@ function safeCompanion(companion) {
 // shared/audio.js; the trusted main process validates the same document again.
 function safeMixer(mixer) {
   const ids = ['rain-soft', 'rain-heavy', 'rain-window', 'wind', 'leaves', 'birds',
-    'stream', 'crickets', 'fire', 'train-track', 'train-wheels', 'carriage'];
-  const presets = ['rainy-evening', 'morning-garden', 'quiet-night', 'peaceful-journey', 'custom'];
+    'stream', 'crickets', 'fire', 'train-track', 'train-wheels', 'carriage', 'kitchen-music', 'kitchen-effects'];
+  const presets = ['rainy-evening', 'morning-garden', 'quiet-night', 'peaceful-journey', 'cozy-kitchen', 'custom'];
   const exact = (value, keys) => value && typeof value === 'object' && !Array.isArray(value)
     && Object.keys(value).length === keys.length && keys.every((key) => Object.hasOwn(value, key));
   const validLayers = (layers) => exact(layers, ids) && ids.every((id) => (
@@ -61,7 +62,7 @@ function validGarden(garden) {
     && garden.version === 1 && ['day', 'sunset', 'night'].includes(garden.atmosphere) && ['clear', 'rain'].includes(garden.weather)
     && Array.isArray(garden.plants) && garden.plants.length <= 8 && garden.plants.every((plant) => (
       exact(plant, ['slotId', 'species', 'elapsedMs', 'updatedAt', 'wateredStages']) && plantSlots.includes(plant.slotId)
-      && ['daisy', 'lavender', 'hibiscus', 'fern', 'succulent'].includes(plant.species)
+      && ['daisy', 'lavender', 'hibiscus', 'fern', 'succulent', 'sunflower', 'rose-red', 'rose-pink', 'tulip', 'hydrangea', 'peony', 'dahlia', 'wildflower', 'cosmos'].includes(plant.species)
       && Number.isFinite(plant.elapsedMs) && plant.elapsedMs >= 0 && plant.elapsedMs <= 1_200_000
       && Number.isFinite(plant.updatedAt) && plant.updatedAt >= 0 && plant.updatedAt <= 8_640_000_000_000_000
       && Array.isArray(plant.wateredStages) && plant.wateredStages.length <= 3
@@ -112,8 +113,105 @@ function safeMemory(board) {
 const memoryWithoutArguments = (channel, args) => args.length
   ? Promise.reject(new TypeError('Unexpected memory arguments.')) : ipcRenderer.invoke(channel);
 
+// Only bounded kitchen commands cross this bridge; no text or paths are accepted.
+function safeKitchenCommand(command) {
+  const exact = (value, keys) => value && typeof value === 'object' && !Array.isArray(value)
+    && Object.keys(value).length === keys.length && keys.every((key) => Object.hasOwn(value, key));
+  if (!command || typeof command !== 'object' || Array.isArray(command)) throw new TypeError('Invalid kitchen command.');
+  const { type } = command;
+  if (['pause', 'resume', 'cancel', 'restart'].includes(type) && exact(command, ['type'])) return { type };
+  if (type === 'start' && (exact(command, ['type', 'recipeId']) || exact(command, ['type', 'recipeId', 'durationMs']))
+    && ['tea', 'toast', 'cookies', 'soup', 'pasta', 'bread', 'cake'].includes(command.recipeId)
+    && (!Object.hasOwn(command, 'durationMs') || (Number.isInteger(command.durationMs)
+      && command.durationMs >= 300000 && command.durationMs <= 3600000 && command.durationMs % 60000 === 0))) {
+    return Object.hasOwn(command, 'durationMs') ? { type, recipeId: command.recipeId, durationMs: command.durationMs } : { type, recipeId: command.recipeId };
+  }
+  if (['present', 'close'].includes(type) && exact(command, ['type', 'sessionId'])
+    && typeof command.sessionId === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(command.sessionId)) return { type, sessionId: command.sessionId };
+  if (type === 'settings' && exact(command, ['type', 'patch'])) {
+    const patch = command.patch;
+    const switches = ['lampOn', 'messagesEnabled', 'completionSoundEnabled', 'effectsEnabled'];
+    if (!patch || typeof patch !== 'object' || Array.isArray(patch) || !Object.keys(patch).length) throw new TypeError('Invalid kitchen settings.');
+    for (const key of Object.keys(patch)) {
+      if (switches.includes(key) ? typeof patch[key] !== 'boolean'
+        : key === 'atmosphere' ? !['day', 'sunset', 'night'].includes(patch[key])
+          : key === 'weather' ? !['clear', 'rain'].includes(patch[key]) : true) throw new TypeError('Invalid kitchen settings.');
+    }
+    return { type, patch: { ...patch } };
+  }
+  throw new TypeError('Invalid kitchen command.');
+}
+
+// Bounded bouquet-only operations. The main process repeats all validation.
+const bouquetExact = (value, keys) => value && typeof value === 'object' && !Array.isArray(value)
+  && Object.keys(value).length === keys.length && keys.every((key) => Object.hasOwn(value, key));
+function bouquetText(subject, message) {
+  if (typeof subject !== 'string' || subject.length > 1024 || /[\p{Cc}\p{Cs}\p{Zl}\p{Zp}\p{Bidi_Control}]/u.test(subject)) throw new TypeError('Invalid bouquet subject.');
+  const normalized = subject.trim() || 'Um pequeno buquê para você 💐';
+  if (Array.from(normalized).length > 120 || typeof message !== 'string' || message.length > 2000
+    || /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f\p{Cs}]/u.test(message)) throw new TypeError('Invalid bouquet text.');
+  const letter = message.replace(/\r\n?/g, '\n');
+  if (Array.from(letter).length > 1000) throw new TypeError('Invalid bouquet text.');
+  return { subject: normalized, message: letter };
+}
+function safeBouquetSave(value) {
+  if (!bouquetExact(value, ['bouquet', 'includeLetter']) || typeof value.includeLetter !== 'boolean') throw new TypeError('Invalid bouquet draft.');
+  const b = value.bouquet;
+  if (!bouquetExact(b, ['version', 'stems', 'paper', 'ribbon', 'foliage', 'tag', 'letterPaper', 'message', 'subject'])
+    || b.version !== 1 || !Array.isArray(b.stems) || b.stems.length > 12
+    || !Array.from(b.stems).every((id) => ['daisy', 'lavender', 'hibiscus', 'sunflower', 'rose-red', 'rose-pink', 'tulip', 'hydrangea', 'peony', 'dahlia', 'wildflower', 'cosmos'].includes(id))
+    || !['kraft', 'rose', 'cream', 'sage', 'lilac'].includes(b.paper) || !['white', 'pink', 'blue', 'red', 'gold'].includes(b.ribbon)
+    || !['cream', 'rose', 'sage'].includes(b.letterPaper) || typeof b.foliage !== 'boolean' || typeof b.tag !== 'boolean') throw new TypeError('Invalid bouquet draft.');
+  const text = bouquetText(b.subject, b.message);
+  return { bouquet: { ...b, stems: [...b.stems], ...text,
+    ...(!value.includeLetter ? { message: '', subject: 'Um pequeno buquê para você 💐' } : {}) }, includeLetter: value.includeLetter };
+}
+function safeBouquetEmail(value) {
+  if (!bouquetExact(value, ['recipient', 'subject', 'message']) || typeof value.recipient !== 'string'
+    || value.recipient.length > 254 || /[\p{Cc}\p{Cs}\p{Zl}\p{Zp}]/u.test(value.recipient)) throw new TypeError('Invalid bouquet email.');
+  const recipient = value.recipient.trim();
+  if (recipient) {
+    const [local, domain, extra] = recipient.split('@');
+    if (extra !== undefined || !local || local.length > 64 || local.startsWith('.') || local.endsWith('.') || local.includes('..')
+      || !/^[a-zA-Z0-9.!#$'*+\-=^_`{|}~]+$/.test(local) || !domain || domain.length > 253 || !domain.includes('.')
+      || !domain.split('.').every((part) => /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/.test(part))) throw new TypeError('Invalid bouquet email.');
+  }
+  return { recipient, ...bouquetText(value.subject, value.message) };
+}
+function safeBouquetImage(value) {
+  const html = value?.kind === 'card-html';
+  if (!bouquetExact(value, html ? ['dataUrl', 'kind', 'message', 'letterPaper'] : ['dataUrl', 'kind']) || !['bouquet', 'card', 'card-html'].includes(value.kind) || typeof value.dataUrl !== 'string'
+    || value.dataUrl.length > 16_777_238 || !/^data:image\/png;base64,[A-Za-z0-9+/]+={0,2}$/.test(value.dataUrl)) throw new TypeError('Invalid bouquet PNG.');
+  if (html && !['cream', 'rose', 'sage'].includes(value.letterPaper)) throw new TypeError('Invalid bouquet paper.');
+  return { dataUrl: value.dataUrl, kind: value.kind, ...(html ? { message: bouquetText('', value.message).message, letterPaper: value.letterPaper } : {}) };
+}
+function bouquetInvoke(channel, args, validator) {
+  try {
+    if (args.length !== (validator ? 1 : 0)) throw new TypeError('Invalid bouquet arguments.');
+    return validator ? ipcRenderer.invoke(channel, validator(args[0])) : ipcRenderer.invoke(channel);
+  } catch { return Promise.reject(new TypeError('Invalid bouquet request.')); }
+}
+
 // The sandboxed renderer receives no filesystem, Node.js, or generic IPC access.
 contextBridge.exposeInMainWorld('haven', Object.freeze({
+  getBouquetDraft: (...args) => bouquetInvoke('haven:bouquets:get', args),
+  saveBouquetDraft: (...args) => bouquetInvoke('haven:bouquets:save', args, safeBouquetSave),
+  deleteBouquetDraft: (...args) => bouquetInvoke('haven:bouquets:delete', args),
+  saveBouquetImage: (...args) => bouquetInvoke('haven:bouquets:export', args, safeBouquetImage),
+  openBouquetEmail: (...args) => bouquetInvoke('haven:bouquets:email', args, safeBouquetEmail),
+  getKitchen: (...args) => args.length ? Promise.reject(new TypeError('Unexpected kitchen arguments.')) : ipcRenderer.invoke('haven:kitchen:get'),
+  commandKitchen: (...args) => {
+    try {
+      if (args.length !== 1) throw new TypeError('Invalid kitchen command.');
+      return ipcRenderer.invoke('haven:kitchen:command', safeKitchenCommand(args[0]));
+    } catch { return Promise.reject(new TypeError('Invalid kitchen command.')); }
+  },
+  onKitchenChanged: (listener) => {
+    if (typeof listener !== 'function') throw new TypeError('Invalid kitchen listener.');
+    const receive = (_event, snapshot) => listener(snapshot);
+    ipcRenderer.on('haven:kitchen:changed', receive);
+    return () => ipcRenderer.removeListener('haven:kitchen:changed', receive);
+  },
   openDeveloperContact: (...args) => args.length === 1 && ['email', 'linkedin'].includes(args[0])
     ? ipcRenderer.invoke('haven:developer:open-contact', args[0])
     : Promise.reject(new TypeError('Invalid developer contact.')),

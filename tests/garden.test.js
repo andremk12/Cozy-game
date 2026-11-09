@@ -7,8 +7,9 @@ import {
 
 const plantAt = (slotId = 'pot-1', species = 'daisy', now = 1000) => gardenReducer(createGarden(), { type: 'plant', slotId, species }, now);
 
-test('garden catalog has five species, eight plant slots and compatible decoration points', () => {
-  assert.deepEqual(SPECIES.map(({ id }) => id), ['daisy', 'lavender', 'hibiscus', 'fern', 'succulent']);
+test('garden catalog preserves its original species, eight plant slots and compatible decoration points', () => {
+  assert.deepEqual(SPECIES.slice(0, 5).map(({ id }) => id), ['daisy', 'lavender', 'hibiscus', 'fern', 'succulent']);
+  assert.equal(new Set(SPECIES.map(({ id }) => id)).size, SPECIES.length);
   assert.equal(PLANT_SLOTS.length, 8);
   assert.equal(DECOR_SLOTS.length, 6);
   assert.equal(createGarden().pots.length, 4);

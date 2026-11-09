@@ -1,5 +1,6 @@
 // Original paths on the scenes' 480 × 270 grid. Walking segments use one axis;
 // only the bed's front edge permits an explicit leap between two surfaces.
+import { KITCHEN_COMPANION_PLACES, KITCHEN_COMPANION_CONNECTIONS, nextKitchenMotion } from './kitchenCompanionMotion.js';
 export const COMPANION_POSES = Object.freeze([
   'idle', 'sitting', 'walking', 'sleeping', 'lying', 'stretching', 'petting', 'looking',
 ]);
@@ -12,17 +13,20 @@ export const COMPANION_PLACES = Object.freeze({
   // This reserved strip is clear even when every plant/decorative slot is used.
   garden: Object.freeze({ grass: point(350, 265), pond: point(395, 265) }),
   journey: Object.freeze({ seat: point(320, 211), window: point(303, 211), rest: point(330, 211) }),
+  kitchen: KITCHEN_COMPANION_PLACES,
 });
 const connections = {
   room: [['bed', 'bed-edge'], ['bed-edge', 'landing', 'hop'], ['landing', 'floor'],
     ['floor', 'lamp'], ['floor', 'window-floor'], ['window-floor', 'window']],
   garden: [['grass', 'pond']],
   journey: [['seat', 'window'], ['seat', 'rest']],
+  kitchen: KITCHEN_COMPANION_CONNECTIONS,
 };
 const cycles = {
   room: ['sleeping', 'stretching', 'idle', 'sitting', 'looking', 'lying'],
   garden: ['lying', 'idle', 'looking', 'sitting', 'sleeping', 'stretching'],
   journey: ['sitting', 'looking', 'lying', 'sleeping', 'stretching', 'idle'],
+  kitchen: ['sitting', 'looking', 'sleeping', 'idle'],
 };
 const clampRandom = (value) => Number.isFinite(value) ? Math.min(0.999999, Math.max(0, value)) : 0.5;
 
@@ -51,7 +55,7 @@ function restDuration(pose, random) {
 
 export function initialCompanion(world = 'room', random = 0.5) {
   const safeWorld = Object.hasOwn(COMPANION_PLACES, world) ? world : 'room';
-  const place = safeWorld === 'room' ? 'bed' : safeWorld === 'garden' ? 'grass' : 'seat';
+  const place = safeWorld === 'room' ? 'bed' : safeWorld === 'garden' ? 'grass' : safeWorld === 'kitchen' ? 'wait' : 'seat';
   const pose = cycles[safeWorld][0];
   return { world: safeWorld, place, position: { ...COMPANION_PLACES[safeWorld][place] }, pose,
     restIndex: 0, sequence: 0, reaction: 0, waitMs: restDuration(pose, random), travel: null, returnState: null };
@@ -76,6 +80,7 @@ function destinationFor(state, context, random) {
     return random < 0.6 ? 'bed' : 'window';
   }
   if (state.world === 'garden') return state.place === 'grass' ? 'pond' : 'grass';
+  if (state.world === 'kitchen') return state.place === 'wait' ? 'book' : 'wait';
   return state.place === 'seat' ? random < 0.5 ? 'window' : 'rest' : 'seat';
 }
 
@@ -84,6 +89,7 @@ export function nextCompanion(state, context = {}, random = 0.5) {
   if (state.pose === 'petting' && state.returnState) {
     return { ...state.returnState, sequence: state.sequence + 1, reaction: state.reaction, returnState: null };
   }
+  if (state.world === 'kitchen' && state.kitchenPhase) return nextKitchenMotion(state);
   if (state.travel) {
     const arrived = { ...state, place: state.travel.destination, position: { ...state.travel.to }, travel: null };
     if (state.travel.remainingPath.length) return startSegment(arrived, state.travel.remainingPath);
@@ -129,4 +135,36 @@ export function petCompanion(state, elapsedMs = 0) {
     travel: state.travel ? { ...state.travel, elapsedStart: state.travel.elapsedStart + elapsed } : null };
   return { ...state, pose: 'petting', position: companionPositionAt(state, elapsed), travel: null,
     sequence: state.sequence + 1, reaction: state.reaction + 1, waitMs: 1800, returnState };
+}
+
+/** Kitchen direction is a projection of the real session, never a second clock.
+ * Existing identity, affection and base poses stay shared across all scenes. */
+export function kitchenCompanionAction(context = {}) {
+  const stage = context.kitchenStage;
+  const stageId = typeof stage === 'string' ? stage : stage?.id;
+  const status = context.kitchenStatus;
+  const stages = {
+    ingredients: 'read', preparing: 'mix', batter: 'mix', cooking: 'stir',
+    oven: 'oven', baking: 'oven', chocolate: 'decorate', finishing: 'decorate',
+    serving: 'present', ready: 'present',
+  };
+  const active = status === 'running' || status === 'paused';
+  const directed = status === 'completed' ? 'present' : active
+    ? stageId === 'baking' ? 'oven' : stage?.pose || stages[stageId] || 'wait' : 'read';
+  const actions = {
+    read: ['reading', 'looking', active ? 'prep' : 'book'],
+    mix: ['mixing', 'sitting', 'prep'], stir: ['stirring', 'sitting', 'prep'],
+    oven: ['baking', 'looking', 'oven'], decorate: ['icing', 'sitting', 'prep'],
+    present: ['presenting', 'sitting', 'table'], wait: ['waiting', 'sitting', active ? 'oven' : 'wait'],
+    sleep: ['sleeping', 'sleeping', 'wait'],
+  };
+  const [action, pose, place] = actions[directed] || actions.wait;
+  return { action, pose, place, position: { ...COMPANION_PLACES.kitchen[place] }, travel: null,
+    celebrate: action === 'presenting' && context.kitchenCelebrate === true };
+}
+
+export function kitchenCompanionTargetKey(context = {}) {
+  const stageId = typeof context.kitchenStage === 'string' ? context.kitchenStage : context.kitchenStage?.id;
+  const status = context.kitchenStatus === 'paused' ? 'running' : context.kitchenStatus || 'idle';
+  return `${context.kitchenSessionId || ''}:${status}:${context.kitchenRecipeId || ''}:${stageId || ''}`;
 }

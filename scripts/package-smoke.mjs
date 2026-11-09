@@ -152,8 +152,8 @@ try {
   let { instance, page } = await launch();
   application = instance;
   assert.deepEqual(await page.evaluate(() => Object.keys(window.haven).sort()), [
-    'getGarden', 'getPreferences', 'memoryExport', 'memoryGet', 'memoryImport', 'memoryRestore', 'memorySave',
-    'openDeveloperContact', 'saveGarden', 'savePreferences',
+    'commandKitchen', 'deleteBouquetDraft', 'getBouquetDraft', 'getGarden', 'getKitchen', 'getPreferences', 'memoryExport', 'memoryGet', 'memoryImport', 'memoryRestore', 'memorySave',
+    'onKitchenChanged', 'openBouquetEmail', 'openDeveloperContact', 'saveBouquetDraft', 'saveBouquetImage', 'saveGarden', 'savePreferences',
   ]);
   assert.deepEqual(await page.evaluate(() => [typeof window.require, typeof window.process]), ['undefined', 'undefined']);
   assert.equal(await page.locator('.brand img').evaluate((image) => image.complete && image.naturalWidth > 0), true);

@@ -1,7 +1,7 @@
 import { useId } from 'react';
 import Icon from '../Icon.jsx';
 
-export default function SoundLayerControl({ layer, value, status, audible, onChange }) {
+export default function SoundLayerControl({ layer, value, status, audible, inScene = true, onChange }) {
   const sliderId = useId();
   const percent = Math.round(value.volume * 100);
   const playing = audible && value.enabled && value.volume > 0 && status === 'playing';
@@ -25,6 +25,8 @@ export default function SoundLayerControl({ layer, value, status, audible, onCha
         <output htmlFor={sliderId}>{percent}%</output>
       </div>
       {status === 'loading' && <small className="mixer-layer-note">Preparando o som local…</small>}
+      {!inScene && <small className="mixer-layer-note">Toca somente em The Cozy Kitchen. Sua escolha fica salva.</small>}
+      {layer.source === 'effects' && <small className="mixer-layer-note">Efeitos contextuais; ative os objetos e o sino em Luz e sons.</small>}
       {status === 'error' && <small className="mixer-layer-note">Não foi possível carregar este som. Desative e ative para tentar novamente.</small>}
       {!layer.available && <small className="mixer-layer-note">Gravação local ainda indisponível.</small>}
     </div>

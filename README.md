@@ -8,6 +8,8 @@ Esta é a **Beta experimental 0.2.0 (`0.2.0-beta.1`)**, destinada aos primeiros 
 
 O guia para compartilhar com os visitantes está em [TESTING.md](TESTING.md), as novidades e limitações em [BETA_NOTES.md](BETA_NOTES.md), e os resultados atuais, tamanho e SHA-256 em [VALIDATION.md](VALIDATION.md). Fotografias importantes devem ter cópias de segurança fora do aplicativo.
 
+O diagnóstico de assinatura, SmartScreen e futuro canal MSIX/Store está em [WINDOWS_DISTRIBUTION.md](WINDOWS_DISTRIBUTION.md). O fluxo `package:win:signed` exige assinatura real e usa uma pasta separada; o portátil existente continua disponível. Nenhum comando de empacotamento publica automaticamente.
+
 ## Executar no Windows
 
 Requisitos: **Windows x64**, **Node.js 22.12 ou superior** e npm. Abra o terminal na pasta do projeto.
@@ -37,6 +39,8 @@ A instalação de dependências, o primeiro download do runtime Electron e as fe
 | `npm start` | Abrir o Electron usando o último build de `dist/`. |
 | `npm run preview` | Inspecionar o build no navegador em `127.0.0.1:4173`. |
 | `npm run package:win` | Gerar a distribuição portátil Windows x64 em `outputs/desktop/`. |
+| `npm run package:win:signed` | Exigir assinatura e timestamp; gerar e verificar o portátil em `outputs/desktop-signed/`. Requer credenciais válidas. |
+| `npm run verify:win` | Inspecionar assinatura, metadados e SHA-256 do portátil existente e do executável interno; não os executa. |
 | `npm test` | Executar os testes unitários. |
 | `npm run test:e2e` | Gerar o build e executar os testes da interface. |
 | `npm run test:desktop` | Abrir e verificar o Electron com um perfil de teste isolado; exige build prévio. |
@@ -54,12 +58,30 @@ A instalação de dependências, o primeiro download do runtime Electron e as fe
 - Explore os objetos do vagão: acenda ou apague a **luminária**, abra ou feche as **cortinas**, prepare **chá**, leia o **livro** no banco e consulte o **bilhete** sobre a mesa. O livro tem quatro páginas originais; o bilhete acompanha a paisagem selecionada. A xícara pode ser preparada novamente: o vapor diminui após 12 segundos e termina após mais 18 segundos, mesmo com o trem parado.
 - Pause ou retome a viagem pelos controles abaixo do cenário; a pausa congela as animações. Na paisagem noturna, ligue ou desligue a chuva. O botão de retorno leva ao quarto.
 - Em The Journey, o botão com ícone de expandir e tooltip **Modo Imersivo** abre o cenário em tela cheia.
-- Em **The Garden**, toque em um dos quatro canteiros ou quatro vasos para plantar margarida, lavanda, **hibisco rosa**, samambaia ou suculenta. Broto, planta jovem e adulta aparecem aos 2, 8 e 20 minutos acumulados, incluindo o tempo com o aplicativo fechado. As plantas nunca morrem ou regridem por ausência.
+- Em **The Garden**, toque em um dos quatro canteiros ou quatro vasos para plantar margarida, lavanda, **hibisco rosa**, samambaia, suculenta ou as novas flores do **Little Bouquets**, descritas abaixo. Broto, planta jovem e adulta aparecem aos 2, 8 e 20 minutos acumulados, incluindo o tempo com o aplicativo fechado. As plantas nunca morrem ou regridem por ausência.
 - Selecione **Regar** e toque na planta para ver regador, gotas e uma reação das folhas. A primeira rega de cada estágio não adulto acrescenta 20% da duração daquele estágio ao crescimento; repetir não acumula bônus. Plantas adultas continuam reagindo.
 - Use **Mover** para selecionar dois vasos ou pontos decorativos compatíveis e trocar suas posições. Vasos levam planta e aparência juntos; canteiros permanecem fixos. **Esc** cancela a ferramenta. Toque em uma planta para mudar o vaso, substituir a espécie ou retirá-la com confirmação.
 - Explore os pontos de decoração para colocar banco, lanternas, pedras e cogumelos. Há vasos de terracota ou madeira, lanternas que podem ser apagadas, borboletas, vagalumes noturnos e peixes que respondem ao toque no lago.
 - Procure o **gato laranja entre as plantas**: orelhas e cauda espiam em um dos três arbustos. Clique ou use Tab e Enter para chamá-lo; ele aparece, pisca e volta a se esconder. Não exige alimento ou cuidados.
 - Em **Luz e clima**, escolha dia, pôr do sol ou noite, com clima limpo ou chuva suave. O jardim possui o mesmo **Modo Imersivo** da viagem; o baú de ferramentas e a placa de atmosfera mantêm os controles acessíveis dentro do cenário.
+
+### Little Bouquets — Flores para Você
+
+No **The Garden**, toque na **mesa de florista** ou em **Oficina de buquês**. O ateliê reutiliza a arte SVG/CSS e o áudio do jardim; a criação funciona offline, também na imersão. Não há Aseprite, nova engine, serviço de envio remoto ou dependência adicional nesta implementação.
+
+- O jardim agora inclui **girassol, rosa vermelha, rosa cor-de-rosa, tulipa, hortênsia, peônia, dália, flores-do-campo e cosmos**, além das cinco espécies anteriores. As novas flores usam os mesmos quatro estágios, rega e persistência. Flores adultas cultivadas ficam disponíveis para arranjos, sem consumo, remoção ou regressão da planta.
+- Combine até **12 hastes**, limite visual da composição. Remova ou reorganize flores pelos controles, escolha cinco papéis e cinco laços, folhagens e etiqueta. Não é necessário arrastar objetos. A animação de acabamento é breve e respeita movimento reduzido.
+- Escreva uma carta de até **1.000 caracteres**, com linhas, acentos e emojis; sugestões opcionais continuam editáveis. Escolha o papel da carta e personalize **Assunto do e-mail** (até 120 caracteres). Assunto vazio usa “Um pequeno buquê para você 💐”; espaços nas pontas são removidos, quebras de linha e controles são rejeitados.
+- Revise **Para**, **Assunto**, **Mensagem** e **Presente** antes de compartilhar, podendo voltar à montagem ou à carta. A edição permanece na sessão ao visitar outro ambiente. Recarregar ou fechar encerra essa sessão.
+- **Salvar rascunho** é explícito: guarda somente o arranjo por padrão; carta e assunto exigem marcar a opção correspondente. O destinatário nunca entra no rascunho. É possível excluir o rascunho local. No desktop, ele fica em `bouquet-draft.json`; na versão web, em `little-haven-bouquet-v1`, separado das preferências e do jardim.
+- Exporte **PNG do buquê**, **PNG do cartão** com texto de alta resolução ou **cartão HTML** independente, com imagem embutida e texto legível. PNGs com muitas linhas têm limite de altura; HTML mantém cartas desse tipo sem reduzir a fonte. Destinatário e assunto não são incluídos nos arquivos. O diálogo nativo permite escolher o destino no Windows.
+- **Abrir meu e-mail** prepara um `mailto:` com destinatário opcional, assunto personalizado e carta codificados. É necessário um cliente de e-mail configurado. Nada é enviado automaticamente; seu endereço pessoal pode aparecer. **Anexe manualmente o cartão exportado**: o aplicativo não promete um anexo automático.
+
+Cartas extensas podem ultrapassar o limite de abertura de links do Windows. Nesse caso, **Abrir e-mail sem a carta no corpo** é uma ação separada: mantém destinatário e assunto, deixa a carta intacta na oficina e orienta anexar o cartão completo. A mensagem nunca é truncada silenciosamente. O limite de 2.081 caracteres da integração está documentado na [API shell do Electron](https://www.electronjs.org/docs/latest/api/shell#shellopenexternalurl-options).
+
+O envio intermediado sem revelar o e-mail pessoal ao destinatário está indisponível. A [proposta técnica separada](BOUQUETS_DELIVERY_PLAN.md) descreve infraestrutura, confirmação por envio, autenticação, prevenção de abuso, bloqueios e retenção mínima. Ela não instala nem ativa um serviço. O mural não recebe cartas automaticamente e Let It Float permanece independente.
+
+A representação das flores é modular em `GardenPlants.jsx`; a composição em `src/scenes/Bouquets/` usa posições próprias, separadas dos dados em `shared/bouquets.js`. Refinamentos visuais e futuros sprites podem substituir as artes sem mudar o modelo do arranjo. Resultados de testes desta entrega estão em `VALIDATION.md`.
 
 ### The Memory Corner — A Place for What Matters
 
@@ -86,11 +108,31 @@ Em **Seu cantinho → Exportar backup**, escolha um destino para o arquivo **`.h
 
 As lembranças ficam **somente neste computador**, sem upload, análise, sincronização ou criptografia implementada pelo aplicativo. Proteja o computador e os backups conforme sua preferência. No desenvolvimento pelo navegador, o mural usa um banco IndexedDB separado (`little-haven-memory-v1`), com imagens em registros Blob, independente dos dados desktop. Backup/restauração completos são oferecidos no desktop. O conteúdo do **Let It Float continua efêmero e nunca entra no mural automaticamente**.
 
+### The Cozy Kitchen — A Recipe for Focus
+
+Uma cozinha original em pixel art para acompanhar uma sessão de foco sem cobranças. Abra **The Cozy Kitchen** e toque no **livro de receitas**: Chá Quentinho (5 minutos), Torradas da Manhã (10), Biscoitos Caseiros (15), Sopa Aconchegante (25), Macarrão Caseiro (35), Pão Quentinho (45) e Bolo de Cenoura com Chocolate (60). Todas estão disponíveis desde o início. A duração personalizada aceita de 5 a 60 minutos inteiros, com a receita visual escolhida. São tempos simbólicos de foco, não instruções culinárias reais.
+
+O relógio permite consultar o restante, pausar, retomar, encerrar antecipadamente e reiniciar por escolha. Há somente uma sessão ativa. Navegar, minimizar, suspender o computador e fechar o aplicativo contam como passagem de tempo para uma sessão em andamento. Ao reabrir, a mesma receita é recuperada ou sua conclusão fica disponível; uma sessão pausada permanece pausada. Não há início automático de outra receita nem notificações do sistema.
+
+Os sete pratos têm arte e mensagens próprias. O bolo passa por ingredientes, massa, forno, crescimento/douramento, chocolate e finalização. O companheiro mantém nome, pelagem e visibilidade, com chapéu e avental de chef somente na cozinha. Ao terminar, ele apresenta o prato e uma mensagem acolhedora uma vez. **Descansar um pouquinho** dispensa o cartão, **Preparar outra receita** abre o livro sem iniciar uma sessão e **Fechar** fecha o cartão. O prato permanece consultável sem repetir a celebração. Em outro ambiente ou com a janela minimizada, a apresentação espera o retorno à cozinha.
+
+As falas e a conclusão acompanham a cabeça do chef no mesmo grupo de movimento do SVG; o texto mantém tamanho legível ao redimensionar ou entrar em imersão. Quando necessário, o balão muda de lado, respeita as bordas e oferece rolagem interna, com fechamento e ações acessíveis. O chef se prepara, caminha por trajetos de piso diante da mesa e à direita dela, chega à estação e só então começa a ação. Pausar mantém seu pixel atual; voltar de uma cena oculta sincroniza a etapa atual, sem reproduzir um percurso antigo. Esse movimento não altera o tempo da receita.
+
+O livro fechado fica sobre um suporte de madeira no trecho livre da bancada, ao lado da pia. Ao abrir, mostra as páginas ampliadas e centralizadas; somente o corpo do cardápio rola, mantendo **Fechar** visível. Esc fecha primeiro o livro e devolve o foco ao objeto, inclusive na imersão. Abrir o livro suspende somente os movimentos visuais do chef; o Pomodoro continua.
+
+Explore luminárias, janela, geladeira, utensílios, chaleira e bilhetes mesmo sem preparar uma receita. Essas interações não alteram o temporizador. As mensagens ocasionais durante o preparo podem ser ocultadas. O sino de conclusão e os efeitos da cozinha são opcionais, inicialmente desligados, sintetizados localmente pelo mesmo motor do mixer e dependem da ativação explícita do áudio. Entrar na cozinha preserva Custom; os demais presets acompanham o ambiente com Cozy Kitchen, sem chuva obrigatória. O modo imersivo reutiliza os controles M/C/Esc e os objetos por teclado.
+
+O documento local `kitchen.json`, em `app.getPath('userData')`, guarda somente a sessão atual, suas marcas temporais, apresentação do resultado e opções da cozinha. No navegador, usa `haven.kitchen.v1`, independentemente do desktop. Não armazena histórico de produtividade nem conteúdo de Let It Float. O processo principal é a autoridade temporal no desktop; callbacks apenas solicitam atualizações, sem contar segundos. Escritas são atômicas e o fechamento normal aguarda as operações aceitas. Arquivos inválidos, excessivos ou de versão futura são preservados; nesse caso, a cozinha informa que a experiência é temporária, sem sobrescrever o original.
+
+Se o relógio retroceder enquanto o aplicativo estiver fechado, a receita é recuperada pausada com uma explicação. Alterações de horário durante o fechamento não podem ser distinguidas perfeitamente da passagem real de tempo sem uma fonte externa. Falhas de disco ou encerramento forçado podem impedir a recuperação da última alteração ou da marca de apresentação; o aplicativo informa erros de salvamento. Não há promessa de apresentação exatamente uma vez diante de uma falha entre gravar o estado e desenhar a interface.
+
 ### Little Companion
 
 Um pequeno gatinho em SVG pixel art descansa no quarto e acompanha você no jardim e no trem. Não tem fome, pontuação, missões, recompensas ou penalidades por ausência. O primeiro carinho abre uma pequena apresentação para escolher seu nome; **Escolher depois**, fechar ou Esc permitem continuar sem nome e sem repetir a apresentação. O nome padrão de identificação é **Seu gatinho**, sem impor um nome próprio.
 
 Abra **Companion** no cabeçalho para acessar **My Companion**: renomeie, mostre/oculte o personagem ou escolha pelagem creme e cinza, laranja ou noite. O campo aceita nomes Unicode com até 24 caracteres percebidos, incluindo acentos combinados e outros idiomas. Espaços nas pontas são removidos; nomes vazios, quebras de linha e controles recebem uma mensagem amigável. Nomes longos não são truncados. Cancelar uma edição preserva o nome salvo.
+
+Em **My Companion → Seu companheiro**, escolha **Dálmata** para usar as sete spritesheets aprovadas no quarto, jardim, trem e cozinha. A escolha persiste junto das preferências existentes; voltar a **Gatinho** conserva sua pelagem. O dálmata senta, levanta, caminha, deita, dorme e acorda com os tempos originais dos frames; na cozinha, mexe massa durante a etapa correspondente. Carinho mantém a pose e responde pelo texto contextual. A arte disponível só tem caminhada orientada à direita, sem espelhamento, e não inclui ações próprias de leitura, forno ou decoração. Cadastro, transições e instruções para próximos pets estão em [DALMATIAN_INTEGRATION.md](DALMATIAN_INTEGRATION.md). Para executar esta integração localmente, use `npm run build` e `npm start`; o portátil anterior não é atualizado por esses comandos.
 
 O companheiro respira, senta, caminha, dorme, deita, se espreguiça, observa e reage ao carinho com olhos/cauda. Há descansos longos e percursos predefinidos: cama e piso do quarto, faixa livre de gramado junto ao lago e um assento do trem. O gato laranja que se esconde nos arbustos continua sendo um animal residente separado. O companheiro não aparece em **Let It Float**, preservando a simplicidade do ritual.
 
@@ -100,15 +142,19 @@ O botão de som inicia a ambientação local. O volume geral começa em 25% e te
 
 ### Cozy Sound Mixer
 
-Use **Mixer** no cabeçalho para abrir o pequeno rádio de sons. O cenário permanece visível e o áudio continua ao fechar o painel. Escolha **Rainy Evening**, **Morning Garden**, **Quiet Night** ou **Peaceful Journey**, ative camadas e ajuste seus volumes com os sliders ou as setas do teclado. O volume geral afeta todas proporcionalmente; **Silenciar tudo** preserva cada ajuste e atinge silêncio em uma rampa curta de 25 ms.
+Use **Mixer** no cabeçalho para abrir o pequeno rádio de sons. O cenário permanece visível e o áudio continua ao fechar o painel. Escolha **Rainy Evening**, **Morning Garden**, **Quiet Night**, **Peaceful Journey** ou **Cozy Kitchen**, ative camadas e ajuste seus volumes com os sliders ou as setas do teclado. O volume geral afeta todas proporcionalmente; **Silenciar tudo** preserva cada ajuste e atinge silêncio em uma rampa curta de 25 ms.
 
-A biblioteca inclui três chuvas (suave, intensa e na janela), vento, folhas, pássaros, riacho, grilos, lareira, trilhos, rodas e interior do vagão. As gravações são locais e os sons procedurais são gerados no dispositivo. As três camadas do trem são tratamentos diferentes da mesma gravação real, com origem e licenças em [`public/assets/audio/README.md`](public/assets/audio/README.md).
+A biblioteca inclui três chuvas (suave, intensa e na janela), vento, folhas, pássaros, riacho, grilos, lareira, trilhos, rodas, interior do vagão e **Café na Cozinha**. São 13 fontes contínuas e um controle separado de **Sons da cozinha** para os efeitos contextuais. As folhas combinam foley real com rajadas irregulares; o trem combina a gravação licenciada com articulação original das juntas, grave e texturas complementares em ciclos de 48 segundos. Origem, licenças e preparo estão em [`public/assets/audio/README.md`](public/assets/audio/README.md); diagnóstico, inventário e limitações em [AUDIO_AUDIT.md](AUDIO_AUDIT.md).
+
+**Café na Cozinha** é uma composição instrumental original de 3min12s, a 80 BPM, com teclado elétrico, cordas pinçadas, baixo e percussão discreta sintetizados localmente. O arquivo estéreo Ogg Opus está incluído no aplicativo e carrega somente quando necessário. Sua melodia, harmonia, produção e medições estão em [CAFE-NA-COZINHA.md](public/assets/audio/CAFE-NA-COZINHA.md). O preset **Cozy Kitchen** usa música a 30% e efeitos a 65%, sem chuva. Os efeitos ainda dependem das opções em **Luz e sons**, inicialmente desligadas; nenhum preset liga essas opções. No mixer, é possível usar música a 30% e efeitos a 15%, por exemplo, sem alterar o volume geral.
+
+A música toca somente na cozinha e exige a mesma ativação explícita de áudio da sessão. Pausar, retomar ou concluir uma receita, mudar a animação do gato e entrar na imersão mantêm a fonte musical. Ao sair da cozinha, a música reduz até zero e libera a fonte após 850 ms; voltar respeita as configurações. Um retorno durante o fade mantém a fonte atual. Após a liberação, a faixa recomeça do início; não há posição musical persistida. Áudio já autorizado pode continuar com a janela minimizada.
 
 Alterar uma camada seleciona **Custom** e salva sua combinação. Ela acompanha você entre os ambientes; escolher um preset mantém a última Custom disponível para recuperar pelo seletor. Uma camada ativada com volume zero permanece ativada e inaudível; desativá-la preserva seu volume para a próxima vez.
 
-Após uma troca de ambiente, os presets acompanham o lugar: Rainy Evening no quarto, Morning Garden/Quiet Night conforme a luz do jardim e Peaceful Journey no trem. Clima e chuva ajustam a camada de chuva desses perfis. **Custom nunca é sobrescrita por essas trocas**; o painel oferece a sugestão do lugar para aplicar por escolha. A combinação salva é restaurada sem alterações ao abrir o aplicativo. As chuvas visuais continuam independentes da combinação Custom.
+Após uma troca de ambiente, os presets acompanham o lugar: Rainy Evening no quarto, Morning Garden/Quiet Night conforme a luz do jardim, Peaceful Journey no trem e Cozy Kitchen na cozinha. Clima e chuva ajustam a camada de chuva desses perfis. **Custom nunca é sobrescrita por essas trocas**; o painel oferece a sugestão do lugar para aplicar por escolha. A combinação salva é restaurada sem alterações ao abrir o aplicativo, e documentos v1 anteriores recebem somente os novos controles com valores seguros. As chuvas visuais continuam independentes da combinação Custom. A música da cozinha fica inaudível nos outros ambientes mesmo em Custom.
 
-No Modo Imersivo de Garden ou Journey, pressione **M** para ajustar os sons sem sair da tela cheia. **Esc** fecha primeiro o mixer; outro Esc segue as regras existentes de contexto/ferramentas/saída. Fechar o mixer devolve o foco ao cenário e deixa somente a arte. O áudio iniciado continua com a janela sem foco. O painel possui foco protegido, grupos recolhíveis, volume geral fixo e rolagem interna em janelas menores.
+No Modo Imersivo de Garden, Journey, Memory Corner ou Kitchen, pressione **M** para ajustar os sons sem sair da tela cheia. **Esc** fecha primeiro o mixer; outro Esc segue as regras existentes de contexto/ferramentas/saída. Fechar o mixer devolve o foco ao cenário e deixa somente a arte. O áudio iniciado continua com a janela sem foco. O painel possui foco protegido, grupos recolhíveis, volume geral fixo e rolagem interna em janelas menores.
 
 Os objetos, a navegação e os botões funcionam com **Tab**, **Enter** ou **Espaço**, com foco visível. O volume e a seleção de paisagem aceitam as setas do teclado. Os diálogos mantêm o foco e **Esc** preserva o rascunho. A preferência de movimento reduzido do sistema interrompe as animações ambientais e conclui o ritual com uma alternativa estática. Na viagem, mantém a cena estática e desabilita o controle de pausa; a troca de paisagem e o retorno ao quarto continuam disponíveis.
 
@@ -143,7 +189,7 @@ Somente estas preferências são persistidas:
 | `audioEnabled` | `false` |
 | `volume` | `0.25`, entre `0` e `1` |
 | `mixer` | Documento v1: preset, mute, camadas habilitadas/volumes e última Custom |
-| `companion` | Visível, sem nome, pelagem `default`, sons desativados e apresentação pendente |
+| `companion` | Visível, sem nome, espécie `cat`, pelagem `default`, sons desativados e apresentação pendente |
 
 No Electron, o arquivo é `preferences.json` dentro de `app.getPath('userData')`, normalmente `%APPDATA%\Little Haven` no Windows. O processo principal valida os campos e grava o JSON de forma atômica. Campos desconhecidos, inclusive dentro das camadas e do companheiro, são rejeitados. Preferências antigas recebem os padrões ausentes preservando luz, chuva, volume, escolha de áudio e mixer. No navegador, as preferências usam a chave existente `haven.preferences.v1` do `localStorage`; esse armazenamento é independente do desktop. O nome escolhido é o único texto livre do companheiro, limitado e validado; pensamentos do ritual nunca entram nesse campo automaticamente ou são enviados para ele.
 
@@ -162,6 +208,7 @@ electron/
   main/index.js                 Janela, navegação, segurança e handlers IPC
   preload/index.cjs             Ponte mínima isolada para preferências
   services/preferences.js       Validação e gravação local
+  services/bouquets.js          Rascunho explícito, exportação e mailto restritos
   services/security.js          Políticas de recursos e CSP
   services/memoryCorner.js       Originais, miniaturas e metadados atômicos do mural
   services/memoryBackup.js       Pacote local restaurável com hashes e limites
@@ -175,7 +222,9 @@ src/
   scenes/LetItFloat/            Escrita, estados do ritual e rio
   scenes/Journey/               Vagão, paisagens e controles da viagem
   scenes/Garden/                Jardim, plantas, ferramentas, decoração e fauna
+  scenes/Bouquets/              Ateliê, composição SVG, carta, revisão e exportação
   scenes/MemoryCorner/          Mural, cartões, editores e visualizações ampliadas
+  scenes/Kitchen/               Cozinha, livro, pratos e objetos interativos
   services/audio/               Motor compartilhado, camadas, biblioteca e presets
   services/                     Preferências e persistência do jardim
   styles/                       Estilos e fontes locais
@@ -185,18 +234,23 @@ public/
   licenses/                     Licenças das fontes e créditos/licenças de áudio
 scripts/                        Inicialização de desenvolvimento e teste nativo
 shared/garden.js                Modelo puro, crescimento, posições e validação do jardim
+shared/bouquets.js              Arranjos, consentimento, assunto, carta e validação de e-mail
 shared/audio.js                 Schema do mixer e configurações dos presets
 shared/companion.js             Nome Unicode e preferências limitadas do companheiro
 shared/memory.js                Schema e limites do mural; inspeção segura de imagens
 shared/memoryImage.js           Miniaturas com orientação no Chromium
+shared/kitchen.js               Modelo temporal, comandos e documento da cozinha
+shared/kitchenRecipes.js        Catálogo em português e mensagens das sete receitas
 tests/                          Testes unitários e de interface
 ```
 
 O ritual tem estados explícitos de escrita, dobra, navegação do barco e conclusão, em `src/scenes/LetItFloat/ritual.js`. O conteúdo escrito não faz parte dos serviços de preferências ou jardim. `useGarden` mantém a store acima das cenas e agenda somente o próximo estágio enquanto o jardim está visível. O motor de áudio libera fontes, conexões e contexto ao ser descartado; camadas retiradas da mistura são liberadas após o fade, inclusive ao mudar de ambiente fora de Custom.
 
-O hook `useImmersiveMode` coordena a DOM Fullscreen API e o componente `ImmersiveViewport` envolve a arte SVG, sem remontar a cena. A lógica de entrada, saída e ajuste de escala pode ser reutilizada por outros ambientes, que ainda não expõem esse modo.
+O hook `useImmersiveMode` coordena a DOM Fullscreen API e o componente `ImmersiveViewport` envolve a arte SVG, sem remontar a cena. Garden, Journey, Memory Corner e Kitchen reutilizam esse mecanismo.
 
 ### Limites de segurança do desktop
+
+Para a cozinha, a ponte acrescenta apenas `getKitchen()`, `commandKitchen(command)` e `onKitchenChanged(callback)`, que retorna uma função para remover o listener. Os comandos aceitam somente tipos predefinidos, receitas conhecidas, durações limitadas, identificadores de sessão e opções validadas; não aceitam texto livre ou caminhos. O processo principal valida novamente o comando e a origem antes de executá-lo.
 
 O renderer usa `contextIsolation: true`, `nodeIntegration: false` e `sandbox: true`. A ponte expõe `window.haven.getPreferences()`, `savePreferences(prefs)`, `getGarden()` e `saveGarden(snapshot)`, cinco ações explícitas do mural (`memoryGet()`, `memorySave(board)`, `memoryImport()`, `memoryExport()` e `memoryRestore()`) e `openDeveloperContact(id)` para os dois destinos públicos configurados. Há validação na ponte e no processo principal, incluindo a origem do pedido IPC. As ações de arquivo não recebem caminhos do renderer; os destinos e fontes são escolhidos por diálogos nativos. Campos desconhecidos são rejeitados antes do IPC. Somente uma instância pode escrever em cada perfil: abrir novamente restaura e focaliza a janela existente.
 
@@ -205,6 +259,8 @@ O processo principal usa ESM. O preload tem extensão **`.cjs`** porque o sandbo
 Em produção, o Electron carrega `dist/index.html`, bloqueia requisições de rede e arquivos fora do bundle, nega novas janelas solicitadas pelo conteúdo, downloads e navegações externas. A exceção de imagens do mural usa somente o protocolo local com UUID autorizado e tipo de recurso `image`, na janela principal; o renderer não recebe acesso `file://` ao diretório pessoal. A permissão `fullscreen` é limitada ao frame principal da janela e à página local confiável esperada. Para que Esc feche primeiro um diálogo no desktop, `keyboardLock` também recebe uma exceção para esse mesmo frame/URL, somente quando a janela já está em fullscreen. O diálogo solicita apenas a tecla Escape e libera a captura ao fechar ou desmontar; não captura texto nem registra teclas. `automatic-fullscreen`, `pointerLock` e as demais permissões continuam negadas. O modo imersivo usa a DOM Fullscreen API, sem novos canais IPC de tela cheia. A CSP mantém scripts locais, frames negados e `connect-src 'none'`; a origem de imagem `haven-memory://local` é autorizada apenas para as fotografias gerenciadas. O desenvolvimento habilita apenas o servidor local explícito `127.0.0.1:5173` e seu WebSocket; esse modo é ignorado no aplicativo empacotado. Não há backend, autenticação, telemetria ou atualização automática.
 
 ## Testes
+
+Os testes da cozinha cobrem as sete conclusões, etapas do bolo, duração personalizada, temporização/persistência, áudio opcional e imersão. Após `npm run build`, `node scripts/kitchen-smoke.mjs` verifica quatro aberturas reais do Electron com estado sintético e perfis isolados: pausa persistida, conclusão com janela minimizada, ausência de repetição ao reabrir e caminhada/falas/livro com captura nativa. A suspensão real do Windows e a escuta em diferentes equipamentos continuam na validação manual.
 
 ```powershell
 npm test

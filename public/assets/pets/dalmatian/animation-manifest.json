@@ -1,0 +1,742 @@
+{
+  "schemaVersion": 1,
+  "character": "Dálmata",
+  "petId": "dalmatian",
+  "project": "Cozy Chilling",
+  "origin": "PixelArtStudio",
+  "preparedOn": "2026-11-06",
+  "timezone": "America/Sao_Paulo",
+  "status": "assets_prepared_for_future_integration",
+  "documentationOnly": true,
+  "runtimeIntegrated": false,
+  "pathBase": "directory_containing_this_manifest",
+  "destinationRepository": "joguinho/Cozy-game",
+  "destinationDirectory": "public/assets/pets/dalmatian",
+  "repositoryIdentityNote": "O diretório joguinho contém o repositório Cozy-game; package.json e README usam o nome Little Haven. Os componentes de companheiro e cozinha correspondem às referências do projeto Cozy Chilling.",
+  "sourceRoot": "PixelArtStudio",
+  "sourcePathBase": "workspace_root_of_PixelArtStudio",
+  "renderGuidance": {
+    "sourcePixelScale": 1,
+    "recommendedSampling": "nearest",
+    "frameOrigin": "top-left",
+    "positionFormula": "frameTopLeft = feetPosition - anchor * renderScale",
+    "renderScaleInGame": null,
+    "renderScaleStatus": "pending_scene_integration_review",
+    "automaticMirroring": false,
+    "palette": [
+      "#263f38",
+      "#495e58",
+      "#718b86",
+      "#a5b5a0",
+      "#d6d0b8",
+      "#f0e5c9"
+    ]
+  },
+  "animations": [
+    {
+      "stateId": "seated_idle",
+      "assetAction": "idle",
+      "label": "Sentado / Idle",
+      "status": "prepared_for_future_integration",
+      "fileName": "dalmatian_idle_sheet.png",
+      "path": "animations/dalmatian_idle_sheet.png",
+      "metadataPath": "animations/dalmatian_idle_sheet.json",
+      "tag": "idle",
+      "frameCount": 4,
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "sheetWidth": 256,
+      "sheetHeight": 64,
+      "columns": 4,
+      "rows": 1,
+      "frameOrder": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "frameIndexBase": 0,
+      "layout": "horizontal_left_to_right",
+      "margin": 0,
+      "spacing": 0,
+      "trimmed": false,
+      "rotated": false,
+      "durationsMs": [
+        1800,
+        900,
+        1800,
+        900
+      ],
+      "totalMs": 5400,
+      "timingMode": "per_frame_ms",
+      "loop": true,
+      "playbackDirection": "forward",
+      "type": "continuous_state",
+      "fromState": null,
+      "toState": null,
+      "transition": null,
+      "anchor": {
+        "x": 32,
+        "y": 55,
+        "origin": "top-left",
+        "indexBase": 0
+      },
+      "facing": "near_front",
+      "exportScale": 1,
+      "automaticMirroring": false,
+      "sha256": {
+        "png": "310beedc608d30381509dc2ff4cbeec61e5042fb70acbf0ef1314c30280f92ba",
+        "atlas": "45012b54fc3d80e672f6c8c5f7b7cc34d6a291542442b97262ef7ec04e73ed21"
+      },
+      "provenance": {
+        "root": "PixelArtStudio",
+        "sourcePath": "projects/cozy-chilling/source/dalmatian_idle.aseprite",
+        "sourceSHA256": "b681bcfb8b2ef8e54e3d66b7bf29ce93e5df6c0eaa3bed1bbc7ab4a96ad43b5b",
+        "sourceFrameCount": 4,
+        "originalPngPath": "projects/cozy-chilling/exports/dalmatian_idle_sheet.png",
+        "originalMetadataPath": "projects/cozy-chilling/exports/dalmatian_idle_sheet.json",
+        "evidencePaths": [
+          "projects/cozy-chilling/source/dalmatian_idle.md",
+          "projects/cozy-chilling/source/dalmatian_idle.animation.json",
+          "projects/cozy-chilling/source/dalmatian_idle.validation.json"
+        ],
+        "selectionBasis": "Entrega atual identificada nas fichas locais como pronta para importação; revisão técnica atual confirma arquivos e fonte. Não é uma nova aprovação artística nem validação no cenário."
+      },
+      "notes": [
+        "Quatro frames A-B-C-B, três poses visuais; respiração sem piscada.",
+        "Este estado corresponde à pose sitting do gato; idle no jogo atual é em pé."
+      ]
+    },
+    {
+      "stateId": "stand_up",
+      "assetAction": "stand_up",
+      "label": "Levantando",
+      "status": "prepared_for_future_integration",
+      "fileName": "dalmatian_stand_up_sheet.png",
+      "path": "animations/dalmatian_stand_up_sheet.png",
+      "metadataPath": "animations/dalmatian_stand_up_sheet.json",
+      "tag": "stand_up",
+      "frameCount": 7,
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "sheetWidth": 448,
+      "sheetHeight": 64,
+      "columns": 7,
+      "rows": 1,
+      "frameOrder": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "frameIndexBase": 0,
+      "layout": "horizontal_left_to_right",
+      "margin": 0,
+      "spacing": 0,
+      "trimmed": false,
+      "rotated": false,
+      "durationsMs": [
+        300,
+        160,
+        160,
+        180,
+        180,
+        180,
+        260
+      ],
+      "totalMs": 1420,
+      "timingMode": "per_frame_ms",
+      "loop": false,
+      "playbackDirection": "forward",
+      "type": "transition",
+      "fromState": "seated_idle",
+      "toState": "walk",
+      "transition": {
+        "entryStateFrame": 0,
+        "exitStateFrame": 0,
+        "holdLastFrameUntilTransition": true,
+        "note": "As poses de ligação são idênticas. Ao reproduzir ambos os clipes completos, os holds de poses coincidentes se somam."
+      },
+      "anchor": {
+        "x": 32,
+        "y": 55,
+        "origin": "top-left",
+        "indexBase": 0
+      },
+      "facing": "near_front_to_right_three_quarter",
+      "exportScale": 1,
+      "automaticMirroring": false,
+      "sha256": {
+        "png": "ea3a252e35d52f5d127314ec05d870abfe255e61c119ce04c0994c6fb33bc0f2",
+        "atlas": "c1603bdac7ae350daf51e4422acf1a97928a86586b2ceb9fc9f217644832acc0"
+      },
+      "provenance": {
+        "root": "PixelArtStudio",
+        "sourcePath": "projects/cozy-chilling/source/dalmatian_stand_up.aseprite",
+        "sourceSHA256": "f3330718cefd717ad46403f14e56cfed2536c8709c7ef9de25f7891090c7243c",
+        "sourceFrameCount": 7,
+        "originalPngPath": "projects/cozy-chilling/exports/dalmatian_stand_up_sheet.png",
+        "originalMetadataPath": "projects/cozy-chilling/exports/dalmatian_stand_up_sheet.json",
+        "evidencePaths": [
+          "projects/cozy-chilling/source/dalmatian_stand_up.md",
+          "projects/cozy-chilling/source/dalmatian_stand_up.animation.json",
+          "projects/cozy-chilling/source/dalmatian_stand_up.validation.json"
+        ],
+        "selectionBasis": "Pendência finalizada por solicitação do usuário em 07/11/2026; revisão visual e validação dos arquivos concluídas. O piloto original permanece preservado."
+      },
+      "notes": [
+        "Executar 0→6 uma vez, sem ping-pong; entrada em seated_idle frame 0 e saída em walk frame 0.",
+        "Cabeça e orelhas preservadas; a cauda fica oculta no giro do frame 3 e reaparece gradualmente nos frames 4–5 (índices zero).",
+        "Transição sem deslocamento pelo cenário. Pata distante simplificada durante a subida.",
+        "O GIF de prévia repete apenas para revisão; loop de runtime é false."
+      ]
+    },
+    {
+      "stateId": "walk",
+      "assetAction": "walk",
+      "label": "Andando",
+      "status": "prepared_for_future_integration",
+      "fileName": "dalmatian_walk_sheet.png",
+      "path": "animations/dalmatian_walk_sheet.png",
+      "metadataPath": "animations/dalmatian_walk_sheet.json",
+      "tag": "walk",
+      "frameCount": 4,
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "sheetWidth": 256,
+      "sheetHeight": 64,
+      "columns": 4,
+      "rows": 1,
+      "frameOrder": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "frameIndexBase": 0,
+      "layout": "horizontal_left_to_right",
+      "margin": 0,
+      "spacing": 0,
+      "trimmed": false,
+      "rotated": false,
+      "durationsMs": [
+        220,
+        180,
+        220,
+        180
+      ],
+      "totalMs": 800,
+      "timingMode": "per_frame_ms",
+      "loop": true,
+      "playbackDirection": "forward",
+      "type": "continuous_state",
+      "fromState": null,
+      "toState": null,
+      "transition": null,
+      "anchor": {
+        "x": 32,
+        "y": 55,
+        "origin": "top-left",
+        "indexBase": 0
+      },
+      "facing": "right_three_quarter",
+      "exportScale": 1,
+      "automaticMirroring": false,
+      "sha256": {
+        "png": "2e6fa27c9a3d98fa473f4f7f1f04cdec243fb3b5c93fc70fe29e3e0e918c1748",
+        "atlas": "d07db8e62ac599343600345f40de5f77385c1a74b82bab69d30ed95c46673439"
+      },
+      "provenance": {
+        "root": "PixelArtStudio",
+        "sourcePath": "projects/cozy-chilling/source/dalmatian_walk.aseprite",
+        "sourceSHA256": "5886ec29e7665c3c9b4c498e98a8454368f6007641b9b35df3706512aeac15ee",
+        "sourceFrameCount": 16,
+        "originalPngPath": "projects/cozy-chilling/exports/dalmatian_walk_sheet.png",
+        "originalMetadataPath": "projects/cozy-chilling/exports/dalmatian_walk_sheet.json",
+        "evidencePaths": [
+          "projects/cozy-chilling/source/dalmatian_walk.md",
+          "projects/cozy-chilling/source/dalmatian_walk.validation.json"
+        ],
+        "selectionBasis": "Entrega atual identificada nas fichas locais como pronta para importação; revisão técnica atual confirma arquivos e fonte. Não é uma nova aprovação artística nem validação no cenário."
+      },
+      "notes": [
+        "Quatro poses no lugar, direcionadas para a direita; o deslocamento pertence ao controlador do jogo.",
+        "O fonte possui 16 frames que repetem o ciclo quatro vezes. Usar somente a tag walk e as quatro células exportadas.",
+        "A tag walk_extended também aparece limitada a 0..3 no atlas exportado; não representa 16 células.",
+        "Revisão atual com balanço das orelhas; v02 e o rascunho before_ear_revision foram excluídos.",
+        "Linha visível dos pés em y=54; manter o pivô documentado (32,55), sem recentralização."
+      ]
+    },
+    {
+      "stateId": "lie_down",
+      "assetAction": "lie_down",
+      "label": "Deitando",
+      "status": "prepared_for_future_integration",
+      "fileName": "dalmatian_lie_down_sheet.png",
+      "path": "animations/dalmatian_lie_down_sheet.png",
+      "metadataPath": "animations/dalmatian_lie_down_sheet.json",
+      "tag": "lie_down",
+      "frameCount": 6,
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "sheetWidth": 384,
+      "sheetHeight": 64,
+      "columns": 6,
+      "rows": 1,
+      "frameOrder": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "frameIndexBase": 0,
+      "layout": "horizontal_left_to_right",
+      "margin": 0,
+      "spacing": 0,
+      "trimmed": false,
+      "rotated": false,
+      "durationsMs": [
+        240,
+        180,
+        190,
+        210,
+        240,
+        540
+      ],
+      "totalMs": 1600,
+      "timingMode": "per_frame_ms",
+      "loop": false,
+      "playbackDirection": "forward",
+      "type": "transition",
+      "fromState": "seated_idle",
+      "toState": "sleep",
+      "transition": {
+        "entryStateFrame": 3,
+        "exitStateFrame": 0,
+        "holdLastFrameUntilTransition": true,
+        "note": "Character matches; sleep adds FX_Sono_ZZZ."
+      },
+      "anchor": {
+        "x": 32,
+        "y": 55,
+        "origin": "top-left",
+        "indexBase": 0
+      },
+      "facing": "near_front",
+      "exportScale": 1,
+      "automaticMirroring": false,
+      "sha256": {
+        "png": "0b74c028bc6f776cb4b2d57112045d99c2d1d646f8eeeb05dd885f62a8ca34e2",
+        "atlas": "0302956c2aa115aaf144de02d4ce62c11e27af856b339790e4ec29c0a080dd01"
+      },
+      "provenance": {
+        "root": "PixelArtStudio",
+        "sourcePath": "projects/cozy-chilling/source/dalmatian_lie_down.aseprite",
+        "sourceSHA256": "2c098fb3e411c66a63921914596ed3764318a336ec589efbf877cdea6038c87b",
+        "sourceFrameCount": 6,
+        "originalPngPath": "projects/cozy-chilling/exports/dalmatian_lie_down_sheet.png",
+        "originalMetadataPath": "projects/cozy-chilling/exports/dalmatian_lie_down_sheet.json",
+        "evidencePaths": [
+          "projects/cozy-chilling/source/dalmatian_rest.md",
+          "projects/cozy-chilling/source/dalmatian_lie_down.animation.json",
+          "projects/cozy-chilling/source/dalmatian_rest.validation.json"
+        ],
+        "selectionBasis": "Entrega atual identificada nas fichas locais como pronta para importação; revisão técnica atual confirma arquivos e fonte. Não é uma nova aprovação artística nem validação no cenário."
+      },
+      "notes": [
+        "Executar uma vez; iniciar após idle frame 3 (índice zero); ao terminar entrar em sleep frame 0.",
+        "O personagem conecta com o sono; o balão zzz aparece somente ao entrar em sleep."
+      ]
+    },
+    {
+      "stateId": "sleep",
+      "assetAction": "sleep",
+      "label": "Dormindo",
+      "status": "prepared_for_future_integration",
+      "fileName": "dalmatian_sleep_sheet.png",
+      "path": "animations/dalmatian_sleep_sheet.png",
+      "metadataPath": "animations/dalmatian_sleep_sheet.json",
+      "tag": "sleep",
+      "frameCount": 4,
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "sheetWidth": 256,
+      "sheetHeight": 64,
+      "columns": 4,
+      "rows": 1,
+      "frameOrder": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "frameIndexBase": 0,
+      "layout": "horizontal_left_to_right",
+      "margin": 0,
+      "spacing": 0,
+      "trimmed": false,
+      "rotated": false,
+      "durationsMs": [
+        2200,
+        1050,
+        2200,
+        1050
+      ],
+      "totalMs": 6500,
+      "timingMode": "per_frame_ms",
+      "loop": true,
+      "playbackDirection": "forward",
+      "type": "continuous_state",
+      "fromState": null,
+      "toState": null,
+      "transition": null,
+      "anchor": {
+        "x": 32,
+        "y": 55,
+        "origin": "top-left",
+        "indexBase": 0
+      },
+      "facing": "near_front",
+      "exportScale": 1,
+      "automaticMirroring": false,
+      "sha256": {
+        "png": "20fa4e41097da73ba361dee1868f0baf7ba7f52a5857dfb0f345f915cfeaa8fb",
+        "atlas": "01b4ef3e81301c3673663fe7aae54666f34ee3bf10e31b91686e758e82cecd41"
+      },
+      "provenance": {
+        "root": "PixelArtStudio",
+        "sourcePath": "projects/cozy-chilling/source/dalmatian_sleep.aseprite",
+        "sourceSHA256": "91434689dc14998eeed3573231d2b637e9443db8e5087a22d151b49b3b030c25",
+        "sourceFrameCount": 4,
+        "originalPngPath": "projects/cozy-chilling/exports/dalmatian_sleep_sheet.png",
+        "originalMetadataPath": "projects/cozy-chilling/exports/dalmatian_sleep_sheet.json",
+        "evidencePaths": [
+          "projects/cozy-chilling/source/dalmatian_sleep_zzz.md",
+          "projects/cozy-chilling/source/dalmatian_sleep.animation.json",
+          "projects/cozy-chilling/source/dalmatian_sleep_zzz.validation.json"
+        ],
+        "selectionBasis": "Entrega atual identificada nas fichas locais como pronta para importação; revisão técnica atual confirma arquivos e fonte. Não é uma nova aprovação artística nem validação no cenário."
+      },
+      "effectsBakedIntoSheet": [
+        "FX_Sono_ZZZ"
+      ],
+      "notes": [
+        "Respiração A-B-C-B de amplitude 1 px.",
+        "Balão zzz já incluído no PNG; surge/desaparece na troca de estado. Não criar efeito duplicado.",
+        "A ligação com wake_up usa o frame 3 (índice zero); a igualdade vale para o cachorro, excluindo FX_Sono_ZZZ."
+      ]
+    },
+    {
+      "stateId": "wake_up",
+      "assetAction": "wake_up",
+      "label": "Acordando",
+      "status": "prepared_for_future_integration",
+      "fileName": "dalmatian_wake_up_sheet.png",
+      "path": "animations/dalmatian_wake_up_sheet.png",
+      "metadataPath": "animations/dalmatian_wake_up_sheet.json",
+      "tag": "wake_up",
+      "frameCount": 7,
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "sheetWidth": 448,
+      "sheetHeight": 64,
+      "columns": 7,
+      "rows": 1,
+      "frameOrder": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "frameIndexBase": 0,
+      "layout": "horizontal_left_to_right",
+      "margin": 0,
+      "spacing": 0,
+      "trimmed": false,
+      "rotated": false,
+      "durationsMs": [
+        420,
+        320,
+        280,
+        260,
+        260,
+        300,
+        520
+      ],
+      "totalMs": 2360,
+      "timingMode": "per_frame_ms",
+      "loop": false,
+      "playbackDirection": "forward",
+      "type": "transition",
+      "fromState": "sleep",
+      "toState": "seated_idle",
+      "transition": {
+        "entryStateFrame": 3,
+        "exitStateFrame": 0,
+        "holdLastFrameUntilTransition": true,
+        "note": "Character matches; FX_Sono_ZZZ disappears on entry."
+      },
+      "anchor": {
+        "x": 32,
+        "y": 55,
+        "origin": "top-left",
+        "indexBase": 0
+      },
+      "facing": "near_front",
+      "exportScale": 1,
+      "automaticMirroring": false,
+      "sha256": {
+        "png": "b8afc593195bdacbda893dd7f564059255e17c1ed47532b6b98f35cc7f03ac4a",
+        "atlas": "825bf1c2f9ffe18359cc16c01e08aa4f1c856961fe722ffd4358dd1f9cd6f4f6"
+      },
+      "provenance": {
+        "root": "PixelArtStudio",
+        "sourcePath": "projects/cozy-chilling/source/dalmatian_wake_up.aseprite",
+        "sourceSHA256": "7253a7697b0c9c5c306ca9bae9e28e1f3c8b71e3f096c437a4301abe88e450bf",
+        "sourceFrameCount": 7,
+        "originalPngPath": "projects/cozy-chilling/exports/dalmatian_wake_up_sheet.png",
+        "originalMetadataPath": "projects/cozy-chilling/exports/dalmatian_wake_up_sheet.json",
+        "evidencePaths": [
+          "projects/cozy-chilling/source/dalmatian_wake_up.md",
+          "projects/cozy-chilling/source/dalmatian_wake_up.animation.json",
+          "projects/cozy-chilling/source/dalmatian_wake_up.validation.json",
+          "projects/cozy-chilling/source/dalmatian_sleep_zzz.md"
+        ],
+        "selectionBasis": "Entrega atual identificada nas fichas locais como pronta para importação; revisão técnica atual confirma arquivos e fonte. Não é uma nova aprovação artística nem validação no cenário."
+      },
+      "notes": [
+        "Executar uma vez após sleep frame 3; terminar em idle frame 0, sentado.",
+        "A ficha e o manifesto de wake_up antecedem a adição de FX_Sono_ZZZ. A igualdade integral com sleep deixou de valer: o personagem coincide, o balão desaparece.",
+        "Termina sentado; para sair andando, encadear seated_idle → stand_up → walk."
+      ]
+    },
+    {
+      "stateId": "cook",
+      "assetAction": "cook",
+      "label": "Cozinhando",
+      "status": "prepared_for_future_integration",
+      "fileName": "dalmatian_cook_sheet.png",
+      "path": "animations/dalmatian_cook_sheet.png",
+      "metadataPath": "animations/dalmatian_cook_sheet.json",
+      "tag": "cook",
+      "frameCount": 8,
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "sheetWidth": 512,
+      "sheetHeight": 64,
+      "columns": 8,
+      "rows": 1,
+      "frameOrder": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "frameIndexBase": 0,
+      "layout": "horizontal_left_to_right",
+      "margin": 0,
+      "spacing": 0,
+      "trimmed": false,
+      "rotated": false,
+      "durationsMs": [
+        400,
+        300,
+        400,
+        300,
+        400,
+        300,
+        400,
+        300
+      ],
+      "totalMs": 2800,
+      "timingMode": "per_frame_ms",
+      "loop": true,
+      "playbackDirection": "forward",
+      "type": "continuous_state",
+      "fromState": null,
+      "toState": null,
+      "transition": null,
+      "anchor": {
+        "x": 32,
+        "y": 55,
+        "origin": "top-left",
+        "indexBase": 0
+      },
+      "facing": "near_front",
+      "exportScale": 1,
+      "automaticMirroring": false,
+      "sha256": {
+        "png": "f8527922ae48d1276279f42dfc9e324d3d71fdce595f0a4b77d3534e2a40061b",
+        "atlas": "8e504d3bb0f06623fb384dabeb04f7695cbedffd631dbe8b7865c58ecddd56f4"
+      },
+      "provenance": {
+        "root": "PixelArtStudio",
+        "sourcePath": "projects/cozy-chilling/source/dalmatian_cook.aseprite",
+        "sourceSHA256": "e13b7819e21c460ea2ff2a28a7a1efe5b5551defc5e56567594baf8e032bf473",
+        "sourceFrameCount": 8,
+        "originalPngPath": "projects/cozy-chilling/exports/dalmatian_cook_sheet.png",
+        "originalMetadataPath": "projects/cozy-chilling/exports/dalmatian_cook_sheet.json",
+        "evidencePaths": [
+          "projects/cozy-chilling/source/dalmatian_cook.md",
+          "projects/cozy-chilling/source/dalmatian_cook.animation.json",
+          "projects/cozy-chilling/source/dalmatian_cook.validation.json"
+        ],
+        "selectionBasis": "Entrega atual identificada nas fichas locais como pronta para importação; revisão técnica atual confirma arquivos e fonte. Não é uma nova aprovação artística nem validação no cenário."
+      },
+      "specificAction": "mixing_batter",
+      "loopControlledBy": "cooking_state",
+      "referenceRepetitions": 3,
+      "propsBakedIntoSheet": true,
+      "costumeBakedIntoSheet": true,
+      "bowlBounds": {
+        "x": 38,
+        "y": 44,
+        "w": 21,
+        "h": 11
+      },
+      "notes": [
+        "Ação disponível: mexer massa. Loop controlado pela interação culinária; três voltas são referência, não obrigação.",
+        "Chapéu, avental, tigela e colher já incluídos no PNG; não sobrepor os acessórios SVG atuais.",
+        "Sem animações próprias de entrada/saída da estação, leitura, forno, decoração ou apresentação.",
+        "Revisar oclusão da bancada e posição da tigela (x=38, y=44, w=21, h=11) na integração futura."
+      ]
+    }
+  ],
+  "pendingAnimations": [],
+  "integrationPoints": [
+    {
+      "path": "src/components/companion/CompanionSprite.jsx",
+      "role": "Desenho atual do gato em SVG e ChefAccessories; futuro ponto de seleção do desenho do pet."
+    },
+    {
+      "path": "src/components/companion/Companion.jsx",
+      "role": "Posição, deslocamento, espelhamento, interação, área clicável e âncora de conteúdo; espelhamento automático exige revisão para o dálmata."
+    },
+    {
+      "path": "src/hooks/useCompanion.js",
+      "role": "Temporizadores, estados, pausas por visibilidade, movimento reduzido e contexto da cozinha."
+    },
+    {
+      "path": "src/services/companionBehaviors.js",
+      "role": "Poses, rotas, mudanças de estado, carinho e escolha das ações culinárias; o tempo de permanência em estado é separado do tempo dos frames."
+    },
+    {
+      "path": "src/services/kitchenCompanionMotion.js",
+      "role": "Percursos e fases de movimento na cozinha, posição dos pés e âncora da cabeça."
+    },
+    {
+      "path": "src/components/companion/Companion.css",
+      "role": "Ciclos CSS atuais de respiração, patas e cauda; evitar sobrepor ao movimento já desenhado nas folhas."
+    },
+    {
+      "path": "src/scenes/Kitchen/KitchenScene.jsx",
+      "role": "Composição SVG da cozinha 480×270, posição/oclusão do companheiro e objetos."
+    },
+    {
+      "path": "src/scenes/Kitchen/Kitchen.jsx",
+      "role": "Contexto da receita, sessão, apresentação e conteúdo ancorado ao personagem."
+    },
+    {
+      "path": "src/hooks/useKitchen.js",
+      "role": "Estado e comandos da sessão culinária; fornece contexto, não a cadência dos frames."
+    },
+    {
+      "path": "src/components/ImmersiveViewport/fitPixelArt.js",
+      "role": "Ajuste da grade lógica à tela considerando pixels físicos."
+    },
+    {
+      "path": "src/components/companion/CompanionPanel.jsx",
+      "role": "Painel existente de nome, visibilidade e aparência do gato; ainda não é um seletor de espécies."
+    },
+    {
+      "path": "src/services/preferences.js",
+      "role": "Persistência e validação das preferências locais existentes."
+    }
+  ],
+  "exclusions": [
+    {
+      "paths": [
+        "exports/dalmatian_walk_review_v02_sheet.png",
+        "exports/dalmatian_walk_review_v02_sheet.json"
+      ],
+      "reason": "Versão anterior, substituída pela revisão de orelhas documentada em dalmatian_walk.md."
+    },
+    {
+      "paths": [
+        "source/dalmatian_walk_before_ear_revision.aseprite"
+      ],
+      "reason": "Rascunho anterior preservado; não é o fonte da folha atual."
+    },
+    {
+      "paths": [
+        "source/dalmatian_walk_ears_review_v03.aseprite"
+      ],
+      "reason": "Cópia idêntica por SHA-256 ao fonte oficial dalmatian_walk.aseprite; editáveis permanecem na origem."
+    },
+    {
+      "paths": [
+        "source/dalmatian_sleep_zzz_work/before_zzz",
+        "source/dalmatian_cook_work/before_costume"
+      ],
+      "reason": "Backups anteriores aos efeitos e figurino atuais."
+    },
+    {
+      "paths": [
+        "exports/dalmata_base_sentado_v01.png",
+        "exports/dalmata_animacao_preparo_v01.png"
+      ],
+      "reason": "Imagens estáticas idênticas por SHA-256; não são ciclos adicionais."
+    },
+    {
+      "categories": [
+        "GIF previews",
+        "references",
+        "work directories",
+        "drafts",
+        "editable Aseprite sources"
+      ],
+      "reason": "Não necessários ao pacote de execução; preservados no PixelArtStudio."
+    },
+    {
+      "categories": [
+        "per-animation .animation.json sidecars"
+      ],
+      "reason": "Políticas de reprodução consolidadas neste manifesto; sidecars originais mantêm caminhos de edição/prévia e permanecem na origem."
+    }
+  ],
+  "validation": {
+    "pngCRC": "passed",
+    "transparentAlphaValues": [
+      0,
+      255
+    ],
+    "atlasDimensionsAndTiming": "passed",
+    "sourcePixelComparison": "passed",
+    "visualSheetsInspected": true,
+    "runtimeOrSceneTested": false,
+    "externalAuditDirectory": "projects/cozy-chilling/deliveries/dalmatian-2026-11-06",
+    "additionalAuditDirectories": [
+      "projects/cozy-chilling/source/dalmatian_stand_up_work"
+    ]
+  },
+  "updatedOn": "2026-11-07",
+  "resolvedAnimations": [
+    {
+      "stateId": "stand_up",
+      "resolvedOn": "2026-11-07",
+      "resolution": "Finalização e exportação dedicada; incluída em animations."
+    }
+  ]
+}

@@ -1,17 +1,18 @@
 // Only bounded, non-sensitive mixer settings cross the persistence boundary.
 export const AUDIO_LAYER_IDS = Object.freeze([
   'rain-soft', 'rain-heavy', 'rain-window', 'wind', 'leaves', 'birds',
-  'stream', 'crickets', 'fire', 'train-track', 'train-wheels', 'carriage',
+  'stream', 'crickets', 'fire', 'train-track', 'train-wheels', 'carriage', 'kitchen-music', 'kitchen-effects',
 ]);
 export const AUDIO_PRESET_IDS = Object.freeze([
-  'rainy-evening', 'morning-garden', 'quiet-night', 'peaceful-journey', 'custom',
+  'rainy-evening', 'morning-garden', 'quiet-night', 'peaceful-journey', 'cozy-kitchen', 'custom',
 ]);
 
 export const AUDIO_PRESET_LEVELS = Object.freeze({
   'rainy-evening': Object.freeze({ 'rain-soft': 0.4, fire: 0.25, wind: 0.15 }),
-  'morning-garden': Object.freeze({ birds: 0.5, stream: 0.35, wind: 0.25 }),
+  'morning-garden': Object.freeze({ leaves: 0.42, birds: 0.38, stream: 0.25, wind: 0.15 }),
   'quiet-night': Object.freeze({ crickets: 0.4, wind: 0.2, stream: 0.1 }),
-  'peaceful-journey': Object.freeze({ 'train-track': 0.35, 'train-wheels': 0.2, wind: 0.1 }),
+  'peaceful-journey': Object.freeze({ 'train-track': 0.45, 'train-wheels': 0.22, carriage: 0.16, wind: 0.08 }),
+  'cozy-kitchen': Object.freeze({ 'kitchen-music': 0.3, 'kitchen-effects': 0.65 }),
 });
 
 const isRecord = (value) => value !== null && typeof value === 'object' && !Array.isArray(value)
@@ -27,7 +28,8 @@ export function cloneAudioLayers(layers) {
 function presetLayers(id) {
   const levels = AUDIO_PRESET_LEVELS[id] ?? {};
   return Object.fromEntries(AUDIO_LAYER_IDS.map((layerId) => [layerId, {
-    enabled: Object.hasOwn(levels, layerId), volume: levels[layerId] ?? 0.35,
+    enabled: layerId === 'kitchen-effects' || Object.hasOwn(levels, layerId),
+    volume: levels[layerId] ?? (layerId === 'kitchen-effects' ? 1 : layerId === 'kitchen-music' ? 0.3 : 0.35),
   }]));
 }
 

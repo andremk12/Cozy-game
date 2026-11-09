@@ -35,7 +35,7 @@ test('mixer opens silently, starts simultaneous real layers and keeps them playi
   await openMixer(page);
   await expect(mixer(page).getByText('Create your own little atmosphere.', { exact: true })).toBeVisible();
   await expect(mixer(page).getByText('Em silêncio', { exact: true })).toBeVisible();
-  await expect(mixer(page).getByRole('switch')).toHaveCount(12);
+  await expect(mixer(page).getByRole('switch')).toHaveCount(14);
   expect((await audioSnapshot(page)).contexts).toBe(0);
   await closeMixer(page);
   await expect(page.getByRole('button', { name: 'Abrir Cozy Sound Mixer', exact: true })).toBeFocused();

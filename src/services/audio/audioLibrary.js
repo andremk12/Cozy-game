@@ -11,6 +11,8 @@
   { id: 'train-track', name: 'Trem sobre trilhos', category: 'Journey', icon: 'rails', source: 'recording', available: true },
   { id: 'train-wheels', name: 'Rodas do trem', category: 'Journey', icon: 'wheels', source: 'recording', available: true },
   { id: 'carriage', name: 'Interior do vagão', category: 'Journey', icon: 'carriage', source: 'recording', available: true },
+  { id: 'kitchen-music', name: 'Café na Cozinha', category: 'Music', icon: 'music', source: 'recording', available: true, scene: 'kitchen', loopOverlap: 0 },
+  { id: 'kitchen-effects', name: 'Sons da cozinha', category: 'Cozy', icon: 'kitchen', source: 'effects', available: true, scene: 'kitchen' },
 ].map((layer) => Object.freeze(layer)));
 
 // Imports are deliberately explicit: Vite emits one lazily loaded local chunk
@@ -24,6 +26,7 @@ const recordingLoaders = {
   'train-track': () => import('virtual:haven-audio/train-track.wav'),
   'train-wheels': () => import('virtual:haven-audio/train-wheels.wav'),
   carriage: () => import('virtual:haven-audio/carriage.wav'),
+  'kitchen-music': () => import('virtual:haven-audio/cafe-na-cozinha.ogg'),
 };
 
 export async function loadRecording(context, id) {

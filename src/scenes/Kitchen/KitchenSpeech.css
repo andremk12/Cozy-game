@@ -1,0 +1,38 @@
+.kitchen-speech-anchor { overflow:visible; pointer-events:none; }
+.kitchen-speech-pixels { width:var(--speech-width); transform:scale(var(--speech-inverse-scale)); transform-origin:0 0; }
+.kitchen-speech { position:relative; width:100%; color:#43513d; font:12px/1.5 'DM Sans',sans-serif; cursor:auto; }
+.kitchen-speech-card { position:relative; display:flex; flex-direction:column; max-height:var(--speech-max-height); padding:11px 13px; border:2px solid #a38b62; border-radius:3px; background:#eee1bd; box-shadow:2px 3px 0 #263c3855; animation:kitchen-speech-enter 180ms ease-out both; pointer-events:auto; }
+.kitchen-speech--message .kitchen-speech-card { color:#f1e5c6; border-color:#a5ae82; background:#304b3e; pointer-events:none; }
+.kitchen-speech--message p { margin:0; }
+.kitchen-speech.is-leaving .kitchen-speech-card { animation:kitchen-speech-leave 160ms ease-in both; }
+.kitchen-speech-tail { position:absolute; width:12px; height:8px; background:#a38b62; pointer-events:none; }
+.kitchen-speech--message .kitchen-speech-tail { background:#a5ae82; }
+.kitchen-speech[data-speech-placement=above] .kitchen-speech-tail { top:100%; left:clamp(12px,var(--speech-tip-x),calc(100% - 12px)); transform:translateX(-50%); clip-path:polygon(0 0,100% 0,50% 100%); }
+.kitchen-speech[data-speech-placement=left] .kitchen-speech-tail { left:100%; top:clamp(12px,var(--speech-tip-y),calc(100% - 12px)); width:8px; height:12px; transform:translateY(-50%); clip-path:polygon(0 0,100% 50%,0 100%); }
+.kitchen-speech[data-speech-placement=right] .kitchen-speech-tail { right:100%; top:clamp(12px,var(--speech-tip-y),calc(100% - 12px)); width:8px; height:12px; transform:translateY(-50%); clip-path:polygon(100% 0,100% 100%,0 50%); }
+.kitchen-speech .kitchen-completion { position:static; display:flex; flex-direction:column; width:auto; max-height:calc(var(--speech-max-height) - 26px); min-height:0; gap:8px; padding:0; border:0; box-shadow:none; background:none; color:inherit; font:inherit; animation:none; overflow:visible; }
+.kitchen-speech .kitchen-completion-header { display:flex; align-items:flex-start; gap:8px; flex-shrink:0; }
+.kitchen-speech .kitchen-completion-dish { width:42px; flex-shrink:0; }
+.kitchen-speech .kitchen-completion h2 { flex:1; margin:0; font:400 20px/1.2 'Fraunces',Georgia,serif; overflow-wrap:anywhere; }
+.kitchen-speech .kitchen-completion-close { flex-shrink:0; min-height:26px; padding:3px 5px; font-size:10px; }
+.kitchen-speech .kitchen-speech-body { overflow:auto; min-height:16px; overscroll-behavior:contain; scrollbar-width:thin; }
+.kitchen-speech .kitchen-speech-body:focus-visible { outline:2px solid #647b50; outline-offset:-2px; }
+.kitchen-speech .kitchen-chef-signature { margin-top:7px; overflow-wrap:anywhere; }
+.kitchen-speech .kitchen-completion-actions { flex-shrink:0; gap:5px; margin:0; }
+.kitchen-speech .kitchen-completion-actions button { min-height:27px; padding:4px 6px; font-size:10px; white-space:normal; }
+.kitchen-speech.is-compact .kitchen-speech-card { padding:6px; }
+.kitchen-speech.is-compact .kitchen-completion { max-height:calc(var(--speech-max-height) - 16px); gap:4px; }
+.kitchen-speech.is-compact .kitchen-completion h2 { font-size:16px; line-height:1.1; }
+.kitchen-speech.is-compact .kitchen-completion-dish { width:28px; }
+.kitchen-speech.is-compact .kitchen-completion-actions { gap:4px; }
+.kitchen-speech.is-compact .kitchen-completion-actions button { flex:1 1 100%; min-height:22px; padding:2px 4px; }
+.kitchen-speech.is-tight .kitchen-completion h2 { font-size:13px; }
+.kitchen-speech.is-tight .kitchen-completion-dish { width:24px; }
+.kitchen-speech.is-tight .kitchen-completion-header { gap:4px; }
+.kitchen-speech.is-tight .kitchen-completion-close { min-height:20px; padding:2px 3px; font-size:9px; }
+.kitchen-speech.is-tight .kitchen-completion-actions button { min-height:18px; font-size:9px; }
+.kitchen-speech.is-tight .kitchen-speech-body { font-size:11px; line-height:1.4; min-height:14px; }
+@keyframes kitchen-speech-enter { from { opacity:0; transform:translateY(2px); } to { opacity:1; transform:none; } }
+@keyframes kitchen-speech-leave { from { opacity:1; transform:none; } to { opacity:0; transform:translateY(1px); } }
+.kitchen-scene.is-reduced-motion .kitchen-speech-card { animation:none; }
+@media(prefers-reduced-motion:reduce) { .kitchen-speech-card { animation:none!important; } }

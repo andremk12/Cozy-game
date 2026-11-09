@@ -2,11 +2,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   COMPANION_PLACES, COMPANION_POSES, companionPositionAt, companionRoute,
-  initialCompanion, nextCompanion, petCompanion,
+  initialCompanion, kitchenCompanionAction, nextCompanion, petCompanion,
 } from '../src/services/companionBehaviors.js';
 
 test('companion begins resting on a valid surface in each scene, with no needs or persistent state', () => {
-  const expected = { room: ['bed', 'sleeping'], garden: ['grass', 'lying'], journey: ['seat', 'sitting'] };
+  const expected = { room: ['bed', 'sleeping'], garden: ['grass', 'lying'], journey: ['seat', 'sitting'], kitchen: ['wait', 'sitting'] };
   for (const [world, [place, pose]] of Object.entries(expected)) {
     const state = initialCompanion(world, 0);
     assert.equal(state.place, place);
@@ -139,4 +139,47 @@ test('garden and journey reserve short corridors apart from plants and train con
     assert.ok(position.x - 20 > 273, 'the cat does not cover tea, ticket or book');
     assert.ok(position.x + 21 < 377, 'the cat does not cover the curtain or lamp targets');
   }
+});
+
+test('kitchen actions follow the real recipe stage and use the same companion base poses', () => {
+  const stages = [
+    ['ingredients', 'read', 'reading', 'prep'], ['preparing', 'mix', 'mixing', 'prep'],
+    ['cooking', 'stir', 'stirring', 'prep'], ['finishing', 'decorate', 'icing', 'prep'],
+    ['batter', 'mix', 'mixing', 'prep'], ['oven', 'oven', 'baking', 'oven'],
+    ['baking', 'wait', 'baking', 'oven'], ['chocolate', 'decorate', 'icing', 'prep'],
+    ['serving', 'present', 'presenting', 'table'],
+  ];
+  for (const [id, pose, action, place] of stages) {
+    const result = kitchenCompanionAction({ kitchenStatus: 'running', kitchenStage: { id, pose }, kitchenProgress: 0.4 });
+    assert.equal(result.action, action);
+    assert.equal(result.place, place);
+    assert.ok(COMPANION_POSES.includes(result.pose));
+    assert.deepEqual(result.position, COMPANION_PLACES.kitchen[place]);
+    assert.equal(result.travel, null);
+    assert.equal(result.celebrate, false);
+    for (const key of ['name', 'appearance', 'draft', 'remainingMs']) assert.equal(Object.hasOwn(result, key), false);
+  }
+  assert.equal(kitchenCompanionAction({ kitchenStatus: 'running', kitchenStage: 'batter' }).action, 'mixing');
+});
+
+test('kitchen pause preserves its current destination and only celebrates when presentation is explicitly claimed', () => {
+  const context = { kitchenStage: { id: 'batter', pose: 'mix' }, kitchenProgress: 0.5 };
+  const paused = kitchenCompanionAction({ ...context, kitchenStatus: 'paused' });
+  assert.equal(paused.action, 'mixing');
+  assert.equal(paused.pose, 'sitting');
+  assert.deepEqual(paused.position, COMPANION_PLACES.kitchen.prep);
+  const completed = kitchenCompanionAction({ ...context, kitchenStatus: 'completed' });
+  assert.equal(completed.action, 'presenting');
+  assert.equal(completed.celebrate, false);
+  assert.equal(kitchenCompanionAction({ kitchenStatus: 'completed', kitchenCelebrate: true }).celebrate, true);
+  for (const status of ['idle', 'cancelled']) {
+    const idle = kitchenCompanionAction({ ...context, kitchenStatus: status });
+    assert.equal(idle.action, 'reading');
+    assert.equal(idle.celebrate, false);
+  }
+  const preparing = { ...initialCompanion('kitchen'), ...kitchenCompanionAction({ ...context, kitchenStatus: 'running' }) };
+  const petted = petCompanion(preparing, 500);
+  assert.equal(petted.pose, 'petting');
+  assert.deepEqual(petted.position, preparing.position);
+  assert.equal(nextCompanion(petted).action, 'mixing');
 });

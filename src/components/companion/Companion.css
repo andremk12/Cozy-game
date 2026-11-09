@@ -18,11 +18,24 @@
 .companion-pose--petting .companion-breathe { animation: companion-pet 1800ms steps(1, end) both; }
 .companion-affection { animation: companion-affection 1800ms steps(1, end) both; }
 .companion-travel { animation-fill-mode: both; }
+@property --kitchen-travel-progress { syntax: '<number>'; inherits: true; initial-value: 0; }
+.kitchen-companion-travel { transform: translate(calc(var(--kitchen-dx) * var(--kitchen-travel-progress) * 1px), calc(var(--kitchen-dy) * var(--kitchen-travel-progress) * 1px)); }
+.companion[data-world="kitchen"][data-pose="walking"] .companion-breathe { animation: companion-kitchen-walk-body 750ms steps(1, end) infinite; }
+.companion[data-world="kitchen"][data-pose="walking"] .companion-tail { animation-duration: 1500ms; }
+@keyframes kitchen-companion-travel-a { from { --kitchen-travel-progress: 0; } to { --kitchen-travel-progress: 1; } }
+@keyframes kitchen-companion-travel-b { from { --kitchen-travel-progress: 0; } to { --kitchen-travel-progress: 1; } }
+@keyframes companion-kitchen-walk-body { 0%, 49%, 100% { transform: translateY(0); } 50%, 99% { transform: translateY(-1px); } }
 .companion.is-held .companion-paws { animation-play-state: paused; }
 .companion.is-paused *, .companion.is-paused *::before, .companion.is-paused *::after { animation-play-state: paused !important; }
 .companion-sprite.is-airborne .companion-shadow { opacity: .08; }
 .companion-sprite.is-airborne .companion-paws { animation: none; transform: translateY(-3px); }
 .companion-sprite.is-airborne .companion-breathe { animation: companion-hop-shape 1500ms steps(1, end) both; }
+.companion-kitchen-work { animation: companion-kitchen-stir 2.8s steps(1, end) 3; transform-origin: 15px -8px; }
+.companion-chef-spatula { animation-name: companion-kitchen-icing; }
+.companion-chef.is-presenting .companion-chef-present { animation: companion-kitchen-present 1.6s steps(1, end) both; }
+@keyframes companion-kitchen-stir { 0%, 100% { transform: translate(0, 0); } 25% { transform: translate(2px, 1px); } 50% { transform: translate(0, 2px); } 75% { transform: translate(-2px, 1px); } }
+@keyframes companion-kitchen-icing { 0%, 100% { transform: translate(0, 0); } 30% { transform: translate(3px, 2px); } 65% { transform: translate(1px, 3px); } }
+@keyframes companion-kitchen-present { 0%, 100% { transform: translate(0, 0); } 35%, 70% { transform: translate(1px, -2px); } }
 @keyframes companion-travel { from { transform: translate(0, 0); } to { transform: translate(var(--companion-dx), var(--companion-dy)); } }
 @keyframes companion-hop-down {
   0% { transform: translate(0, 0); animation-timing-function: steps(var(--companion-hop-rise), end); }

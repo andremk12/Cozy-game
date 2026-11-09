@@ -2,8 +2,11 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Icon from '../Icon.jsx';
 import CompanionSprite from './CompanionSprite.jsx';
+import SpriteSheet from './SpriteSheet.jsx';
+import { SPRITE_PETS } from '../../services/petAnimations.js';
 import { acquireFullscreenEscape } from '../../services/fullscreenEscape.js';
 import { COMPANION_APPEARANCES, displayCompanionName, validateCompanionName } from '../../../shared/companion.js';
+import { PETS, getPetDefinition } from '../../../shared/pets.js';
 import './CompanionPanel.css';
 
 export default function CompanionPanel({ settings, welcome = false, reducedMotion, storageError, target, onChange, onClose }) {
@@ -24,6 +27,8 @@ export default function CompanionPanel({ settings, welcome = false, reducedMotio
   const appearanceId = useId();
   const validation = validateCompanionName(draft);
   const label = displayCompanionName(settings);
+  const selectedPet = getPetDefinition(settings.petId);
+  const spritePet = SPRITE_PETS[selectedPet.id];
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -93,13 +98,22 @@ export default function CompanionPanel({ settings, welcome = false, reducedMotio
             <path d="M10 49h100v4H10zM18 53h84v3H18z" fill="#6d8069" />
             <path d="M30 45h58v4H30zM34 41h50v4H34z" fill="#afa582" />
             <path d="M33 45h52v2H33z" fill="#cfbf99" />
-            <g transform="translate(59 43) scale(1.5)"><CompanionSprite pose={editing ? 'looking' : 'sitting'} appearance={settings.appearance} /></g>
+            {spritePet ? <g transform="translate(59 49)"><SpriteSheet animation={spritePet.animations.seated_idle}
+              frame={0} assetBase={spritePet.assetBase} /></g>
+              : <g transform="translate(59 43) scale(1.5)"><CompanionSprite pose={editing ? 'looking' : 'sitting'} appearance={settings.appearance} /></g>}
             <path d="M16 39h8v10h-8zM18 32h4v8h-4zM13 34h5v5h-5zM22 29h5v6h-5z" fill="#879b73" />
             <path d="M93 21h2v6h-2zM91 23h6v2h-6zM102 35h2v4h-2z" fill="#d7be8c" opacity=".65" />
           </svg>
         </div>
         {welcome ? <><h3>A little friend has arrived!</h3><p className="companion-panel-intro">Um pequeno companheiro chegou ao seu refúgio. Como você gostaria de chamá-lo?</p></>
           : <><h3 className="companion-current-name">{label}</h3><p className="companion-panel-intro">Um pequeno amigo. No seu tempo, do seu jeito.</p></>}
+        <fieldset className="companion-pet-selection">
+          <legend>Seu companheiro</legend>
+          <div className="companion-pet-options">
+            {PETS.map((pet) => <button key={pet.id} type="button" aria-pressed={selectedPet.id === pet.id}
+              onClick={() => onChange({ ...settings, petId: pet.id })}>{pet.label}</button>)}
+          </div>
+        </fieldset>
         {editing ? (
           <form onSubmit={save} noValidate>
             <label className="companion-field-label" htmlFor={nameId}>Nome do companheiro</label>
@@ -120,10 +134,12 @@ export default function CompanionPanel({ settings, welcome = false, reducedMotio
           <div className="companion-settings">
             <div className="companion-setting-row"><span>Nome</span><button ref={renameRef} type="button" className="companion-text-button" onClick={() => { setDraft(settings.name); setEditing(true); setSaved(false); }}>Renomear</button></div>
             <label className="companion-setting-row companion-visibility"><span>Mostrar companheiro<small>Ele pode descansar fora de vista.</small></span><button type="button" role="switch" aria-label="Mostrar companheiro" aria-checked={settings.enabled} onClick={() => onChange({ ...settings, enabled: !settings.enabled })}><span /></button></label>
-            <label className="companion-field-label" htmlFor={appearanceId}>Pelagem do companheiro</label>
-            <select id={appearanceId} value={settings.appearance} onChange={(event) => onChange({ ...settings, appearance: event.target.value })}>
-              {COMPANION_APPEARANCES.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
-            </select>
+            {selectedPet.id === 'cat' && <>
+              <label className="companion-field-label" htmlFor={appearanceId}>Pelagem do companheiro</label>
+              <select id={appearanceId} value={settings.appearance} onChange={(event) => onChange({ ...settings, appearance: event.target.value })}>
+                {COMPANION_APPEARANCES.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
+              </select>
+            </>}
             <p className="companion-settings-note">Carinhos são bem-vindos. Sua companhia nunca vira uma obrigação.</p>
             {saved && <p className="companion-saved" role="status">Nome atualizado.</p>}
           </div>

@@ -13,8 +13,8 @@ streaming, microfone, telemetria ou download durante o uso.
 | `fire.wav` | [Fireplace Sound loop — PagDev](https://opengameart.org/content/fireplace-sound-loop) | CC0 1.0 | Trecho a partir de 2 s; mono/32 kHz, filtro suave, remoção de DC e ganho limitado. |
 | `stream.wav` | [Stream Sounds — kurt](https://opengameart.org/content/stream-sounds), arquivo `stream-waterfall/stream1.ogg` | CC BY 3.0 Unported | Trecho de 1 a 31 s; mono/32 kHz, filtro suave, remoção de DC e ganho limitado. |
 | `crickets.wav` | [Crickets Ambient Noise - loopable — Wolfgang_ / Ted Kerr](https://opengameart.org/content/crickets-ambient-noise-loopable) | CC0 1.0 | Primeiros 11 s; mono/32 kHz, filtro suave, remoção de DC e ganho limitado. |
-| `train-track.wav`, `train-wheels.wav`, `carriage.wav` | [Background Rumble Noise — gryc](https://opengameart.org/content/background-rumble-noise) | CC BY 3.0 Unported | Trecho de 4 a 25 s da mesma gravação real de uma viagem de trem; perfis filtrados descritos abaixo, mono/32 kHz, remoção de DC e ganho limitado. |
-| `leaves.wav` | [20 Rustles of dry leaves — qubodup](https://opengameart.org/content/20-rustles-dry-leaves) | CC0 1.0 | Foley de folhas secas gravado pelo autor na cozinha. Montagem de `rustle02/05/09/12.flac` com envelopes suaves e intervalos, filtro e ganho limitado; não é uma gravação de árvores ao vento. |
+| `train-track.wav`, `train-wheels.wav`, `carriage.wav` | [Background Rumble Noise — gryc](https://opengameart.org/content/background-rumble-noise) | CC BY 3.0 Unported | Revisão de 31/10/2026: trecho de 4 a 21 s da mesma gravação real, perfis mais separados e arranjo cíclico de 48 s; trilhos/rodas recebem articulação original suave das juntas; mono/32 kHz, remoção de DC e ganho linear limitado pelo pico, sem compressor. |
+| `leaves.wav` | [20 Rustles of dry leaves — qubodup](https://opengameart.org/content/20-rustles-dry-leaves) | CC0 1.0 | Revisão de 31/10/2026: montagem de `rustle01–20.flac`, fragmentos sobrepostos e equilibrados individualmente, rajadas irregulares, exclusão de contatos isolados e filtros suaves. Foley de folhas secas gravado na cozinha, arranjado como movimento de vegetação; não é uma gravação de árvores ao vento. |
 
 **Crédito CC BY obrigatório ao redistribuir:** “Stream Sounds”, por kurt, e
 “Background Rumble Noise”, por gryc, disponíveis no OpenGameArt sob Creative Commons
@@ -22,9 +22,18 @@ Attribution 3.0 Unported. Adaptados para Little Haven conforme descrito nesta p�
 Os autores não endossam este aplicativo. Preserve os links das obras e os avisos.
 
 Os três controles do trem destacam regiões diferentes da **mesma gravação de
-interior**, e não representam três gravações isoladas: trilhos usa 70–3000 Hz;
-rodas usa 550–5000 Hz; vagão tem passa-baixas de 320 Hz. Os controles e ganhos são
+interior**, e não representam três gravações isoladas: trilhos usa 100–1400 Hz,
+rodas usa 380–2100 Hz e vagão usa 45–260 Hz. Trilhos e rodas acrescentam pares
+arredondados de juntas sintetizados originalmente pelo projeto, separados por
+185 ms em ciclos de 1,2 s com oscilação lenta. Os controles e ganhos são
 independentes, mas outras partes do trem continuam audíveis em cada perfil.
+
+Folhas e os três perfis ferroviários possuem ciclos de **48 s**, sem um retorno
+periódico a silêncio. Os WAVs contêm mais 750 ms idênticos ao começo: o overlap
+existente do motor consome esse apêndice e conserva o ciclo, em vez de encurtar o
+ritmo. Teto PCM de 0,235 antes dos sliders; nenhum limitador ou compressor novo.
+`environment-audit.json` registra a medição anterior e atual. RMS e pico não
+comprovam reconhecimento ou conforto; a escuta humana continua pendente.
 
 Textos oficiais completos distribuídos com o aplicativo:
 
@@ -50,7 +59,7 @@ periódica até silêncio, e limita cada buffer a pico absoluto de 0.24. Fades f
 chegam a zero real. Fontes desativadas são liberadas após o fade; `dispose()` para
 as fontes, desconecta nós e fecha o contexto. O mute preserva os volumes.
 
-As gravações são WAV PCM mono, 16 bits, 32 kHz, cerca de 12 MB no total. Cada gravação
+As gravações ambientais são WAV PCM mono, 16 bits, 32 kHz, cerca de 19 MB no total. Cada gravação
 é importada sob demanda como módulo local pelo plugin de build
 `scripts/local-audio-plugin.mjs`; não há fetch remoto nem ampliação da CSP.
 O custo de módulos codificados e buffers decodificados é maior que o tamanho WAV;
@@ -82,3 +91,10 @@ de cada WAV final, duração, pico, RMS e parâmetros. Não reproduz som, não e
 arquivos à rede e não altera preferências. A decodificação pode apresentar pequenas
 diferenças entre versões de navegador; o manifest entregue identifica este preparo.
 Os originais temporários em `work/` não são empacotados nem versionados.
+
+Para refazer somente folhas e trem, execute
+`node scripts/refine-environment-audio.mjs` usando os mesmos originais locais.
+`prepare-audio.mjs` chama esse refinamento ao final. As medidas reproduzíveis e
+limitações da escuta constam em [`AUDIO_AUDIT.md`](../../../AUDIO_AUDIT.md);
+`node scripts/audit-audio.mjs` escreve as somas reais em
+`outputs/audio-mix-audit.json`, sem reproduzir áudio.
